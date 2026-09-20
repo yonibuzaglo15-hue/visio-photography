@@ -7,3 +7,4 @@ dist
 .data/
 public/tours/
 .vercel/
+.vercel
