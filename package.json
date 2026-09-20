@@ -1,19 +1,27 @@
 {
   "name": "visio-photography",
   "private": true,
-  "version": "1.0.0",
-  "type": "module",
+  "version": "2.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "@vercel/blob": "^0.27.3",
+    "googleapis": "^173.0.0",
+    "lucide-react": "^0.475.0",
+    "next": "14.2.35",
+    "next-auth": "^4.24.11",
+    "nodemailer": "^8.0.10",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "twilio": "^6.0.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^6.0.5"
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35"
   }
 }

@@ -1,5 +1,9 @@
 node_modules
+.next
 dist
 .env
 .env.local
 .DS_Store
+.data/
+public/tours/
+.vercel/

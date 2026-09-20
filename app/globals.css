@@ -1,0 +1,253 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Heebo:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  background: #060606;
+  color: #e8dfc8;
+  font-family: 'Heebo', sans-serif;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+input, select, textarea, button {
+  font-family: 'Heebo', sans-serif;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #060606; }
+::-webkit-scrollbar-thumb { background: #1e1c14; }
+
+button:hover { opacity: 0.85; }
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.page-content { animation: fadein 0.3s ease; }
+
+.visio-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ── Navbar ── */
+.visio-nav { position: sticky; top: 0; z-index: 100; background: rgba(6,6,4,.96); border-bottom: 1px solid #1e1c14; backdrop-filter: blur(12px); }
+.visio-nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 56px; direction: rtl; }
+.nav-desktop { display: flex; gap: 0; }
+.nav-cta-desktop { display: block; }
+.nav-hamburger { display: none; background: none; border: none; color: #c9a84c; font-size: 24px; cursor: pointer; min-width: 44px; min-height: 44px; padding: 0; line-height: 1; }
+.nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 150; }
+.nav-drawer { display: none; position: fixed; top: 0; right: 0; width: min(280px, 85vw); height: 100vh; background: #0c0c0a; border-left: 1px solid #1e1c14; z-index: 200; flex-direction: column; padding: 72px 0 24px; transform: translateX(100%); transition: transform .3s ease; direction: rtl; overflow-y: auto; }
+.nav-drawer.open { transform: translateX(0); }
+.nav-drawer-btn { width: 100%; padding: 16px 24px; background: none; border: none; border-bottom: 1px solid #1e1c14; font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 3px; color: #4a4538; cursor: pointer; text-align: right; min-height: 48px; }
+.nav-drawer-btn.active { color: #c9a84c; background: #111108; }
+
+/* ── Hero ── */
+.visio-hero { position: relative; min-height: min(600px, 85vh); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: clamp(60px, 12vw, 80px) 20px; text-align: center; overflow: hidden; }
+.visio-hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 8vw, 80px); letter-spacing: clamp(2px, 1vw, 4px); color: #fff; margin: 0 0 8px; line-height: 1.05; text-shadow: 0 2px 24px rgba(0,0,0,.7), 0 0 60px rgba(201,168,76,.25); word-break: break-word; }
+.visio-hero-sub { font-size: clamp(13px, 2.5vw, 14px); color: #4a4538; letter-spacing: 2px; max-width: min(500px, 100%); margin: 16px auto 40px; }
+.visio-hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Stats ── */
+.visio-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1e1c14; border: 1px solid #1e1c14; margin: 0 20px; }
+
+/* ── Section titles ── */
+.visio-section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px, 5vw, 42px); letter-spacing: clamp(3px, 1vw, 6px); color: #e8dfc8; margin: 0 0 12px; line-height: 1.1; }
+
+/* ── Portfolio ── */
+.visio-portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1e1c14; }
+.visio-portfolio-img-wrap { aspect-ratio: 16/9; background: linear-gradient(135deg, #0e100a, #1a1c12); position: relative; overflow: hidden; cursor: zoom-in; }
+.visio-portfolio-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+
+/* ── Pricing ── */
+.visio-pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1e1c14; margin-bottom: 1px; }
+.visio-pricing-card-free { border: 1px solid rgba(111,207,111,.3) !important; }
+
+/* ── Booking ── */
+.visio-booking-wrap { padding: 60px 20px; max-width: 720px; margin: 0 auto; direction: rtl; width: 100%; }
+.visio-calendar-day { min-height: 56px; min-width: 44px; }
+.visio-time-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #1e1c14; }
+.visio-time-slot { min-height: 48px; min-width: 44px; padding: 16px 8px; }
+.visio-form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1e1c14; }
+.visio-btn-primary { min-height: 48px; padding: 14px 24px; cursor: pointer; }
+.visio-input { font-size: 16px; min-height: 48px; padding: 10px 14px; }
+
+/* ── Lightbox / portfolio modal ── */
+.visio-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.95); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; padding: 16px; }
+
+/* ── Admin Premium ── */
+@keyframes visio-spin { to { transform: rotate(360deg); } }
+@keyframes visio-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+.visio-spin { animation: visio-spin 1s linear infinite; }
+.visio-pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: visio-pulse 1.5s ease infinite; margin-right: auto; }
+
+.visio-admin-shell { min-height: 100vh; background: #050505; direction: rtl; }
+.visio-admin-topbar { background: rgba(8,8,6,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 50; }
+.visio-admin-badge { font-size: 9px; letter-spacing: 3px; color: #6b6558; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2); padding: 3px 10px; }
+.visio-admin-layout { display: flex; min-height: calc(100vh - 56px); }
+.visio-admin-sidebar { width: 200px; background: rgba(10,10,8,0.95); border-left: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; display: flex; flex-direction: column; padding: 12px 10px 16px; min-height: calc(100vh - 56px); }
+.visio-admin-sidebar-toggle { display: none; background: none; border: 1px solid rgba(255,255,255,0.08); color: #c9a84c; min-width: 44px; min-height: 44px; cursor: pointer; padding: 0 12px; border-radius: 2px; }
+.visio-admin-nav-item { width: 100%; padding: 14px 18px; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.04); text-align: right; font-size: 13px; color: #6b6558; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all .2s; }
+.visio-admin-nav-item:hover { color: #e8dfc8; background: rgba(255,255,255,0.02); }
+.visio-admin-nav-item.active { color: #c9a84c; background: rgba(201,168,76,0.06); border-right: 2px solid #c9a84c; }
+.visio-admin-main { flex: 1; padding: 32px 28px; overflow-y: auto; min-width: 0; }
+.visio-admin-page-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: #e8dfc8; margin: 0 0 28px; }
+.visio-admin-section-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: #c9a84c; margin: 0 0 16px; }
+.visio-admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.visio-admin-stat { background: rgba(12,12,10,0.72); backdrop-filter: blur(16px); border: 1px solid rgba(201,168,76,0.15); padding: 20px 18px; border-radius: 2px; }
+.visio-admin-stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; color: #c9a84c; margin: 10px 0 4px; }
+.visio-admin-stat-label { font-size: 12px; color: #e8dfc8; }
+.visio-admin-stat-sub { font-size: 10px; color: #6b6558; margin-top: 2px; }
+.visio-admin-table { border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.visio-admin-table-row { display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 16px; padding: 14px 18px; align-items: center; background: rgba(12,12,10,0.5); border-bottom: 1px solid rgba(255,255,255,0.04); }
+.visio-admin-table-row--wide { grid-template-columns: 1fr 1.2fr 0.8fr auto auto; }
+.visio-admin-tag { font-size: 10px; color: #c9a84c; border: 1px solid rgba(201,168,76,0.25); padding: 4px 10px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
+.visio-admin-label { font-size: 10px; letter-spacing: 2px; color: #8a6a28; display: block; margin-bottom: 6px; }
+.visio-admin-input { width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); color: #e8dfc8; padding: 12px 14px; font-size: 14px; outline: none; border-radius: 2px; }
+.visio-admin-input:focus { border-color: rgba(201,168,76,0.4); }
+.visio-admin-btn-primary { padding: 12px 24px; background: linear-gradient(135deg, #c9a84c, #8a6a28); border: none; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 3px; color: #050505; cursor: pointer; border-radius: 2px; font-weight: 600; }
+.visio-admin-btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: none; border: 1px solid rgba(255,255,255,0.1); color: #6b6558; font-size: 12px; cursor: pointer; border-radius: 2px; }
+.visio-admin-btn-signout { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.55); color: #c9a84c; font-size: 12px; letter-spacing: 0.5px; cursor: pointer; border-radius: 2px; font-family: inherit; }
+.visio-admin-btn-signout:hover { background: rgba(201,168,76,0.22); }
+.visio-admin-btn-google { width: 100%; padding: 12px; background: #fff; border: none; font-size: 14px; color: #333; cursor: pointer; border-radius: 2px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.visio-admin-error { margin-top: 12px; padding: 10px 14px; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); font-size: 12px; color: #f87171; }
+.visio-admin-login-wrap { min-height: 100vh; background: #050505; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.visio-admin-login-card { width: 100%; max-width: 400px; overflow: hidden; }
+.visio-admin-login-header { padding: 32px 28px 24px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.visio-admin-login-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.visio-admin-login-tabs button { flex: 1; padding: 14px; background: none; border: none; font-size: 12px; color: #6b6558; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; border-bottom: 2px solid transparent; }
+.visio-admin-login-tabs button.active { color: #c9a84c; border-bottom-color: #c9a84c; background: rgba(201,168,76,0.04); }
+
+.visio-dropzone { border: 1px dashed rgba(201,168,76,0.35); background: rgba(0,0,0,0.25); padding: 36px 24px; text-align: center; cursor: pointer; border-radius: 2px; transition: all .2s; }
+.visio-dropzone:hover, .visio-dropzone.active { border-color: #c9a84c; background: rgba(201,168,76,0.05); }
+.visio-console { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 14px 16px; max-height: 220px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 11px; border-radius: 2px; }
+.visio-console-line { display: flex; gap: 10px; margin-bottom: 6px; color: #6b6558; line-height: 1.5; }
+.visio-console-time { color: #4a4538; flex-shrink: 0; }
+.visio-console-agent { color: #c9a84c; flex-shrink: 0; }
+
+.visio-agents-admin { direction: rtl; }
+.visio-agents-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+.visio-agents-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 5px; color: #8a6a28; margin-bottom: 4px; }
+.visio-agents-tabs { display: flex; gap: 4px; }
+.visio-agents-tabs button { padding: 10px 18px; background: rgba(12,12,10,0.8); border: 1px solid rgba(255,255,255,0.08); color: #6b6558; font-size: 12px; cursor: pointer; border-radius: 2px; }
+.visio-agents-tabs button.active { color: #c9a84c; border-color: rgba(201,168,76,0.35); background: rgba(201,168,76,0.06); }
+.visio-agent-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+.visio-agent-pill { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: rgba(12,12,10,0.6); border: 1px solid; font-size: 11px; color: #e8dfc8; border-radius: 2px; }
+.visio-agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.visio-agent-card { background: rgba(12,12,10,0.72); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); padding: 20px; cursor: pointer; border-radius: 2px; transition: all .2s; }
+.visio-agent-card:hover { border-color: rgba(201,168,76,0.2); }
+.visio-agent-card.selected { border-color: color-mix(in srgb, var(--agent-color) 50%, transparent); box-shadow: 0 0 24px color-mix(in srgb, var(--agent-color) 15%, transparent); }
+.visio-agent-icon-wrap { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); color: var(--agent-color); border-radius: 2px; }
+.visio-agent-name { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--agent-color); }
+.visio-agent-role { font-size: 10px; color: #6b6558; letter-spacing: 1px; margin-top: 2px; }
+.visio-agent-card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.visio-agent-status { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #6b6558; text-transform: uppercase; letter-spacing: 1px; }
+.visio-agent-desc { font-size: 12px; color: #6b6558; line-height: 1.65; margin: 0; }
+.visio-agent-details { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; margin-top: 14px; font-size: 11px; color: #e8dfc8; }
+.visio-agent-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.visio-agent-tools span { font-size: 9px; padding: 3px 8px; border: 1px solid rgba(255,255,255,0.1); color: #8a6a28; }
+
+.visio-pipeline-flow { display: flex; flex-direction: column; gap: 8px; }
+.visio-pipeline-step { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 2px; flex-wrap: wrap; }
+.visio-pipeline-num { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: #4a4538; width: 24px; }
+.visio-pipeline-agent { display: flex; align-items: center; gap: 8px; font-size: 12px; min-width: 120px; }
+.visio-pipeline-arrow { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 10px; color: #6b6558; justify-content: center; min-width: 100px; }
+
+.visio-filter-pills { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.visio-filter-pills button { padding: 6px 14px; background: none; border: 1px solid rgba(255,255,255,0.08); color: #6b6558; font-size: 11px; cursor: pointer; border-radius: 2px; }
+.visio-filter-pills button.active { color: #c9a84c; border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.06); }
+.visio-job-list { display: flex; flex-direction: column; gap: 8px; }
+.visio-job-row { background: rgba(12,12,10,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.visio-job-row-head { width: 100%; display: grid; grid-template-columns: auto 1fr 1fr auto auto; gap: 14px; padding: 14px 16px; align-items: center; background: none; border: none; cursor: pointer; text-align: right; color: inherit; }
+.visio-job-detail { padding: 0 16px 16px; border-top: 1px solid rgba(255,255,255,0.04); }
+.visio-status-pill { font-size: 10px; padding: 4px 10px; border: 1px solid; letter-spacing: 1px; }
+.visio-phase-bar { display: flex; gap: 4px; margin-bottom: 14px; }
+.visio-phase-step { flex: 1; text-align: center; padding: 8px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); font-size: 10px; color: #6b6558; border-radius: 2px; }
+.visio-phase-step.done { color: #c9a84c; border-color: rgba(201,168,76,0.35); }
+.visio-agent-status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.visio-agent-status-cell { padding: 10px 12px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; }
+.visio-agent-status-name { font-size: 10px; color: #e8dfc8; margin: 6px 0 2px; }
+.visio-agent-status-msg { font-size: 9px; color: #6b6558; }
+.visio-progress-bar { margin-top: 6px; height: 2px; background: rgba(255,255,255,0.08); }
+.visio-progress-bar div { height: 100%; transition: width .3s; }
+.visio-file-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.visio-file-tags span { font-size: 9px; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.1); color: #6b6558; }
+.visio-file-tags span.pano { border-color: rgba(96,184,216,0.4); color: #60b8d8; }
+.visio-output-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.visio-output-links a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 11px; text-decoration: none; border-radius: 2px; }
+.visio-output-links a.tour { background: #60b8d8; color: #fff; }
+.visio-output-links a.video { background: #d47ab0; color: #fff; }
+.visio-empty-state { text-align: center; padding: 48px 20px; color: #6b6558; }
+.visio-empty-state p { margin-top: 12px; font-size: 14px; }
+
+/* ── About values grid ── */
+.visio-about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1e1c14; }
+
+/* ── Done confirmation grid ── */
+.visio-done-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1e1c14; max-width: 400px; margin: 28px auto 0; width: 100%; }
+
+/* ── Tablet ── */
+@media (max-width: 768px) {
+  .nav-desktop { display: none !important; }
+  .nav-cta-desktop { display: none !important; }
+  .nav-hamburger { display: flex; align-items: center; justify-content: center; }
+  .nav-overlay { display: block; }
+  .nav-drawer { display: flex; }
+
+  .visio-stats { grid-template-columns: repeat(2, 1fr); margin: 0 12px; }
+  .visio-portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+  .visio-pricing-grid { grid-template-columns: 1fr; }
+  .visio-time-slots { grid-template-columns: repeat(2, 1fr); }
+  .visio-form-grid-2 { grid-template-columns: 1fr; }
+  .visio-about-grid { grid-template-columns: 1fr; }
+
+  .visio-booking-wrap { padding: 40px 16px; }
+  .visio-calendar-day { min-height: 48px; }
+  .visio-admin-sidebar { position: fixed; top: 52px; right: 0; height: calc(100vh - 52px); z-index: 90; transform: translateX(100%); transition: transform .3s ease; width: min(240px, 80vw); }
+  .visio-admin-sidebar.open { transform: translateX(0); }
+  .visio-admin-sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+  .visio-admin-main { padding: 20px 16px; }
+
+  .visio-lightbox img { max-height: 70vh; max-width: 100%; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .visio-nav-inner { padding: 0 12px; }
+  .visio-stats { grid-template-columns: 1fr 1fr; margin: 0 8px; }
+  .visio-portfolio-grid { grid-template-columns: 1fr; }
+  .visio-hero { min-height: 70vh; padding: 48px 16px; }
+  .visio-hero-btns { flex-direction: column; width: 100%; max-width: 280px; }
+  .visio-hero-btns button { width: 100%; min-height: 48px; }
+  .visio-btn-primary { width: 100%; font-size: 16px; }
+  .visio-done-grid { grid-template-columns: 1fr; max-width: 100%; }
+  .visio-input, select, textarea { font-size: 16px !important; }
+}
+
+/* ── Large desktop ── */
+@media (min-width: 1920px) {
+  .visio-nav-inner, .visio-container { max-width: 1400px; }
+  .visio-booking-wrap { max-width: 800px; }
+}
