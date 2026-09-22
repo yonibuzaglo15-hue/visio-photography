@@ -60,12 +60,18 @@ export async function GET(request, { params }) {
     const firstSceneId =
       existingConfig?.default?.firstScene || scenes[0]?.id || null;
 
+    // Prefer site-hosted tour URL; fall back to legacy Blob HTML only if needed
+    let tourUrl = job.outputs?.tourUrl || null;
+    if (!tourUrl || String(tourUrl).includes("blob.vercel-storage.com")) {
+      tourUrl = `/tour/${job.id}`;
+    }
+
     return NextResponse.json({
       ok: true,
       jobId: job.id,
       booking: job.booking || null,
       status: job.status,
-      tourUrl: job.outputs?.tourUrl || null,
+      tourUrl,
       tourJsonUrl: job.outputs?.tourJsonUrl || null,
       provider: job.outputs?.tourUrl?.includes("kuula") ? "kuula" : "pannellum",
       firstSceneId,
@@ -137,6 +143,7 @@ export async function PUT(request, { params }) {
     await updateOutputs(params.id, {
       tourUrl: published.tourUrl,
       tourJsonUrl: published.tourJsonUrl,
+      ...(published.tourHtmlUrl ? { tourHtmlUrl: published.tourHtmlUrl } : {}),
     });
 
     const linkCount = scenes.reduce(

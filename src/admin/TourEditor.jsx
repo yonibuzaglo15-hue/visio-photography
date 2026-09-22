@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Loader2,
   MapPin,
   MousePointerClick,
   Eye,
+  EyeOff,
   Save,
   Trash2,
   ExternalLink,
@@ -13,11 +14,32 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { ADMIN, glassPanel } from "./theme.js";
+import {
+  analyzeTourGraph,
+  buildPannellumConfig,
+} from "../../lib/tour/pannellum-config.js";
+import {
+  FLOOR_NAV_CSS,
+  installFloorNav,
+  prepareFloorHotspots,
+} from "../../lib/tour/floor-nav.js";
 
 const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
 const PANNELLUM_JS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
 
 let pannellumLoadPromise = null;
+let floorCssInjected = false;
+
+function ensureFloorCss() {
+  if (typeof document === "undefined" || floorCssInjected) return;
+  if (!document.getElementById("visio-floor-nav-css")) {
+    const style = document.createElement("style");
+    style.id = "visio-floor-nav-css";
+    style.textContent = FLOOR_NAV_CSS;
+    document.head.appendChild(style);
+  }
+  floorCssInjected = true;
+}
 
 function loadPannellum() {
   if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
@@ -120,11 +142,14 @@ export default function TourEditor() {
   const [viewerReady, setViewerReady] = useState(false);
 
   const viewerRef = useRef(null);
+  const floorNavRef = useRef(null);
+  const walkRef = useRef(null);
   const containerRef = useRef(null);
   const placeModeRef = useRef(false);
   const pendingTargetRef = useRef("");
   const scenesRef = useRef(scenes);
   const activeSceneIdRef = useRef(activeSceneId);
+  const skipRemountRef = useRef(false);
 
   useEffect(() => {
     placeModeRef.current = placeMode;
@@ -141,7 +166,18 @@ export default function TourEditor() {
 
   useEffect(() => {
     setTextureLimit(probeTextureLimit());
+    ensureFloorCss();
   }, []);
+
+  const graphStats = useMemo(
+    () => analyzeTourGraph(scenes, firstSceneId),
+    [scenes, firstSceneId]
+  );
+  const statsById = useMemo(() => {
+    const m = new Map();
+    for (const g of graphStats) m.set(g.id, g);
+    return m;
+  }, [graphStats]);
 
   const loadJobs = useCallback(async () => {
     try {
@@ -165,6 +201,14 @@ export default function TourEditor() {
   }, [loadJobs]);
 
   const destroyViewer = useCallback(() => {
+    if (floorNavRef.current) {
+      try {
+        floorNavRef.current.destroy();
+      } catch {
+        /* ignore */
+      }
+      floorNavRef.current = null;
+    }
     if (viewerRef.current) {
       try {
         viewerRef.current.destroy();
@@ -197,10 +241,14 @@ export default function TourEditor() {
         return;
       }
 
-      const list = data.scenes || [];
+      const list = (data.scenes || []).map((s) => ({
+        ...s,
+        hidden: Boolean(s.hidden),
+        hotSpots: s.hotSpots || [],
+      }));
       setScenes(list);
-      setFirstSceneId(data.firstSceneId || list[0]?.id || "");
-      setActiveSceneId(list[0]?.id || "");
+      setFirstSceneId(data.firstSceneId || list.find((s) => !s.hidden)?.id || list[0]?.id || "");
+      setActiveSceneId(list.find((s) => !s.hidden)?.id || list[0]?.id || "");
       setTourUrl(data.tourUrl);
       if (list.length === 0) {
         setError("אין פנורמות ב-job. העלה קבצי X4 בטאב Pipeline קודם.");
@@ -240,97 +288,155 @@ export default function TourEditor() {
     setDirty(true);
   }, []);
 
+  const placeHotspot = useCallback(
+    (pitch, yaw) => {
+      const targetId = pendingTargetRef.current;
+      if (!targetId) return;
+      const sceneId = activeSceneIdRef.current;
+      const target = scenesRef.current.find((s) => s.id === targetId);
+      const origin = scenesRef.current.find((s) => s.id === sceneId);
+
+      applySceneUpdate(sceneId, (scene) => ({
+        ...scene,
+        hotSpots: [
+          ...(scene.hotSpots || []),
+          {
+            id: newHotspotId(),
+            pitch,
+            yaw,
+            targetSceneId: targetId,
+            text: target?.title || "חדר",
+          },
+        ],
+      }));
+
+      setPlaceMode(false);
+      setPendingTarget("");
+
+      const targetTitle = target?.title || "B";
+      const originTitle = origin?.title || "A";
+      const addBack = window.confirm(
+        `הוסף גם נקודה חזרה מ-${targetTitle} ל-${originTitle}?`
+      );
+      if (addBack) {
+        activeSceneIdRef.current = targetId;
+        setActiveSceneId(targetId);
+        setPendingTarget(sceneId);
+        setPlaceMode(true);
+        setOkMsg(`לחץ על הרצפה ב-${targetTitle} במקום שבו רואים את ${originTitle}`);
+      } else {
+        setOkMsg("נקודת ניווט נוספה — שמור כדי לפרסם");
+      }
+    },
+    [applySceneUpdate]
+  );
+
   const mountViewer = useCallback(async () => {
-    if (!activeScene?.panoramaUrl || !containerRef.current) return;
+    if (!scenesRef.current.length || !containerRef.current) return;
 
     destroyViewer();
     setViewerReady(false);
+    ensureFloorCss();
 
     try {
       const pannellum = await loadPannellum();
       if (!containerRef.current) return;
 
+      const startId =
+        activeSceneIdRef.current ||
+        scenesRef.current.find((s) => !s.hidden)?.id ||
+        scenesRef.current[0]?.id;
+
+      const config = buildPannellumConfig({
+        scenes: scenesRef.current,
+        firstSceneId: startId,
+        includeHidden: true,
+      });
+      if (config.default) {
+        config.default.firstScene = startId;
+        config.default.sceneFadeDuration = 400;
+        config.default.hotSpotDebug = false;
+      }
+
+      const walkBridge = { current: null };
+      prepareFloorHotspots(config, {
+        cssClass: "visio-editor-hotspot",
+        onHover: (sceneId) => {
+          if (floorNavRef.current?.preloadScene) {
+            floorNavRef.current.preloadScene(sceneId);
+          }
+        },
+        onClick: (hs) => {
+          if (placeModeRef.current) return;
+          if (typeof walkBridge.current === "function") walkBridge.current(hs);
+        },
+      });
+
       containerRef.current.innerHTML = "";
-      const viewer = pannellum.viewer(containerRef.current, {
-        type: "equirectangular",
-        panorama: activeScene.panoramaUrl,
-        autoLoad: true,
-        showControls: true,
-        compass: true,
-        yaw: activeScene.yaw ?? 0,
-        pitch: activeScene.pitch ?? 0,
-        hfov: activeScene.hfov ?? 100,
-        hotSpotDebug: false,
-        crossOrigin: "anonymous",
-        hotSpots: (activeScene.hotSpots || []).map((h) => ({
-          id: h.id,
-          pitch: h.pitch,
-          yaw: h.yaw,
-          type: "info",
-          text: h.text || scenesRef.current.find((s) => s.id === h.targetSceneId)?.title || "חץ",
-          cssClass: "visio-editor-hotspot",
-        })),
+      const viewer = pannellum.viewer(containerRef.current, config);
+
+      const nav = installFloorNav(viewer, config, {
+        walkRef: walkBridge,
+        isPlaceMode: () => placeModeRef.current,
+        onFloorPlace: (pitch, yaw) => placeHotspot(pitch, yaw),
+        onSceneChange: (sceneId) => {
+          if (sceneId && sceneId !== activeSceneIdRef.current) {
+            skipRemountRef.current = true;
+            setActiveSceneId(sceneId);
+          }
+        },
       });
 
-      let pointerDown = null;
-      viewer.on("mousedown", (event) => {
-        pointerDown = { x: event.clientX, y: event.clientY, event };
-      });
-      viewer.on("mouseup", (event) => {
-        if (!placeModeRef.current || !pointerDown) return;
-        const moved = Math.hypot(
-          event.clientX - pointerDown.x,
-          event.clientY - pointerDown.y
-        );
-        const sourceEvent = moved < 6 ? pointerDown.event : null;
-        pointerDown = null;
-        if (!sourceEvent) return;
-
-        const targetId = pendingTargetRef.current;
-        if (!targetId) return;
-
-        const coords = viewer.mouseEventToCoords(sourceEvent);
-        if (!coords) return;
-        const [pitch, yaw] = coords;
-        const sceneId = activeSceneIdRef.current;
-        const target = scenesRef.current.find((s) => s.id === targetId);
-
-        applySceneUpdate(sceneId, (scene) => ({
-          ...scene,
-          hotSpots: [
-            ...(scene.hotSpots || []),
-            {
-              id: newHotspotId(),
-              pitch,
-              yaw,
-              targetSceneId: targetId,
-              text: target?.title || "חדר",
-            },
-          ],
-        }));
-
-        setPlaceMode(false);
-        setOkMsg("חץ נוסף — שמור כדי לפרסם");
-      });
-
+      walkRef.current = walkBridge;
+      floorNavRef.current = nav;
       viewerRef.current = viewer;
       setViewerReady(true);
     } catch (err) {
       setError(err.message || "שגיאה בטעינת הצופה");
     }
-  }, [activeScene, destroyViewer, applySceneUpdate]);
+  }, [destroyViewer, placeHotspot]);
 
-  // Remount viewer when scene identity or hotspot count changes for that scene
-  const hotspotSignature = activeScene
-    ? `${activeScene.id}:${(activeScene.hotSpots || []).map((h) => h.id).join(",")}`
-    : "";
+  const tourSignature = scenes
+    .map(
+      (s) =>
+        `${s.id}:${s.hidden ? 1 : 0}:${s.panoramaUrl}:${(s.hotSpots || [])
+          .map((h) => `${h.id}:${h.targetSceneId}:${Number(h.yaw).toFixed(2)}:${Number(h.pitch).toFixed(2)}`)
+          .join(",")}`
+    )
+    .join("|");
 
   useEffect(() => {
-    if (!activeScene?.panoramaUrl) return undefined;
+    if (!scenes.length) return undefined;
+    if (skipRemountRef.current) {
+      skipRemountRef.current = false;
+      return undefined;
+    }
     mountViewer();
     return () => destroyViewer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- remount on scene/hotspot identity only
-  }, [activeScene?.id, activeScene?.panoramaUrl, hotspotSignature]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- remount on tour graph identity
+  }, [jobId, tourSignature]);
+
+  const selectScene = (sceneId) => {
+    setActiveSceneId(sceneId);
+    const viewer = viewerRef.current;
+    if (viewer && typeof viewer.loadScene === "function") {
+      try {
+        const sc = scenesRef.current.find((s) => s.id === sceneId);
+        if (sc && viewer.getConfig()?.scenes?.[sceneId]) {
+          skipRemountRef.current = true;
+          viewer.loadScene(
+            sceneId,
+            sc.pitch ?? 0,
+            sc.yaw ?? 0,
+            sc.hfov ?? 100
+          );
+          return;
+        }
+      } catch {
+        /* fall through to remount via signature if needed */
+      }
+    }
+  };
 
   const captureStartView = () => {
     const viewer = viewerRef.current;
@@ -349,6 +455,13 @@ export default function TourEditor() {
     applySceneUpdate(activeSceneId, (scene) => ({
       ...scene,
       hotSpots: (scene.hotSpots || []).filter((h) => h.id !== hsId),
+    }));
+  };
+
+  const toggleHidden = (sceneId) => {
+    applySceneUpdate(sceneId, (scene) => ({
+      ...scene,
+      hidden: !scene.hidden,
     }));
   };
 
@@ -382,7 +495,7 @@ export default function TourEditor() {
       if (!data.ok) throw new Error(data.error || "שמירה נכשלה");
       setTourUrl(data.tourUrl);
       setDirty(false);
-      setOkMsg(`נשמר · ${data.sceneCount} סצנות · ${data.linkCount} קישורים`);
+      setOkMsg(`נשמר · ${data.sceneCount} סצנות גלויות · ${data.linkCount} קישורים`);
     } catch (err) {
       setError(err.message || "שמירה נכשלה");
     } finally {
@@ -399,8 +512,8 @@ export default function TourEditor() {
     <div>
       <h1 className="visio-admin-page-title">עורך סיור 360°</h1>
       <p style={{ color: ADMIN.muted, fontSize: 13, marginTop: -16, marginBottom: 24, lineHeight: 1.7, maxWidth: 640 }}>
-        בחר job עם פנורמות X4 → תן שמות לחדרים → לחץ להוספת חצים בין חדרים → שמור.
-        הסיור הציבורי מתעדכן באותם נתיבי Blob (ללא התחברות).
+        בחר job עם פנורמות X4 → תן שמות לחדרים → לחץ על הרצפה להוספת נקודות ניווט → שמור.
+        הסיור הציבורי משתמש בדיסקיות רצפה ומעבר הליכה (כמו Matterport).
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20, alignItems: "flex-end" }}>
@@ -434,9 +547,9 @@ export default function TourEditor() {
           {saving ? <Loader2 size={14} className="visio-spin" /> : <Save size={14} />}
           {" "}שמור סיור
         </button>
-        {tourUrl && (
+        {jobId && (
           <a
-            href={tourUrl}
+            href={`/tour/${jobId}`}
             target="_blank"
             rel="noreferrer"
             className="visio-admin-btn-ghost"
@@ -466,29 +579,71 @@ export default function TourEditor() {
         <div className="visio-tour-editor-grid">
           <aside style={{ ...glassPanel, padding: 16 }}>
             <div className="visio-admin-section-title" style={{ marginBottom: 12 }}>חדרים</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {scenes.map((scene) => (
-                <button
-                  key={scene.id}
-                  type="button"
-                  onClick={() => setActiveSceneId(scene.id)}
-                  style={{
-                    textAlign: "right",
-                    padding: "10px 12px",
-                    background: scene.id === activeSceneId ? "var(--visio-gold-wash)" : "var(--visio-input-bg)",
-                    border: `1px solid ${scene.id === activeSceneId ? "var(--visio-gold-border-strong)" : "var(--visio-border-subtle)"}`,
-                    color: ADMIN.text,
-                    cursor: "pointer",
-                    borderRadius: 2,
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{scene.title || scene.id}</div>
-                  <div style={{ fontSize: 10, color: ADMIN.muted, marginTop: 4 }}>
-                    {(scene.hotSpots || []).length} חצים
-                    {firstSceneId === scene.id ? " · התחלה" : ""}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 520, overflowY: "auto" }}>
+              {scenes.map((scene) => {
+                const g = statsById.get(scene.id);
+                const pointCount = (scene.hotSpots || []).length;
+                return (
+                  <div
+                    key={scene.id}
+                    style={{
+                      padding: "10px 12px",
+                      background: scene.id === activeSceneId ? "var(--visio-gold-wash)" : "var(--visio-input-bg)",
+                      border: `1px solid ${scene.id === activeSceneId ? "var(--visio-gold-border-strong)" : "var(--visio-border-subtle)"}`,
+                      borderRadius: 2,
+                      opacity: scene.hidden ? 0.55 : 1,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => selectScene(scene.id)}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        textAlign: "right",
+                        background: "none",
+                        border: "none",
+                        color: ADMIN.text,
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>
+                        {scene.title || scene.id}
+                        {scene.hidden ? " · מוסתר" : ""}
+                      </div>
+                      <div style={{ fontSize: 10, color: ADMIN.muted, marginTop: 4 }}>
+                        {pointCount} נקודות
+                        {firstSceneId === scene.id ? " · התחלה" : ""}
+                        {g?.isDeadEnd && !scene.hidden ? " · ללא יציאה" : ""}
+                        {g?.isUnreachable && !scene.hidden ? " · לא נגיש" : ""}
+                      </div>
+                    </button>
+                    {(g?.isDeadEnd || g?.isUnreachable) && !scene.hidden && (
+                      <div style={{ marginTop: 6, fontSize: 10, color: ADMIN.error, display: "flex", alignItems: "center", gap: 4 }}>
+                        <AlertTriangle size={11} />
+                        {g.isDeadEnd && g.isUnreachable
+                          ? "מבוי סתום ולא נגיש"
+                          : g.isDeadEnd
+                            ? "אין נקודות יציאה"
+                            : "שום סצנה לא מקשרת לכאן"}
+                      </div>
+                    )}
+                    <div style={{ marginTop: 8, display: "flex", gap: 6 }}>
+                      <button
+                        type="button"
+                        className="visio-admin-btn-ghost"
+                        style={{ padding: "4px 8px", fontSize: 11, flex: 1 }}
+                        onClick={() => toggleHidden(scene.id)}
+                        title={scene.hidden ? "הצג בסיור" : "הסתר מהסיור"}
+                      >
+                        {scene.hidden ? <Eye size={12} /> : <EyeOff size={12} />}
+                        {scene.hidden ? " הצג" : " הסתר"}
+                      </button>
+                    </div>
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
 
             {activeScene && (
@@ -509,7 +664,7 @@ export default function TourEditor() {
                     setDirty(true);
                   }}
                 >
-                  {scenes.map((s) => (
+                  {scenes.filter((s) => !s.hidden).map((s) => (
                     <option key={s.id} value={s.id}>{s.title || s.id}</option>
                   ))}
                 </select>
@@ -532,7 +687,7 @@ export default function TourEditor() {
             <div style={{ padding: 16, borderTop: "1px solid var(--visio-border-subtle)" }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 12 }}>
                 <div style={{ flex: "1 1 180px" }}>
-                  <label className="visio-admin-label">יעד לחץ הבא</label>
+                  <label className="visio-admin-label">יעד לנקודה הבאה</label>
                   <select
                     className="visio-admin-input"
                     value={pendingTarget}
@@ -541,7 +696,9 @@ export default function TourEditor() {
                   >
                     <option value="">— בחר חדר יעד —</option>
                     {otherScenes.map((s) => (
-                      <option key={s.id} value={s.id}>{s.title || s.id}</option>
+                      <option key={s.id} value={s.id}>
+                        {s.title || s.id}{s.hidden ? " (מוסתר)" : ""}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -559,7 +716,7 @@ export default function TourEditor() {
                   onClick={() => setPlaceMode((v) => !v)}
                 >
                   <MousePointerClick size={14} />
-                  {placeMode ? "לחץ על התמונה…" : "הוסף חץ"}
+                  {placeMode ? "לחץ על הרצפה…" : "הוסף נקודה"}
                 </button>
                 <button
                   type="button"
@@ -576,13 +733,13 @@ export default function TourEditor() {
               {placeMode && (
                 <div style={{ fontSize: 12, color: ADMIN.accent, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                   <MapPin size={14} />
-                  מצב מיקום פעיל — לחץ על הכיוון בדלת / מעבר בחדר
+                  מצב מיקום — לחץ על הרצפה במקום הצילום הבא (לא על משקוף הדלת)
                 </div>
               )}
 
-              <div className="visio-admin-section-title" style={{ fontSize: 13, marginBottom: 8 }}>חצים בחדר זה</div>
+              <div className="visio-admin-section-title" style={{ fontSize: 13, marginBottom: 8 }}>נקודות בחדר זה</div>
               {(activeScene?.hotSpots || []).length === 0 ? (
-                <div style={{ fontSize: 12, color: ADMIN.muted }}>אין חצים עדיין</div>
+                <div style={{ fontSize: 12, color: ADMIN.muted }}>אין נקודות עדיין</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {(activeScene.hotSpots || []).map((h) => (
@@ -630,7 +787,7 @@ export default function TourEditor() {
                         className="visio-admin-btn-ghost"
                         style={{ color: ADMIN.error, padding: 8 }}
                         onClick={() => removeHotspot(h.id)}
-                        aria-label="מחק חץ"
+                        aria-label="מחק נקודה"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -671,13 +828,11 @@ export default function TourEditor() {
                 <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
                 <span>
                   פנורמה ~8K — ייתכן עומס על GPU במובייל ישן (מגבלת טקסטורה {textureLimit || "?"}px).
-                  לא משנים גודל אוטומטית. אם הטעינה נכשלת או איטית מאוד בטלפון — ראו המלצת downscale/multires אחרי הבדיקה.
                 </span>
               </div>
             )}
             <p style={{ marginTop: 14, fontSize: 11, color: ADMIN.muted, lineHeight: 1.7 }}>
-              סיווג: קבצים עם יחס ~2:1 או שם Insta360/360 מסווגים כפנורמה equirectangular.
-              X4 ב־8192×4096 עובר את בדיקת היחס.
+              נקודות ניווט = דיסקיות רצפה. קישור דו־כיווני קובע את כיוון ההגעה אחרי מעבר.
             </p>
           </aside>
         </div>

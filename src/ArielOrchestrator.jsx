@@ -330,7 +330,7 @@ export default function ArielOrchestrator({ onJobsMutated, onSelectForUpload, re
                     {job.status === "ready" && job.outputs && (
                       <div className="visio-output-links">
                         {job.outputs.tourUrl && (
-                          <a href={job.outputs.tourUrl} target="_blank" rel="noreferrer" className="tour">
+                          <a href={`/tour/${job.id}`} target="_blank" rel="noreferrer" className="tour">
                             <Globe size={14} /> סיור וירטואלי
                           </a>
                         )}

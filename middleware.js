@@ -9,6 +9,9 @@ import { isEmailAllowed } from "@/lib/auth/allowlist.js";
  *
  * /admin/login is excluded from the gate so signed-out users can reach it.
  * After sign-in we always send people to /admin (deep /admin/* may 404).
+ *
+ * Public tours live at /tour/[jobId] — intentionally NOT in the matcher below,
+ * so they stay unauthenticated. Do not add /tour to this matcher.
  */
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
@@ -66,5 +69,6 @@ export const config = {
     "/admin",
     "/admin/:path*",
     "/api/pipeline/:path*",
+    "/api/branding/:path*",
   ],
 };

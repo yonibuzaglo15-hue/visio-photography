@@ -262,13 +262,13 @@ button:hover { opacity: 0.85; }
   align-items: start;
 }
 .visio-tour-editor-viewer .pnlm-container { background: #0a0a0a; }
+/* Floor discs: styles injected from lib/tour/floor-nav.js (FLOOR_NAV_CSS) */
 .pnlm-hotspot.visio-editor-hotspot {
-  background: rgba(201,168,76,0.95);
-  border: 2px solid #0a0a0a;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+  background: transparent;
+  border: none;
+  width: 0;
+  height: 0;
+  box-shadow: none;
 }
 @media (max-width: 1100px) {
   .visio-tour-editor-grid {
