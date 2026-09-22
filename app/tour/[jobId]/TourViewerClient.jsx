@@ -10,6 +10,7 @@ import {
   applyDevicePanoramas,
   probeMaxTextureSize,
 } from "../../../lib/tour/viewer-sizes.js";
+import TourMiniMap from "../../../src/tour/TourMiniMap.jsx";
 
 const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
 const PANNELLUM_JS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
@@ -65,10 +66,13 @@ export default function TourViewerClient({ config: initialConfig }) {
   const navRef = useRef(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sceneId, setSceneId] = useState(initialConfig?.default?.firstScene || "");
+  const [yaw, setYaw] = useState(0);
   const loadStarted = useRef(typeof performance !== "undefined" ? performance.now() : 0);
 
   useEffect(() => {
     let cancelled = false;
+    let yawTimer = null;
     async function boot() {
       if (!initialConfig || !containerRef.current) return;
       ensureCss();
@@ -87,15 +91,21 @@ export default function TourViewerClient({ config: initialConfig }) {
 
         const walkRef = { current: null };
         prepareFloorHotspots(config, {
-          onHover: (sceneId) => navRef.current?.preloadScene?.(sceneId),
+          onHover: (sceneIdNext) => navRef.current?.preloadScene?.(sceneIdNext),
           onClick: (hs) => walkRef.current?.(hs),
         });
 
         containerRef.current.innerHTML = "";
         const viewer = pannellum.viewer(containerRef.current, config);
-        const nav = installFloorNav(viewer, config, { walkRef });
+        const nav = installFloorNav(viewer, config, {
+          walkRef,
+          onSceneChange: (id) => {
+            if (id) setSceneId(id);
+          },
+        });
         viewerRef.current = viewer;
         navRef.current = nav;
+        setSceneId(viewer.getScene?.() || config.default?.firstScene || "");
 
         viewer.on("load", () => {
           if (cancelled) return;
@@ -106,6 +116,15 @@ export default function TourViewerClient({ config: initialConfig }) {
             console.info("[visio-tour] first scene load ms", Math.round(ms));
           }
         });
+
+        yawTimer = setInterval(() => {
+          try {
+            if (viewerRef.current) setYaw(viewerRef.current.getYaw());
+          } catch {
+            /* ignore */
+          }
+        }, 120);
+
         setTimeout(() => {
           if (!cancelled) setLoading(false);
         }, 8000);
@@ -119,6 +138,7 @@ export default function TourViewerClient({ config: initialConfig }) {
     boot();
     return () => {
       cancelled = true;
+      if (yawTimer) clearInterval(yawTimer);
       try {
         navRef.current?.destroy?.();
       } catch {
@@ -133,6 +153,8 @@ export default function TourViewerClient({ config: initialConfig }) {
       viewerRef.current = null;
     };
   }, [initialConfig]);
+
+  const floorPlans = initialConfig?.floorPlans || [];
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#0a0a0a" }}>
@@ -176,6 +198,13 @@ export default function TourViewerClient({ config: initialConfig }) {
           {error}
         </div>
       )}
+      <TourMiniMap
+        floorPlans={floorPlans}
+        scenes={initialConfig?.scenes || {}}
+        currentSceneId={sceneId}
+        yaw={yaw}
+        onJump={(id) => navRef.current?.jumpToScene?.(id)}
+      />
       <div
         style={{
           position: "fixed",

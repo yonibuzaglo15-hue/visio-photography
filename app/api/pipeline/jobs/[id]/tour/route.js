@@ -3,6 +3,7 @@ import { getJob, updateOutputs, addLog } from "@/lib/pipeline/store.js";
 import { requireAllowedApi } from "@/lib/auth/require.js";
 import {
   configToEditorScenes,
+  configToFloorPlanState,
   panoramasToEditorScenes,
   publishTour,
 } from "@/lib/agents/tour-agent.js";
@@ -45,12 +46,20 @@ export async function GET(request, { params }) {
     const panoramas = panoramasFromJob(job);
     const existingConfig = await fetchTourConfig(job.outputs?.tourJsonUrl);
     let scenes = configToEditorScenes(existingConfig);
+    const { floorPlans: fromConfig, floorPlanMeta } =
+      configToFloorPlanState(existingConfig);
+
+    const floorPlans =
+      fromConfig.length > 0
+        ? fromConfig
+        : Array.isArray(job.outputs?.floorPlans)
+          ? job.outputs.floorPlans
+          : [];
 
     if (scenes.length === 0 && panoramas.length > 0) {
       scenes = panoramasToEditorScenes(panoramas);
     }
 
-    // Prefer live blob URLs from job files when scene panorama is missing
     scenes = scenes.map((scene, i) => {
       if (scene.panoramaUrl) return scene;
       const p = panoramas[i];
@@ -60,7 +69,6 @@ export async function GET(request, { params }) {
     const firstSceneId =
       existingConfig?.default?.firstScene || scenes[0]?.id || null;
 
-    // Prefer site-hosted tour URL; fall back to legacy Blob HTML only if needed
     let tourUrl = job.outputs?.tourUrl || null;
     if (!tourUrl || String(tourUrl).includes("blob.vercel-storage.com")) {
       tourUrl = `/tour/${job.id}`;
@@ -76,6 +84,8 @@ export async function GET(request, { params }) {
       provider: job.outputs?.tourUrl?.includes("kuula") ? "kuula" : "pannellum",
       firstSceneId,
       scenes,
+      floorPlans,
+      floorPlanMeta,
       panoramaCount: panoramas.length,
     });
   } catch (err) {
@@ -98,6 +108,11 @@ export async function PUT(request, { params }) {
 
     const body = await request.json();
     const scenes = Array.isArray(body.scenes) ? body.scenes : [];
+    const floorPlans = Array.isArray(body.floorPlans) ? body.floorPlans : [];
+    const floorPlanMeta =
+      body.floorPlanMeta && typeof body.floorPlanMeta === "object"
+        ? body.floorPlanMeta
+        : null;
 
     if (scenes.length === 0) {
       return NextResponse.json(
@@ -138,12 +153,18 @@ export async function PUT(request, { params }) {
         ? body.firstSceneId
         : scenes[0].id;
 
-    const published = await publishTour(params.id, { scenes, firstSceneId });
+    const published = await publishTour(params.id, {
+      scenes,
+      firstSceneId,
+      floorPlans,
+      floorPlanMeta,
+    });
 
     await updateOutputs(params.id, {
       tourUrl: published.tourUrl,
       tourJsonUrl: published.tourJsonUrl,
       ...(published.tourHtmlUrl ? { tourHtmlUrl: published.tourHtmlUrl } : {}),
+      ...(floorPlans.length ? { floorPlans } : {}),
     });
 
     const linkCount = scenes.reduce(

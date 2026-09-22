@@ -23,6 +23,10 @@ import {
   installFloorNav,
   prepareFloorHotspots,
 } from "../../lib/tour/floor-nav.js";
+import FloorPlanPanel from "./FloorPlanPanel.jsx";
+import {
+  DEFAULT_MAX_DIST_NORM,
+} from "../../lib/tour/floor-plan.js";
 
 const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
 const PANNELLUM_JS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
@@ -140,6 +144,14 @@ export default function TourEditor() {
   const [textureLimit, setTextureLimit] = useState(null);
   const [panoMeta, setPanoMeta] = useState(null);
   const [viewerReady, setViewerReady] = useState(false);
+  const [floorPlans, setFloorPlans] = useState([]);
+  const [floorPlanMeta, setFloorPlanMeta] = useState({
+    maxDistNorm: DEFAULT_MAX_DIST_NORM,
+    metersPerNorm: 12,
+    cameraHeightM: 1.55,
+    deletedLinks: [],
+    addedLinks: [],
+  });
 
   const viewerRef = useRef(null);
   const floorNavRef = useRef(null);
@@ -167,6 +179,17 @@ export default function TourEditor() {
   useEffect(() => {
     setTextureLimit(probeTextureLimit());
     ensureFloorCss();
+    const onReadYaw = () => {
+      try {
+        if (viewerRef.current) {
+          window.__visioEditorYaw = viewerRef.current.getYaw();
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("visio-read-yaw", onReadYaw);
+    return () => window.removeEventListener("visio-read-yaw", onReadYaw);
   }, []);
 
   const graphStats = useMemo(
@@ -247,6 +270,18 @@ export default function TourEditor() {
         hotSpots: s.hotSpots || [],
       }));
       setScenes(list);
+      setFloorPlans(Array.isArray(data.floorPlans) ? data.floorPlans : []);
+      setFloorPlanMeta(
+        data.floorPlanMeta && typeof data.floorPlanMeta === "object"
+          ? data.floorPlanMeta
+          : {
+              maxDistNorm: DEFAULT_MAX_DIST_NORM,
+              metersPerNorm: 12,
+              cameraHeightM: 1.55,
+              deletedLinks: [],
+              addedLinks: [],
+            }
+      );
       setFirstSceneId(data.firstSceneId || list.find((s) => !s.hidden)?.id || list[0]?.id || "");
       setActiveSceneId(list.find((s) => !s.hidden)?.id || list[0]?.id || "");
       setTourUrl(data.tourUrl);
@@ -489,7 +524,7 @@ export default function TourEditor() {
       const res = await fetch(`/api/pipeline/jobs/${jobId}/tour`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenes, firstSceneId }),
+        body: JSON.stringify({ scenes, firstSceneId, floorPlans, floorPlanMeta }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "שמירה נכשלה");
@@ -511,9 +546,9 @@ export default function TourEditor() {
   return (
     <div>
       <h1 className="visio-admin-page-title">עורך סיור 360°</h1>
-      <p style={{ color: ADMIN.muted, fontSize: 13, marginTop: -16, marginBottom: 24, lineHeight: 1.7, maxWidth: 640 }}>
-        בחר job עם פנורמות X4 → תן שמות לחדרים → לחץ על הרצפה להוספת נקודות ניווט → שמור.
-        הסיור הציבורי משתמש בדיסקיות רצפה ומעבר הליכה (כמו Matterport).
+      <p style={{ color: ADMIN.muted, fontSize: 13, marginTop: -16, marginBottom: 24, lineHeight: 1.7, maxWidth: 720 }}>
+        העלה תוכנית קומה → גרור סצנות לנקודות → כייל כיוון → חשב קישורים אוטומטית.
+        עריכה ידנית של דיסקיות נשארת כגיבוי.
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20, alignItems: "flex-end" }}>
@@ -836,6 +871,24 @@ export default function TourEditor() {
             </p>
           </aside>
         </div>
+      )}
+
+      {!loading && scenes.length > 0 && (
+        <FloorPlanPanel
+          jobId={jobId}
+          scenes={scenes}
+          floorPlans={floorPlans}
+          floorPlanMeta={floorPlanMeta}
+          activeSceneId={activeSceneId}
+          onScenesChange={(next) => {
+            setScenes(next);
+            setDirty(true);
+          }}
+          onFloorPlansChange={setFloorPlans}
+          onFloorPlanMetaChange={setFloorPlanMeta}
+          onSelectScene={selectScene}
+          onDirty={() => setDirty(true)}
+        />
       )}
     </div>
   );
