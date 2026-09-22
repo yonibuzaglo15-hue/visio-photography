@@ -1,0 +1,25 @@
+-- Pipeline job property/agency/client details
+-- Jobs already live in pipeline_jobs.data (jsonb). No new columns required.
+-- The app stores a `details` object inside `data` alongside booking/files/agents/outputs.
+--
+-- Optional: if you want to query by city/agency without parsing JSONB, you can add
+-- generated columns later. For Phase 1, the JSONB path is enough.
+--
+-- Example shape inside data.details:
+-- {
+--   "property": { "street", "houseNumber", "apartment", "floor", "city",
+--                 "propertyType", "rooms", "sqm" },
+--   "agency": { "agencyId", "agentId" },
+--   "client": { "name", "phone", "email" },
+--   "shoot": { "date", "time", "pkg" },
+--   "notes": ""
+-- }
+--
+-- No migration DDL is required for existing Supabase projects that already have
+-- pipeline_jobs as defined in lib/pipeline/supabase-schema.sql.
+--
+-- Optional indexes (safe to run; no-ops if you skip them):
+-- create index if not exists pipeline_jobs_details_city_idx
+--   on pipeline_jobs ((data->'details'->'property'->>'city'));
+-- create index if not exists pipeline_jobs_details_agency_idx
+--   on pipeline_jobs ((data->'details'->'agency'->>'agencyId'));

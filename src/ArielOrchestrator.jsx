@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Inbox,
   Zap,
@@ -15,8 +15,15 @@ import {
   Network,
   Loader2,
   AlertTriangle,
+  Pencil,
 } from "lucide-react";
 import { ADMIN, glassPanel, AGENT_META } from "./admin/theme.js";
+import JobDetailsForm from "./admin/JobDetailsForm.jsx";
+import {
+  ensureJobDetails,
+  jobDisplaySubtitle,
+  jobDisplayTitle,
+} from "@/lib/pipeline/job-details.js";
 
 const STATUS_MAP = {
   intake: { label: "קליטת קבצים", color: ADMIN.gold, Icon: Inbox },
@@ -33,6 +40,15 @@ const PHASES = [
 
 const AGENT_ICONS = { ariel: Network, tour: Globe, video: Film, creative: Image };
 const AGENT_NAMES = { ariel: "אריאל", tour: "סיור 360°", video: "וידאו", creative: "קריאייטיב" };
+
+function jobsSignature(jobs) {
+  return (jobs || [])
+    .map(
+      (j) =>
+        `${j.id}:${j.status}:${j.updatedAt || ""}:${j.files?.all?.length ?? 0}:${j.details?.property?.street || ""}:${j.details?.agency?.agentId || ""}`
+    )
+    .join("|");
+}
 
 export async function triggerAriel(bookingData) {
   try {
@@ -90,29 +106,72 @@ function AgentStatusRow({ agents }) {
   );
 }
 
-export default function ArielOrchestrator() {
+export default function ArielOrchestrator({ onJobsMutated, onSelectForUpload, refreshToken = 0 }) {
   const [jobs, setJobs] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [catalog, setCatalog] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [formMode, setFormMode] = useState(null); // null | 'create' | 'edit'
+  const [editJob, setEditJob] = useState(null);
+  const sigRef = useRef("");
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     try {
       const res = await fetch("/api/pipeline/jobs");
       const data = await res.json();
-      if (data.ok) setJobs(data.jobs || []);
+      if (!data.ok) return;
+      const next = data.jobs || [];
+      const sig = jobsSignature(next);
+      if (sig === sigRef.current) return;
+      sigRef.current = sig;
+      setJobs(next);
     } catch (e) {
       console.error("[pipeline jobs]", e);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/branding/catalog");
+        const data = await res.json();
+        if (!cancelled && data.ok) setCatalog(data.catalog);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     loadJobs();
-    const interval = setInterval(loadJobs, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [loadJobs, refreshToken]);
+
+  useEffect(() => {
+    const onFocus = () => loadJobs();
+    window.addEventListener("focus", onFocus);
+    const onVis = () => {
+      if (document.visibilityState === "visible") loadJobs();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [loadJobs]);
+
+  const hasProcessing = jobs.some((j) => j.status === "processing");
+  useEffect(() => {
+    if (!hasProcessing) return undefined;
+    const t = setInterval(loadJobs, 10_000);
+    return () => clearInterval(t);
+  }, [hasProcessing, loadJobs]);
 
   const addTestJob = async () => {
-    await triggerAriel({
+    const job = await triggerAriel({
       name: "ישראל ישראלי (בדיקה)",
       phone: "052-1234567",
       address: "הרצל 10 אשדוד",
@@ -120,7 +179,32 @@ export default function ArielOrchestrator() {
       date: "15/06/2025",
       time: "10:00",
     });
-    loadJobs();
+    sigRef.current = "";
+    await loadJobs();
+    onJobsMutated?.(job);
+  };
+
+  const openCreate = () => {
+    setEditJob(null);
+    setFormMode("create");
+  };
+
+  const openEdit = (job, e) => {
+    e?.stopPropagation();
+    setEditJob(job);
+    setFormMode("edit");
+  };
+
+  const onFormSaved = async (job) => {
+    setFormMode(null);
+    setEditJob(null);
+    sigRef.current = "";
+    await loadJobs();
+    onJobsMutated?.(job);
+    if (job?.id) {
+      onSelectForUpload?.(job.id);
+      setExpandedId(job.id);
+    }
   };
 
   const filtered = filterStatus === "all" ? jobs : jobs.filter((j) => j.status === filterStatus);
@@ -132,10 +216,16 @@ export default function ArielOrchestrator() {
           <div className="visio-agents-eyebrow">ARIEL · ORCHESTRATOR</div>
           <h2 className="visio-admin-section-title" style={{ margin: 0 }}>רשימת Jobs</h2>
         </div>
-        <button type="button" className="visio-admin-btn-ghost" onClick={addTestJob}>
-          <Plus size={14} />
-          הזמנת בדיקה
-        </button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button type="button" className="visio-admin-btn-primary" onClick={openCreate}>
+            <Plus size={14} />
+            הזמנה חדשה
+          </button>
+          <button type="button" className="visio-admin-btn-ghost" onClick={addTestJob}>
+            <Plus size={14} />
+            הזמנת בדיקה
+          </button>
+        </div>
       </div>
 
       <div className="visio-admin-stats-grid" style={{ marginBottom: 20 }}>
@@ -171,15 +261,21 @@ export default function ArielOrchestrator() {
           {filtered.map((job) => {
             const st = STATUS_MAP[job.status] || STATUS_MAP.intake;
             const StIcon = st.Icon;
-            const isOpen = selected === job.id;
+            const isOpen = expandedId === job.id;
             const b = job.booking || {};
+            const title = jobDisplayTitle(job, catalog);
+            const subtitle = jobDisplaySubtitle(job, catalog);
             return (
               <div key={job.id} className={`visio-job-row${isOpen ? " open" : ""}`}>
-                <button type="button" className="visio-job-row-head" onClick={() => setSelected(isOpen ? null : job.id)}>
+                <button
+                  type="button"
+                  className="visio-job-row-head"
+                  onClick={() => setExpandedId(isOpen ? null : job.id)}
+                >
                   <StIcon size={20} color={st.color} />
                   <div>
-                    <div style={{ color: ADMIN.text, fontSize: 14 }}>{b.name || "—"}</div>
-                    <div style={{ color: ADMIN.muted, fontSize: 11 }}>{b.phone} · {b.address}</div>
+                    <div style={{ color: ADMIN.text, fontSize: 14 }}>{title}</div>
+                    <div style={{ color: ADMIN.muted, fontSize: 11 }}>{subtitle || "—"}</div>
                   </div>
                   <div style={{ color: ADMIN.muted, fontSize: 11 }}>
                     {b.date} {b.time}
@@ -195,10 +291,36 @@ export default function ArielOrchestrator() {
                     <PhaseBar phase={job.phase || "a"} />
                     <AgentStatusRow agents={job.agents} />
 
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+                      <button
+                        type="button"
+                        className="visio-admin-btn-ghost"
+                        style={{ color: ADMIN.text }}
+                        onClick={(e) => openEdit(job, e)}
+                      >
+                        <Pencil size={14} />
+                        ערוך פרטים
+                      </button>
+                      {job.status === "intake" && (
+                        <button
+                          type="button"
+                          className="visio-admin-btn-primary"
+                          style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectForUpload?.(job.id);
+                          }}
+                        >
+                          <Inbox size={14} />
+                          קליטת קבצים
+                        </button>
+                      )}
+                    </div>
+
                     {job.files?.all?.length > 0 && (
                       <div className="visio-file-tags">
                         {job.files.all.map((f) => (
-                          <span key={f.id} className={f.type === "panorama" ? "pano" : ""}>
+                          <span key={f.id || f.url || f.name} className={f.type === "panorama" ? "pano" : ""}>
                             {f.type === "panorama" ? "360" : "IMG"} {f.name}
                           </span>
                         ))}
@@ -225,6 +347,26 @@ export default function ArielOrchestrator() {
             );
           })}
         </div>
+      )}
+
+      {formMode === "create" && (
+        <JobDetailsForm
+          mode="create"
+          onCancel={() => setFormMode(null)}
+          onSaved={onFormSaved}
+        />
+      )}
+      {formMode === "edit" && editJob && (
+        <JobDetailsForm
+          mode="edit"
+          jobId={editJob.id}
+          initialDetails={ensureJobDetails(editJob)}
+          onCancel={() => {
+            setFormMode(null);
+            setEditJob(null);
+          }}
+          onSaved={onFormSaved}
+        />
       )}
     </div>
   );

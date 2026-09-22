@@ -10,6 +10,7 @@ import {
   Terminal,
 } from "lucide-react";
 import { ADMIN, glassPanel, AGENT_META } from "./theme.js";
+import { jobDropdownLabel } from "@/lib/pipeline/job-details.js";
 
 const AGENT_LOG_LABEL = {
   ariel: "אריאל",
@@ -28,6 +29,7 @@ export default function IntakeHub({ onJobUpdated }) {
   const [error, setError] = useState("");
   const [logs, setLogs] = useState([]);
   const [liveJob, setLiveJob] = useState(null);
+  const [catalog, setCatalog] = useState(null);
   const fileRef = useRef(null);
   const logEndRef = useRef(null);
 
@@ -61,6 +63,22 @@ export default function IntakeHub({ onJobUpdated }) {
   useEffect(() => {
     loadJobs();
   }, [loadJobs]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/branding/catalog");
+        const data = await res.json();
+        if (!cancelled && data.ok) setCatalog(data.catalog);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     pollJob();
@@ -164,7 +182,7 @@ export default function IntakeHub({ onJobUpdated }) {
               <option value="">— בחר הזמנה —</option>
               {jobs.map((j) => (
                 <option key={j.id} value={j.id}>
-                  {j.booking?.name || j.id} · {j.booking?.address || ""} · {j.status}
+                  {jobDropdownLabel(j, catalog)} · {j.status}
                 </option>
               ))}
             </select>
