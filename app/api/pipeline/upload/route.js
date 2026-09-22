@@ -5,6 +5,7 @@ import { getJob, findJobByBookingId, updateJob } from "@/lib/pipeline/store.js";
 import { uploadAsset } from "@/lib/storage/index.js";
 import { runPipeline } from "@/lib/agents/ariel.js";
 import { requireAllowedApi } from "@/lib/auth/require.js";
+import { readImageDimensions } from "@/lib/images/dimensions.js";
 
 function mimeFromName(name) {
   const ext = path.extname(name).toLowerCase();
@@ -46,8 +47,14 @@ export async function POST(request) {
         if (!file || typeof file === "string") continue;
         const buf = Buffer.from(await file.arrayBuffer());
         const safeName = file.name.replace(/[^a-zA-Z0-9._\u0590-\u05FF-]/g, "_");
+        const dims = readImageDimensions(buf);
         const url = await uploadAsset(targetJobId, safeName, buf, file.type || mimeFromName(safeName));
-        fileEntries.push({ name: safeName, url });
+        fileEntries.push({
+          name: safeName,
+          url,
+          width: dims?.width,
+          height: dims?.height,
+        });
       }
     } else {
       const body = await request.json();

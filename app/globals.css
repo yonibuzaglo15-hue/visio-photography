@@ -132,6 +132,26 @@ button:hover { opacity: 0.85; }
 .visio-admin-btn-signout { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.55); color: #c9a84c; font-size: 12px; letter-spacing: 0.5px; cursor: pointer; border-radius: 2px; font-family: inherit; }
 .visio-admin-btn-signout:hover { background: rgba(201,168,76,0.22); }
 .visio-admin-btn-google { width: 100%; padding: 12px; background: #fff; border: none; font-size: 14px; color: #333; cursor: pointer; border-radius: 2px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.visio-tour-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(180px, 220px);
+  gap: 16px;
+  align-items: start;
+}
+.visio-tour-editor-viewer .pnlm-container { background: #0a0a0a; }
+.pnlm-hotspot.visio-editor-hotspot {
+  background: rgba(201,168,76,0.95);
+  border: 2px solid #0a0a0a;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+@media (max-width: 1100px) {
+  .visio-tour-editor-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .visio-admin-error { margin-top: 12px; padding: 10px 14px; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); font-size: 12px; color: #f87171; }
 .visio-admin-login-wrap { min-height: 100vh; background: #050505; display: flex; align-items: center; justify-content: center; padding: 24px; }
 .visio-admin-login-card { width: 100%; max-width: 400px; overflow: hidden; }

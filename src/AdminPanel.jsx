@@ -3,6 +3,7 @@
 import ArielOrchestrator from "./ArielOrchestrator.jsx";
 import AgentsAdmin from "./AgentsAdmin.jsx";
 import IntakeHub from "./admin/IntakeHub.jsx";
+import TourEditor from "./admin/TourEditor.jsx";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import {
@@ -19,6 +20,7 @@ import {
   Globe,
   Shield,
   Home,
+  Compass,
 } from "lucide-react";
 import { ADMIN, glassPanel } from "./admin/theme.js";
 
@@ -35,6 +37,7 @@ const TABS = [
   { id: "overview", label: "סקירה", Icon: LayoutDashboard },
   { id: "new-property", label: "נכס חדש", Icon: Home },
   { id: "pipeline", label: "Pipeline", Icon: GitBranch },
+  { id: "tour-editor", label: "סיור 360°", Icon: Compass },
   { id: "bookings", label: "הזמנות", Icon: Calendar },
   { id: "portfolio", label: "פורטפוליו", Icon: Camera },
   { id: "agents", label: "סוכנים", Icon: Bot },
@@ -180,6 +183,8 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
               </div>
             </>
           )}
+
+          {activeTab === "tour-editor" && <TourEditor />}
 
           {activeTab === "bookings" && (
             <>
