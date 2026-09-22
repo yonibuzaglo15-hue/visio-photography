@@ -450,7 +450,7 @@ export default function TourEditor() {
 
       {error && <div className="visio-admin-error" style={{ marginBottom: 16 }}>{error}</div>}
       {okMsg && (
-        <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.25)", color: ADMIN.success, fontSize: 12 }}>
+        <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--visio-success-bg)", border: "1px solid var(--visio-success-border)", color: ADMIN.success, fontSize: 12 }}>
           {okMsg}
         </div>
       )}
@@ -475,8 +475,8 @@ export default function TourEditor() {
                   style={{
                     textAlign: "right",
                     padding: "10px 12px",
-                    background: scene.id === activeSceneId ? "rgba(201,168,76,0.12)" : "rgba(0,0,0,0.35)",
-                    border: `1px solid ${scene.id === activeSceneId ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.06)"}`,
+                    background: scene.id === activeSceneId ? "var(--visio-gold-wash)" : "var(--visio-input-bg)",
+                    border: `1px solid ${scene.id === activeSceneId ? "var(--visio-gold-border-strong)" : "var(--visio-border-subtle)"}`,
                     color: ADMIN.text,
                     cursor: "pointer",
                     borderRadius: 2,
@@ -529,7 +529,7 @@ export default function TourEditor() {
               </div>
             )}
 
-            <div style={{ padding: 16, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ padding: 16, borderTop: "1px solid var(--visio-border-subtle)" }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 12 }}>
                 <div style={{ flex: "1 1 180px" }}>
                   <label className="visio-admin-label">יעד לחץ הבא</label>
@@ -594,8 +594,8 @@ export default function TourEditor() {
                         gap: 8,
                         alignItems: "center",
                         padding: "8px 10px",
-                        background: "rgba(0,0,0,0.35)",
-                        border: "1px solid rgba(255,255,255,0.06)",
+                        background: "var(--visio-input-bg)",
+                        border: "1px solid var(--visio-border-subtle)",
                       }}
                     >
                       <div style={{ fontSize: 12, color: ADMIN.text }}>
@@ -667,7 +667,7 @@ export default function TourEditor() {
               )}
             </div>
             {eightKWarning && (
-              <div style={{ marginTop: 12, padding: 10, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.08)", color: ADMIN.error, fontSize: 12, lineHeight: 1.6, display: "flex", gap: 8 }}>
+              <div style={{ marginTop: 12, padding: 10, border: "1px solid var(--visio-error-border)", background: "var(--visio-error-bg)", color: ADMIN.error, fontSize: 12, lineHeight: 1.6, display: "flex", gap: 8 }}>
                 <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
                 <span>
                   פנורמה ~8K — ייתכן עומס על GPU במובייל ישן (מגבלת טקסטורה {textureLimit || "?"}px).

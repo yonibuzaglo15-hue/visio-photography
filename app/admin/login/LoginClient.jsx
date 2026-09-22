@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { signIn, signOut } from "next-auth/react";
 import { Shield } from "lucide-react";
 import { ADMIN, glassPanel } from "@/src/admin/theme.js";
+import ThemeToggle from "@/src/theme/ThemeToggle.jsx";
 
 export default function LoginClient({ initialError, errorKey }) {
   useEffect(() => {
@@ -14,6 +15,9 @@ export default function LoginClient({ initialError, errorKey }) {
 
   return (
     <div className="visio-admin-login-wrap">
+      <div style={{ position: "fixed", top: 16, left: 16, zIndex: 10 }}>
+        <ThemeToggle />
+      </div>
       <div className="visio-admin-login-card" style={glassPanel}>
         <div className="visio-admin-login-header">
           <Shield size={28} color={ADMIN.gold} strokeWidth={1.25} />

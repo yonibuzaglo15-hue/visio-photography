@@ -1,20 +1,22 @@
 "use client";
 
 export const ADMIN = {
-  bg: "#050505",
-  glass: "rgba(12, 12, 10, 0.72)",
-  glassBorder: "rgba(201, 168, 76, 0.18)",
-  gold: "#c9a84c",
-  goldDim: "#8a6a28",
-  goldGlow: "rgba(201, 168, 76, 0.08)",
-  text: "#e8dfc8",
-  muted: "#6b6558",
-  border: "rgba(255,255,255,0.06)",
-  accent: "#60b0f0",
-  success: "#4ade80",
-  error: "#f87171",
+  bg: "var(--visio-bg)",
+  glass: "var(--visio-glass)",
+  glassBorder: "var(--visio-glass-border)",
+  gold: "var(--visio-gold)",
+  goldDim: "var(--visio-gold-dim)",
+  goldGlow: "var(--visio-gold-glow)",
+  text: "var(--visio-text)",
+  muted: "var(--visio-muted-soft)",
+  border: "var(--visio-border-subtle)",
+  accent: "var(--visio-accent)",
+  success: "var(--visio-success)",
+  error: "var(--visio-error)",
   fontDisplay: "'Bebas Neue', sans-serif",
   fontBody: "'Heebo', sans-serif",
+  panel: "var(--visio-panel)",
+  panelBorder: "var(--visio-border-subtle)",
 };
 
 export const glassPanel = {

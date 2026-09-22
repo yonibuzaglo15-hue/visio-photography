@@ -23,6 +23,7 @@ import {
   Compass,
 } from "lucide-react";
 import { ADMIN, glassPanel } from "./admin/theme.js";
+import ThemeToggle from "./theme/ThemeToggle.jsx";
 
 const MOCK_BOOKINGS = [
   { id: 1, name: "דוד כהן", phone: "052-1234567", address: "רוטשילד 12, אשדוד", pkg: "SIGNATURE", date: "10/06/2025", time: "10:00", status: "confirmed" },
@@ -87,6 +88,7 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
           <span className="visio-admin-badge">CONTROL CENTER</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <ThemeToggle />
           <span
             style={{
               fontSize: 12,
@@ -124,7 +126,7 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
               {label}
             </button>
           ))}
-          <div style={{ marginTop: "auto", paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ marginTop: "auto", paddingTop: 24, borderTop: `1px solid ${ADMIN.border}` }}>
             <div style={{ fontSize: 11, color: ADMIN.muted, marginBottom: 8, direction: "ltr", wordBreak: "break-all" }}>
               {admin.email || admin.name}
             </div>

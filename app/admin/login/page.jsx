@@ -17,7 +17,7 @@ export default function AdminLoginPage({ searchParams }) {
     errorKey && (ERROR_HEB[errorKey] || ERROR_HEB.Default);
 
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#050505" }} />}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--visio-bg)" }} />}>
       <LoginClient initialError={initialError} errorKey={errorKey} />
     </Suspense>
   );

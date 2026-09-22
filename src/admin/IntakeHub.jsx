@@ -153,7 +153,7 @@ export default function IntakeHub({ onJobUpdated }) {
               style={{
                 width: "100%",
                 appearance: "none",
-                background: "rgba(0,0,0,0.4)",
+                background: "var(--visio-input-bg)",
                 border: `1px solid ${ADMIN.border}`,
                 color: ADMIN.text,
                 padding: "12px 40px 12px 14px",
@@ -218,7 +218,7 @@ export default function IntakeHub({ onJobUpdated }) {
             placeholder="שורה לכל לינק..."
             style={{
               width: "100%",
-              background: "rgba(0,0,0,0.4)",
+              background: "var(--visio-input-bg)",
               border: `1px solid ${ADMIN.border}`,
               color: ADMIN.text,
               padding: 12,
@@ -231,7 +231,7 @@ export default function IntakeHub({ onJobUpdated }) {
         </div>
 
         {error && (
-          <div style={{ marginTop: 12, padding: "10px 14px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.25)", fontSize: 12, color: ADMIN.error }}>
+          <div style={{ marginTop: 12, padding: "10px 14px", background: "var(--visio-error-bg)", border: "1px solid var(--visio-error-border)", fontSize: 12, color: ADMIN.error }}>
             {error}
           </div>
         )}
@@ -260,7 +260,7 @@ export default function IntakeHub({ onJobUpdated }) {
         {agentLines.length > 0 && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 8, marginBottom: 14 }}>
             {agentLines.map((a) => (
-              <div key={a.id} style={{ padding: "10px 12px", background: "rgba(0,0,0,0.35)", border: `1px solid ${ADMIN.border}` }}>
+              <div key={a.id} style={{ padding: "10px 12px", background: "var(--visio-input-bg)", border: `1px solid ${ADMIN.border}` }}>
                 <div style={{ fontSize: 10, color: AGENT_META[a.id]?.color || ADMIN.muted, marginBottom: 4 }}>{a.label}</div>
                 <div style={{ fontSize: 11, color: ADMIN.text }}>{a.message || a.status}</div>
                 {a.progress > 0 && (
