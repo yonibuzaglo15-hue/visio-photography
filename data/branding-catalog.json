@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-22T00:00:00.000Z",
+  "source": "ComfyUI-GuyBanner/assets/banners.json (Phase 2 snapshot; Phase 3 worker refreshes on startup)",
+  "agencies": [
+    { "id": "rehouse", "label": "ReHouse", "labelHe": "ריהאוס" },
+    { "id": "independent", "label": "Independent", "labelHe": "עצמאי" }
+  ],
+  "agents": [
+    {
+      "id": "yan",
+      "label": "Yan Shindelman",
+      "labelHe": "יאן שינדלמן",
+      "agencyId": "rehouse",
+      "defaultLogo": "rehouse"
+    },
+    {
+      "id": "guy",
+      "label": "Guy",
+      "labelHe": "גיא",
+      "agencyId": "independent",
+      "defaultLogo": "none"
+    },
+    {
+      "id": "liran",
+      "label": "Liran David Biton",
+      "labelHe": "לירן דוד ביטון",
+      "agencyId": "independent",
+      "defaultLogo": "none"
+    }
+  ]
+}

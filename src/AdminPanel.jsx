@@ -4,7 +4,9 @@ import ArielOrchestrator from "./ArielOrchestrator.jsx";
 import AgentsAdmin from "./AgentsAdmin.jsx";
 import IntakeHub from "./admin/IntakeHub.jsx";
 import TourEditor from "./admin/TourEditor.jsx";
-import { useState } from "react";
+import NewPropertyForm from "./admin/NewPropertyForm.jsx";
+import BrandingJobsTab from "./admin/BrandingJobsTab.jsx";
+import { useState, useRef } from "react";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
@@ -21,6 +23,7 @@ import {
   Shield,
   Home,
   Compass,
+  Images,
 } from "lucide-react";
 import { ADMIN, glassPanel } from "./admin/theme.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
@@ -37,6 +40,7 @@ const STATUS_HEB = { confirmed: "מאושר", pending: "ממתין", cancelled: 
 const TABS = [
   { id: "overview", label: "סקירה", Icon: LayoutDashboard },
   { id: "new-property", label: "נכס חדש", Icon: Home },
+  { id: "branding-jobs", label: "עבודות באנר", Icon: Images },
   { id: "pipeline", label: "Pipeline", Icon: GitBranch },
   { id: "tour-editor", label: "סיור 360°", Icon: Compass },
   { id: "bookings", label: "הזמנות", Icon: Calendar },
@@ -61,6 +65,11 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
   const [bookings, setBookings] = useState(MOCK_BOOKINGS);
   const [newPkg, setNewPkg] = useState({ title: "", sub: "", partner: "ReHouse", matterport: "" });
   const [saved, setSaved] = useState(false);
+  const [brandingRefresh, setBrandingRefresh] = useState(0);
+  const [pipelineTick, setPipelineTick] = useState(0);
+  const [intakeFocusId, setIntakeFocusId] = useState("");
+  const [intakeFocusNonce, setIntakeFocusNonce] = useState(0);
+  const intakeSectionRef = useRef(null);
 
   const revenue = bookings.filter((b) => b.status === "confirmed").reduce((s, b) => {
     const prices = { ESSENTIAL: 350, SIGNATURE: 400, PRESTIGE: 750 };
@@ -167,21 +176,42 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
           {activeTab === "new-property" && (
             <>
               <h1 className="visio-admin-page-title">נכס חדש</h1>
-              <div style={{ ...glassPanel, padding: 28, maxWidth: 560 }}>
-                <p style={{ color: ADMIN.muted, fontSize: 14, lineHeight: 1.9 }}>
-                  טופס העלאת נכס + תור עבודות ComfyUI יגיע ב־Phase 2.
-                  הטאב הזה גלוי רק למשתמשים ברשימת <code dir="ltr">ALLOWED_EMAILS</code>.
-                </p>
-              </div>
+              <NewPropertyForm
+                onCreated={() => {
+                  setBrandingRefresh((n) => n + 1);
+                  setActiveTab("branding-jobs");
+                }}
+              />
+            </>
+          )}
+
+          {activeTab === "branding-jobs" && (
+            <>
+              <h1 className="visio-admin-page-title">עבודות באנר</h1>
+              <BrandingJobsTab refreshToken={brandingRefresh} />
             </>
           )}
 
           {activeTab === "pipeline" && (
             <>
               <h1 className="visio-admin-page-title">Asset Pipeline</h1>
-              <IntakeHub />
+              <IntakeHub
+                sectionRef={intakeSectionRef}
+                focusJobId={intakeFocusId}
+                focusNonce={intakeFocusNonce}
+                refreshToken={pipelineTick}
+                onUploadFinished={() => setPipelineTick((n) => n + 1)}
+              />
               <div style={{ marginTop: 24 }}>
-                <ArielOrchestrator />
+                <ArielOrchestrator
+                  refreshToken={pipelineTick}
+                  onJobsMutated={() => setPipelineTick((n) => n + 1)}
+                  onSelectForUpload={(jobId) => {
+                    setIntakeFocusId(jobId);
+                    setIntakeFocusNonce((n) => n + 1);
+                    setPipelineTick((n) => n + 1);
+                  }}
+                />
               </div>
             </>
           )}
