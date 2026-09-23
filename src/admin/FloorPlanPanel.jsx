@@ -14,14 +14,21 @@ import {
   ZoomOut,
 } from "lucide-react";
 import { ADMIN } from "./theme.js";
+import FloorPlanCropModal, { prepareCropSession } from "./FloorPlanCropModal.jsx";
 import {
-  DEFAULT_MAX_DIST_NORM,
+  DEFAULT_MAX_LINK_METERS,
+  DEFAULT_MAX_NEIGHBORS,
+  DEFAULT_SHORT_SIDE_METERS,
   applyAutoLinksToScenes,
   generateAutoLinks,
   hotspotPitch,
   hotspotYaw,
   mapBearing,
   metersPerNormFromLine,
+  remapScenesToCrop,
+  resolveMaxLinkMeters,
+  resolveMetersPerNorm,
+  summarizeAutoLinks,
 } from "../../lib/tour/floor-plan.js";
 
 function pairKey(a, b) {
@@ -48,6 +55,8 @@ export default function FloorPlanPanel({
   );
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState("");
+  const [cropSession, setCropSession] = useState(null);
+  const [linkSummary, setLinkSummary] = useState(null);
   const [mode, setMode] = useState("place"); // place | orient | link | scale
   const [dragSceneId, setDragSceneId] = useState(null);
   const [selectedMapId, setSelectedMapId] = useState(null);
@@ -69,12 +78,18 @@ export default function FloorPlanPanel({
   );
 
   const meta = floorPlanMeta || {
-    maxDistNorm: DEFAULT_MAX_DIST_NORM,
-    metersPerNorm: 12,
+    maxLinkMeters: DEFAULT_MAX_LINK_METERS,
+    metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
     cameraHeightM: 1.55,
+    maxNeighbors: DEFAULT_MAX_NEIGHBORS,
+    scaleCalibrated: false,
+    sameFloorOnly: true,
     deletedLinks: [],
     addedLinks: [],
   };
+
+  const metersPerNorm = resolveMetersPerNorm(meta);
+  const maxLinkMeters = resolveMaxLinkMeters(meta);
 
   const placed = useMemo(
     () =>
@@ -146,27 +161,91 @@ export default function FloorPlanPanel({
     setUploading(true);
     setUploadErr("");
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("floor", String(activeFloor));
-      fd.append("label", `קומה ${activeFloor}`);
-      const res = await fetch(`/api/pipeline/jobs/${jobId}/tour/floorplan`, {
-        method: "POST",
-        body: fd,
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "העלאה נכשלה");
-      const next = [...floorPlans.filter((p) => Number(p.floor) !== Number(data.floorPlan.floor)), data.floorPlan];
-      next.sort((a, b) => a.floor - b.floor);
-      onFloorPlansChange(next);
-      setActiveFloor(data.floorPlan.floor);
-      markDirty();
+      const session = await prepareCropSession(file);
+      setCropSession({ ...session, floor: activeFloor, remap: false });
     } catch (err) {
       setUploadErr(err.message || "העלאה נכשלה");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
+  };
+
+  const startRecropCurrent = async () => {
+    if (!plan?.url) return;
+    setUploading(true);
+    setUploadErr("");
+    try {
+      const session = await prepareCropSession(plan.url);
+      setCropSession({
+        ...session,
+        floor: plan.floor ?? activeFloor,
+        remap: true,
+      });
+    } catch (err) {
+      setUploadErr(err.message || "טעינת תוכנית לחיתוך נכשלה");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const finishCrop = async ({ crop, blob }) => {
+    if (!jobId || !cropSession) return;
+    setUploading(true);
+    setUploadErr("");
+    try {
+      const floor = cropSession.floor ?? activeFloor;
+      const fd = new FormData();
+      fd.append("file", blob, `floorplan-f${floor}.jpg`);
+      fd.append("floor", String(floor));
+      fd.append("label", `קומה ${floor}`);
+      const res = await fetch(`/api/pipeline/jobs/${jobId}/tour/floorplan`, {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "העלאה נכשלה");
+      const next = [
+        ...floorPlans.filter((p) => Number(p.floor) !== Number(data.floorPlan.floor)),
+        data.floorPlan,
+      ];
+      next.sort((a, b) => a.floor - b.floor);
+      onFloorPlansChange(next);
+      setActiveFloor(data.floorPlan.floor);
+      if (cropSession.remap) {
+        onScenesChange(remapScenesToCrop(scenes, floor, crop));
+      }
+      // Reset scale estimate for cropped plan (short side ≈ DEFAULT_SHORT_SIDE_METERS)
+      if (!meta.scaleCalibrated) {
+        updateMeta({ metersPerNorm: DEFAULT_SHORT_SIDE_METERS });
+      }
+      setCropSession(null);
+      markDirty();
+    } catch (err) {
+      setUploadErr(err.message || "שמירת חיתוך נכשלה");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const regenerate = () => {
+    const allPlaced = scenes.filter(
+      (s) => !s.hidden && Number.isFinite(Number(s.mapX)) && Number.isFinite(Number(s.mapY))
+    );
+    const edges = generateAutoLinks(allPlaced, {
+      maxLinkMeters,
+      metersPerNorm,
+      maxNeighbors: meta.maxNeighbors ?? DEFAULT_MAX_NEIGHBORS,
+      cameraHeightM: meta.cameraHeightM ?? 1.55,
+      sameFloorOnly: meta.sameFloorOnly !== false,
+      deletedLinks: meta.deletedLinks || [],
+      addedLinks: meta.addedLinks || [],
+      scaleCalibrated: meta.scaleCalibrated,
+    });
+    const next = applyAutoLinksToScenes(scenes, edges);
+    onScenesChange(next);
+    setLinkSummary(summarizeAutoLinks(next, edges));
+    markDirty();
   };
 
   const clientToNorm = useCallback((clientX, clientY) => {
@@ -229,21 +308,6 @@ export default function FloorPlanPanel({
     markDirty();
   };
 
-  const regenerate = () => {
-    const allPlaced = scenes.filter(
-      (s) => !s.hidden && Number.isFinite(Number(s.mapX)) && Number.isFinite(Number(s.mapY))
-    );
-    const edges = generateAutoLinks(allPlaced, {
-      maxDistNorm: meta.maxDistNorm ?? DEFAULT_MAX_DIST_NORM,
-      metersPerNorm: meta.metersPerNorm ?? 12,
-      cameraHeightM: meta.cameraHeightM ?? 1.55,
-      deletedLinks: meta.deletedLinks || [],
-      addedLinks: meta.addedLinks || [],
-    });
-    onScenesChange(applyAutoLinksToScenes(scenes, edges));
-    markDirty();
-  };
-
   const deleteLink = (a, b) => {
     const k = pairKey(a, b);
     const deleted = [...(meta.deletedLinks || []).filter(([x, y]) => pairKey(x, y) !== k), [a, b]];
@@ -275,8 +339,9 @@ export default function FloorPlanPanel({
     updateMeta({ deletedLinks: deleted, addedLinks: added });
     const d = Math.hypot(b.mapX - a.mapX, b.mapY - a.mapY);
     const pitchOpts = {
-      metersPerNorm: meta.metersPerNorm ?? 12,
+      metersPerNorm,
       cameraHeightM: meta.cameraHeightM ?? 1.55,
+      distM: d * metersPerNorm,
     };
     const stamp = Date.now().toString(36);
     onScenesChange(
@@ -404,7 +469,7 @@ export default function FloorPlanPanel({
     if (!(m > 0)) return;
     const [p1, p2] = scalePts;
     const mpn = metersPerNormFromLine(p1.x, p1.y, p2.x, p2.y, m);
-    updateMeta({ metersPerNorm: mpn });
+    updateMeta({ metersPerNorm: mpn, scaleCalibrated: true });
     setScalePts([]);
   };
 
@@ -416,8 +481,8 @@ export default function FloorPlanPanel({
         <MapIcon size={16} /> תוכנית קומה
       </div>
       <p style={{ fontSize: 12, color: ADMIN.muted, marginBottom: 12, lineHeight: 1.6 }}>
-        גרור תמונה ממוזערת אל הנקודה בתוכנית. מומלץ לכוון מרחק קישור (סליידר) — פשוט יותר מקו־מידה;
-        קו־מידה אופציונלי לדיוק pitch.
+        העלה צילום מסך → חתוך את תוכנית הקומה בלבד → גרור סצנות לנקודות.
+        כייל קנה־מידה (קו באורך ידוע) ואז הגדר מרחק קישור במטרים (ברירת מחדל 6מ׳).
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12, alignItems: "center" }}>
@@ -438,6 +503,16 @@ export default function FloorPlanPanel({
           {uploading ? <Loader2 size={14} className="visio-spin" /> : <Upload size={14} />}
           העלה תוכנית
         </button>
+        {plan?.url && (
+          <button
+            type="button"
+            className="visio-admin-btn-ghost"
+            disabled={uploading}
+            onClick={startRecropCurrent}
+          >
+            חתוך תוכנית
+          </button>
+        )}
         <input
           ref={fileRef}
           type="file"
@@ -541,17 +616,25 @@ export default function FloorPlanPanel({
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginBottom: 10 }}>
         <label style={{ fontSize: 11, color: ADMIN.muted }}>
           מרחק קישור מקס׳{" "}
-          <span dir="ltr">{(meta.maxDistNorm ?? DEFAULT_MAX_DIST_NORM).toFixed(2)}</span>
+          <span dir="ltr">{maxLinkMeters.toFixed(1)} m</span>
         </label>
         <input
           type="range"
-          min={0.08}
-          max={0.45}
-          step={0.01}
-          value={meta.maxDistNorm ?? DEFAULT_MAX_DIST_NORM}
-          onChange={(e) => updateMeta({ maxDistNorm: Number(e.target.value) })}
+          min={2}
+          max={12}
+          step={0.5}
+          value={maxLinkMeters}
+          onChange={(e) => updateMeta({ maxLinkMeters: Number(e.target.value) })}
           style={{ width: 160 }}
         />
+        <label style={{ fontSize: 11, color: ADMIN.muted, display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <input
+            type="checkbox"
+            checked={meta.sameFloorOnly !== false}
+            onChange={(e) => updateMeta({ sameFloorOnly: e.target.checked })}
+          />
+          רק באותה קומה
+        </label>
         {mode === "scale" && (
           <>
             <input
@@ -564,9 +647,41 @@ export default function FloorPlanPanel({
             <button type="button" className="visio-admin-btn-ghost" disabled={scalePts.length < 2} onClick={applyScale}>
               החל קנה־מידה
             </button>
+            {meta.scaleCalibrated ? (
+              <span style={{ fontSize: 11, color: ADMIN.success }}>מכויל</span>
+            ) : (
+              <span style={{ fontSize: 11, color: ADMIN.muted }}>
+                ללא כיול: צד קצר ≈ {DEFAULT_SHORT_SIDE_METERS}מ׳
+              </span>
+            )}
           </>
         )}
       </div>
+
+      {linkSummary && (
+        <div
+          style={{
+            marginBottom: 10,
+            padding: "8px 12px",
+            background: "var(--visio-input-bg)",
+            border: "1px solid var(--visio-border-subtle)",
+            fontSize: 12,
+            color: ADMIN.text,
+            lineHeight: 1.6,
+          }}
+        >
+          חשב מחדש: <strong>{linkSummary.linkCount}</strong> קישורים ·{" "}
+          {linkSummary.placedCount} סצנות מוקמו ·{" "}
+          <strong>{linkSummary.zeroLinkCount}</strong> ללא קישור
+          {linkSummary.zeroLinkTitles?.length > 0 && (
+            <span style={{ color: ADMIN.muted }}>
+              {" "}
+              ({linkSummary.zeroLinkTitles.slice(0, 5).join(", ")}
+              {linkSummary.zeroLinkTitles.length > 5 ? "…" : ""})
+            </span>
+          )}
+        </div>
+      )}
 
       {mode === "orient" && selected && (
         <div style={{ marginBottom: 10, padding: 10, background: "var(--visio-input-bg)", border: "1px solid var(--visio-border-subtle)", fontSize: 12, color: ADMIN.text, lineHeight: 1.6 }}>
@@ -831,6 +946,16 @@ export default function FloorPlanPanel({
             ))}
           </div>
         </div>
+      )}
+
+      {cropSession && (
+        <FloorPlanCropModal
+          source={cropSession.source}
+          initialCrop={cropSession.initialCrop}
+          detection={cropSession.detection}
+          onCancel={() => setCropSession(null)}
+          onConfirm={finishCrop}
+        />
       )}
     </div>
   );

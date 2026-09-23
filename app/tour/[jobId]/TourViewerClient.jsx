@@ -106,6 +106,10 @@ export default function TourViewerClient({ config: initialConfig }) {
         viewerRef.current = viewer;
         navRef.current = nav;
         setSceneId(viewer.getScene?.() || config.default?.firstScene || "");
+        if (typeof window !== "undefined") {
+          window.__visioViewer = viewer;
+          window.__visioNav = nav;
+        }
 
         viewer.on("load", () => {
           if (cancelled) return;

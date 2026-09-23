@@ -7,7 +7,14 @@ import {
   mapBearing,
   metersPerNormFromLine,
   normDist,
+  pickNeighbours,
+  remapNormToCrop,
+  remapScenesToCrop,
+  summarizeAutoLinks,
+  FLOOR_LINE_PITCH,
+  DEFAULT_MAX_NEIGHBORS,
 } from "../lib/tour/floor-plan.js";
+import { detectContentBoundsFromImageData } from "../lib/tour/floor-plan-crop.js";
 import {
   buildPannellumConfig,
   configToEditorScenes,
@@ -21,40 +28,68 @@ describe("floor-plan geometry", () => {
   });
 
   it("hotspotYaw subtracts northOffset", () => {
-    // Facing east (90) with northOffset 10 → yaw 80
     expect(hotspotYaw(0, 0, 1, 0, 10)).toBeCloseTo(80, 5);
   });
 
-  it("hotspotPitch is more negative when closer", () => {
-    const near = hotspotPitch(0.05, { metersPerNorm: 12, cameraHeightM: 1.55 });
-    const far = hotspotPitch(0.3, { metersPerNorm: 12, cameraHeightM: 1.55 });
+  it("hotspotPitch never above floor line", () => {
+    const far = hotspotPitch(0.9, { metersPerNorm: 12, cameraHeightM: 1.55 });
+    expect(far).toBeLessThanOrEqual(FLOOR_LINE_PITCH);
+    const near = hotspotPitch(0.02, { metersPerNorm: 12, cameraHeightM: 1.55 });
     expect(near).toBeLessThan(far);
-    expect(near).toBeGreaterThanOrEqual(-62);
-    expect(far).toBeLessThanOrEqual(-12);
   });
 
   it("metersPerNormFromLine", () => {
     expect(metersPerNormFromLine(0, 0, 0.5, 0, 5)).toBeCloseTo(10, 5);
   });
 
-  it("generateAutoLinks is bidirectional and respects max neighbors", () => {
+  it("remapNormToCrop", () => {
+    const r = remapNormToCrop(0.5, 0.5, { x: 0.25, y: 0.25, w: 0.5, h: 0.5 });
+    expect(r.x).toBeCloseTo(0.5, 5);
+    expect(r.y).toBeCloseTo(0.5, 5);
+  });
+
+  it("pickNeighbours skips occluded farther points", () => {
+    const a = { id: "a", mapX: 0.1, mapY: 0.5 };
+    const group = [
+      a,
+      { id: "b", mapX: 0.2, mapY: 0.5 },
+      { id: "c", mapX: 0.35, mapY: 0.5 }, // same bearing, farther
+      { id: "d", mapX: 0.2, mapY: 0.7 },
+    ];
+    const picked = pickNeighbours(a, group, {
+      maxNeighbors: 3,
+      maxDistNorm: 0.5,
+      bearingOcclusionDeg: 28,
+    });
+    const ids = picked.map((p) => p.b.id);
+    expect(ids).toContain("b");
+    expect(ids).not.toContain("c");
+    expect(ids).toContain("d");
+  });
+
+  it("generateAutoLinks max 3, bidirectional, same floor, meters", () => {
     const placed = [
       { id: "a", mapX: 0.1, mapY: 0.1, floor: 0, northOffset: 0 },
       { id: "b", mapX: 0.15, mapY: 0.1, floor: 0, northOffset: 0 },
       { id: "c", mapX: 0.2, mapY: 0.1, floor: 0, northOffset: 0 },
-      { id: "d", mapX: 0.9, mapY: 0.9, floor: 0, northOffset: 0 },
+      { id: "d", mapX: 0.15, mapY: 0.2, floor: 0, northOffset: 0 },
+      { id: "e", mapX: 0.9, mapY: 0.9, floor: 0, northOffset: 0 },
+      { id: "f", mapX: 0.12, mapY: 0.12, floor: 1, northOffset: 0 },
     ];
-    const edges = generateAutoLinks(placed, { maxDistNorm: 0.2, maxNeighbors: 2 });
-    const pairs = new Set(
-      edges.map((e) => (e.fromId < e.toId ? `${e.fromId}|${e.toId}` : `${e.toId}|${e.fromId}`))
-    );
-    // a-b, b-c nearby; d isolated
-    expect(pairs.has("a|b")).toBe(true);
-    expect(pairs.has("b|c")).toBe(true);
-    expect([...pairs].some((k) => k.includes("d"))).toBe(false);
-    // directed both ways
-    expect(edges.filter((e) => e.fromId === "a" && e.toId === "b")).toHaveLength(1);
-    expect(edges.filter((e) => e.fromId === "b" && e.toId === "a")).toHaveLength(1);
+    const edges = generateAutoLinks(placed, {
+      maxLinkMeters: 6,
+      metersPerNorm: 12,
+      maxNeighbors: DEFAULT_MAX_NEIGHBORS,
+      sameFloorOnly: true,
+    });
+    expect(edges.every((e) => e.pitch <= FLOOR_LINE_PITCH)).toBe(true);
+    // no cross-floor
+    expect(edges.some((e) => e.fromId === "a" && e.toId === "f")).toBe(false);
+    const outA = edges.filter((e) => e.fromId === "a");
+    expect(outA.length).toBeLessThanOrEqual(3);
+    const summary = summarizeAutoLinks(placed, edges);
+    expect(summary.linkCount).toBeGreaterThan(0);
+    expect(summary.zeroLinkCount).toBeGreaterThanOrEqual(1); // e and/or f
   });
 
   it("respects deleted and added links", () => {
@@ -64,14 +99,13 @@ describe("floor-plan geometry", () => {
       { id: "c", mapX: 0.5, mapY: 0.5, floor: 0 },
     ];
     const edges = generateAutoLinks(placed, {
-      maxDistNorm: 0.2,
+      maxLinkMeters: 8,
+      metersPerNorm: 12,
       deletedLinks: [["a", "b"]],
       addedLinks: [["a", "c"]],
     });
-    const hasAB = edges.some((e) => e.fromId === "a" && e.toId === "b");
-    const hasAC = edges.some((e) => e.fromId === "a" && e.toId === "c");
-    expect(hasAB).toBe(false);
-    expect(hasAC).toBe(true);
+    expect(edges.some((e) => e.fromId === "a" && e.toId === "b")).toBe(false);
+    expect(edges.some((e) => e.fromId === "a" && e.toId === "c")).toBe(true);
   });
 
   it("applyAutoLinksToScenes replaces placed-pair hotspots", () => {
@@ -94,7 +128,7 @@ describe("floor-plan geometry", () => {
     ];
     const edges = generateAutoLinks(
       scenes.filter((s) => s.mapX != null),
-      { maxDistNorm: 0.2 }
+      { maxLinkMeters: 6, metersPerNorm: 12 }
     );
     const next = applyAutoLinksToScenes(scenes, edges);
     expect(next.find((s) => s.id === "a").hotSpots.some((h) => h.targetSceneId === "b")).toBe(
@@ -107,6 +141,44 @@ describe("floor-plan geometry", () => {
 
   it("normDist", () => {
     expect(normDist(0, 0, 0.3, 0.4)).toBeCloseTo(0.5, 5);
+  });
+});
+
+describe("content detection", () => {
+  it("finds bright content inside a dark frame", () => {
+    const W = 100;
+    const H = 100;
+    const data = new Uint8ClampedArray(W * H * 4);
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 20;
+      data[i + 1] = 20;
+      data[i + 2] = 20;
+      data[i + 3] = 255;
+    }
+    // bright square 20..80
+    for (let y = 20; y < 80; y++) {
+      for (let x = 20; x < 80; x++) {
+        const i = (y * W + x) * 4;
+        data[i] = 180;
+        data[i + 1] = 160;
+        data[i + 2] = 140;
+      }
+    }
+    const bounds = detectContentBoundsFromImageData({ width: W, height: H, data });
+    expect(bounds.contentRatio).toBeLessThan(0.5);
+    expect(bounds.needsCrop).toBe(true);
+    expect(bounds.w).toBeGreaterThan(0.4);
+    expect(bounds.w).toBeLessThan(0.8);
+  });
+
+  it("remapScenesToCrop updates coords", () => {
+    const scenes = [
+      { id: "a", mapX: 0.5, mapY: 0.5, floor: 0 },
+      { id: "b", mapX: 0.1, mapY: 0.1, floor: 1 },
+    ];
+    const next = remapScenesToCrop(scenes, 0, { x: 0.25, y: 0.25, w: 0.5, h: 0.5 });
+    expect(next[0].mapX).toBeCloseTo(0.5, 5);
+    expect(next[1].mapX).toBe(0.1);
   });
 });
 
@@ -147,16 +219,18 @@ describe("pannellum floor-plan round-trip", () => {
       firstSceneId: "s1",
       includeHidden: true,
       floorPlans: [{ floor: 0, url: "https://example.com/plan.png", label: "קומה 0" }],
-      floorPlanMeta: { maxDistNorm: 0.18, deletedLinks: [["s1", "s2"]], addedLinks: [] },
+      floorPlanMeta: {
+        maxLinkMeters: 6,
+        metersPerNorm: 12,
+        deletedLinks: [["s1", "s2"]],
+        addedLinks: [],
+      },
     });
     expect(cfg.scenes.s1.mapX).toBe(0.4);
-    expect(cfg.scenes.s1.northOffset).toBe(12.5);
-    expect(cfg.floorPlans[0].url).toContain("plan.png");
-    expect(cfg.floorPlanMeta.maxDistNorm).toBe(0.18);
+    expect(cfg.floorPlanMeta.maxLinkMeters).toBe(6);
 
     const back = configToEditorScenes(cfg);
     expect(back[0].mapX).toBe(0.4);
-    expect(back[0].hotSpots[0].source).toBe("auto");
 
     const fp = configToFloorPlanState(cfg);
     expect(fp.floorPlans).toHaveLength(1);

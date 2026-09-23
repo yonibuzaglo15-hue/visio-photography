@@ -25,7 +25,8 @@ import {
 } from "../../lib/tour/floor-nav.js";
 import FloorPlanPanel from "./FloorPlanPanel.jsx";
 import {
-  DEFAULT_MAX_DIST_NORM,
+  DEFAULT_MAX_LINK_METERS,
+  DEFAULT_SHORT_SIDE_METERS,
 } from "../../lib/tour/floor-plan.js";
 
 const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
@@ -146,9 +147,12 @@ export default function TourEditor() {
   const [viewerReady, setViewerReady] = useState(false);
   const [floorPlans, setFloorPlans] = useState([]);
   const [floorPlanMeta, setFloorPlanMeta] = useState({
-    maxDistNorm: DEFAULT_MAX_DIST_NORM,
-    metersPerNorm: 12,
+    maxLinkMeters: DEFAULT_MAX_LINK_METERS,
+    metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
     cameraHeightM: 1.55,
+    maxNeighbors: 3,
+    scaleCalibrated: false,
+    sameFloorOnly: true,
     deletedLinks: [],
     addedLinks: [],
   });
@@ -275,9 +279,12 @@ export default function TourEditor() {
         data.floorPlanMeta && typeof data.floorPlanMeta === "object"
           ? data.floorPlanMeta
           : {
-              maxDistNorm: DEFAULT_MAX_DIST_NORM,
-              metersPerNorm: 12,
+              maxLinkMeters: DEFAULT_MAX_LINK_METERS,
+              metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
               cameraHeightM: 1.55,
+              maxNeighbors: 3,
+              scaleCalibrated: false,
+              sameFloorOnly: true,
               deletedLinks: [],
               addedLinks: [],
             }
