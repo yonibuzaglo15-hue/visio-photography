@@ -25,7 +25,6 @@ import {
 } from "../../lib/tour/floor-nav.js";
 import FloorPlanPanel from "./FloorPlanPanel.jsx";
 import {
-  DEFAULT_MAX_LINK_METERS,
   DEFAULT_SHORT_SIDE_METERS,
   friendlyRoomLabel,
 } from "../../lib/tour/floor-plan.js";
@@ -147,17 +146,10 @@ export default function TourEditor() {
   const [panoMeta, setPanoMeta] = useState(null);
   const [viewerReady, setViewerReady] = useState(false);
   const [floorPlans, setFloorPlans] = useState([]);
-  const [calibHint, setCalibHint] = useState("");
-  const [calibPreview, setCalibPreview] = useState(null);
   const [floorPlanMeta, setFloorPlanMeta] = useState({
-    maxLinkMeters: DEFAULT_MAX_LINK_METERS,
     metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
     cameraHeightM: 1.6,
-    maxNeighbors: 3,
     scaleCalibrated: false,
-    sameFloorOnly: true,
-    deletedLinks: [],
-    addedLinks: [],
   });
 
   const viewerRef = useRef(null);
@@ -186,34 +178,6 @@ export default function TourEditor() {
   useEffect(() => {
     setTextureLimit(probeTextureLimit());
     ensureFloorCss();
-    const onReadYaw = () => {
-      try {
-        if (viewerRef.current) {
-          window.__visioEditorYaw = viewerRef.current.getYaw();
-        }
-      } catch {
-        /* ignore */
-      }
-    };
-    const onArmPick = (ev) => {
-      window.__visioPanoPick = ev.detail || null;
-      setCalibHint(
-        ev.detail?.label
-          ? `לחץ בפנורמה על הפתח ל־${ev.detail.label}`
-          : "לחץ בפנורמה על הפתח"
-      );
-    };
-    const onPreview = (ev) => {
-      setCalibPreview(ev.detail || null);
-    };
-    window.addEventListener("visio-read-yaw", onReadYaw);
-    window.addEventListener("visio-arm-pano-pick", onArmPick);
-    window.addEventListener("visio-calib-preview", onPreview);
-    return () => {
-      window.removeEventListener("visio-read-yaw", onReadYaw);
-      window.removeEventListener("visio-arm-pano-pick", onArmPick);
-      window.removeEventListener("visio-calib-preview", onPreview);
-    };
   }, []);
 
   const graphStats = useMemo(
@@ -315,14 +279,9 @@ export default function TourEditor() {
         data.floorPlanMeta && typeof data.floorPlanMeta === "object"
           ? data.floorPlanMeta
           : {
-              maxLinkMeters: DEFAULT_MAX_LINK_METERS,
               metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
               cameraHeightM: 1.6,
-              maxNeighbors: 3,
               scaleCalibrated: false,
-              sameFloorOnly: true,
-              deletedLinks: [],
-              addedLinks: [],
             }
       );
       setFirstSceneId(data.firstSceneId || list.find((s) => !s.hidden)?.id || list[0]?.id || "");
@@ -373,17 +332,20 @@ export default function TourEditor() {
       const sceneId = activeSceneIdRef.current;
       const target = scenesRef.current.find((s) => s.id === targetId);
       const origin = scenesRef.current.find((s) => s.id === sceneId);
+      // Store exactly the clicked yaw/pitch — never recompute from the plan.
+      const exactPitch = Number(pitch);
+      const exactYaw = Number(yaw);
 
       applySceneUpdate(sceneId, (scene) => ({
         ...scene,
         hotSpots: [
-          ...(scene.hotSpots || []),
+          ...(scene.hotSpots || []).filter((h) => h.targetSceneId !== targetId),
           {
             id: newHotspotId(),
-            pitch,
-            yaw,
+            pitch: exactPitch,
+            yaw: exactYaw,
             targetSceneId: targetId,
-            text: target?.title || "חדר",
+            text: friendlyRoomLabel(target || { id: targetId }),
           },
         ],
       }));
@@ -391,8 +353,8 @@ export default function TourEditor() {
       setPlaceMode(false);
       setPendingTarget("");
 
-      const targetTitle = target?.title || "B";
-      const originTitle = origin?.title || "A";
+      const targetTitle = friendlyRoomLabel(target || { id: targetId });
+      const originTitle = friendlyRoomLabel(origin || { id: sceneId });
       const addBack = window.confirm(
         `הוסף גם נקודה חזרה מ-${targetTitle} ל-${originTitle}?`
       );
@@ -769,54 +731,7 @@ export default function TourEditor() {
               ref={containerRef}
               className="visio-tour-editor-viewer"
               style={{ width: "100%", height: 420, background: "#0a0a0a" }}
-              onClick={(e) => {
-                const pick = window.__visioPanoPick;
-                const viewer = viewerRef.current;
-                if (!pick || !viewer) return;
-                try {
-                  const coords = viewer.mouseEventToCoords(e.nativeEvent || e);
-                  if (!coords) return;
-                  const yaw = coords[1];
-                  window.__visioPanoPick = null;
-                  setCalibHint("");
-                  window.dispatchEvent(
-                    new CustomEvent("visio-pano-pick-done", {
-                      detail: {
-                        fromId: pick.fromId,
-                        toId: pick.toId,
-                        yaw,
-                        pitch: coords[0],
-                      },
-                    })
-                  );
-                } catch {
-                  /* ignore */
-                }
-              }}
             />
-            {calibHint && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 12,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  zIndex: 30,
-                  background: "rgba(201,168,76,0.95)",
-                  color: "#0a0a0a",
-                  padding: "8px 14px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  pointerEvents: "none",
-                }}
-              >
-                {calibHint}
-              </div>
-            )}
-            {calibPreview && viewerReady && (
-              <CalibPreviewOverlay viewerRef={viewerRef} preview={calibPreview} />
-            )}
             {!viewerReady && activeScene && (
               <div style={{ position: "relative", marginTop: -420, height: 420, display: "flex", alignItems: "center", justifyContent: "center", color: ADMIN.muted, pointerEvents: "none" }}>
                 <Loader2 size={22} className="visio-spin" color={ADMIN.gold} />
@@ -830,13 +745,17 @@ export default function TourEditor() {
                   <select
                     className="visio-admin-input"
                     value={pendingTarget}
-                    onChange={(e) => setPendingTarget(e.target.value)}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setPendingTarget(id);
+                      setPlaceMode(Boolean(id));
+                    }}
                     disabled={otherScenes.length === 0}
                   >
                     <option value="">— בחר חדר יעד —</option>
                     {otherScenes.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.title || s.id}{s.hidden ? " (מוסתר)" : ""}
+                        {friendlyRoomLabel(s)}{s.hidden ? " (מוסתר)" : ""}
                       </option>
                     ))}
                   </select>
@@ -872,7 +791,7 @@ export default function TourEditor() {
               {placeMode && (
                 <div style={{ fontSize: 12, color: ADMIN.accent, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                   <MapPin size={14} />
-                  מצב מיקום — לחץ על הרצפה במקום הצילום הבא (לא על משקוף הדלת)
+                  לחץ על הרצפה — הדיסקית תישב בדיוק שם (ללא חישוב מתוכנית)
                 </div>
               )}
 
@@ -895,9 +814,9 @@ export default function TourEditor() {
                       }}
                     >
                       <div style={{ fontSize: 12, color: ADMIN.text }}>
-                        → {scenes.find((s) => s.id === h.targetSceneId)?.title || h.targetSceneId}
+                        → {friendlyRoomLabel(scenes.find((s) => s.id === h.targetSceneId) || { id: h.targetSceneId })}
                         <span style={{ color: ADMIN.muted, marginInlineStart: 8 }} dir="ltr">
-                          yaw {h.yaw.toFixed(1)}° · pitch {h.pitch.toFixed(1)}°
+                          yaw {Number(h.yaw).toFixed(1)}° · pitch {Number(h.pitch).toFixed(1)}°
                         </span>
                       </div>
                       <select
@@ -906,19 +825,23 @@ export default function TourEditor() {
                         value={h.targetSceneId}
                         onChange={(e) => {
                           const targetId = e.target.value;
-                          const title = scenes.find((s) => s.id === targetId)?.title || "";
+                          const t = scenes.find((s) => s.id === targetId);
                           applySceneUpdate(activeSceneId, (scene) => ({
                             ...scene,
                             hotSpots: scene.hotSpots.map((x) =>
                               x.id === h.id
-                                ? { ...x, targetSceneId: targetId, text: title }
+                                ? {
+                                    ...x,
+                                    targetSceneId: targetId,
+                                    text: friendlyRoomLabel(t || { id: targetId }),
+                                  }
                                 : x
                             ),
                           }));
                         }}
                       >
                         {otherScenes.map((s) => (
-                          <option key={s.id} value={s.id}>{s.title || s.id}</option>
+                          <option key={s.id} value={s.id}>{friendlyRoomLabel(s)}</option>
                         ))}
                       </select>
                       <button
@@ -994,70 +917,6 @@ export default function TourEditor() {
           onDirty={() => setDirty(true)}
         />
       )}
-    </div>
-  );
-}
-
-function CalibPreviewOverlay({ viewerRef, preview }) {
-  const [pos, setPos] = useState(null);
-
-  useEffect(() => {
-    let raf = 0;
-    const tick = () => {
-      const viewer = viewerRef.current;
-      if (viewer && preview && Number.isFinite(preview.yaw)) {
-        try {
-          const screen = viewer.coordsToScreen(preview.pitch ?? -25, preview.yaw);
-          if (screen && Number.isFinite(screen.x) && Number.isFinite(screen.y)) {
-            setPos({ x: screen.x, y: screen.y });
-          } else {
-            setPos(null);
-          }
-        } catch {
-          setPos(null);
-        }
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [viewerRef, preview]);
-
-  if (!pos || !preview) return null;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: pos.x,
-        top: pos.y,
-        transform: "translate(-50%, -120%)",
-        zIndex: 25,
-        pointerEvents: "none",
-        textAlign: "center",
-      }}
-    >
-      <div
-        style={{
-          width: 0,
-          height: 0,
-          margin: "0 auto 4px",
-          borderLeft: "8px solid transparent",
-          borderRight: "8px solid transparent",
-          borderBottom: "14px solid rgba(201,168,76,0.95)",
-        }}
-      />
-      <div
-        style={{
-          background: "rgba(10,10,10,0.85)",
-          color: "#f5f5f5",
-          padding: "4px 8px",
-          fontSize: 12,
-          borderRadius: 2,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {preview.label || "חדר"}
-      </div>
     </div>
   );
 }
