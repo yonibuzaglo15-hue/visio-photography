@@ -27,6 +27,7 @@ import FloorPlanPanel from "./FloorPlanPanel.jsx";
 import {
   DEFAULT_MAX_LINK_METERS,
   DEFAULT_SHORT_SIDE_METERS,
+  friendlyRoomLabel,
 } from "../../lib/tour/floor-plan.js";
 
 const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
@@ -246,6 +247,15 @@ export default function TourEditor() {
     loadJobs();
   }, [loadJobs]);
 
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("job");
+      if (q) setJobId(q);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const destroyViewer = useCallback(() => {
     if (floorNavRef.current) {
       try {
@@ -287,10 +297,17 @@ export default function TourEditor() {
         return;
       }
 
-      const list = (data.scenes || []).map((s) => ({
+      const list = (data.scenes || []).map((s, i) => ({
         ...s,
+        title: friendlyRoomLabel(s, i + 1),
         hidden: Boolean(s.hidden),
-        hotSpots: s.hotSpots || [],
+        hotSpots: (s.hotSpots || []).map((h) => ({
+          ...h,
+          text: friendlyRoomLabel({
+            title: h.text,
+            id: h.targetSceneId,
+          }),
+        })),
       }));
       setScenes(list);
       setFloorPlans(Array.isArray(data.floorPlans) ? data.floorPlans : []);
@@ -582,17 +599,31 @@ export default function TourEditor() {
           <label className="visio-admin-label">Job</label>
           <select
             className="visio-admin-input"
-            value={jobId}
-            onChange={(e) => setJobId(e.target.value)}
+            value={jobs.some((j) => j.id === jobId) ? jobId : jobId ? "__custom__" : ""}
+            onChange={(e) => {
+              if (e.target.value === "__custom__") return;
+              setJobId(e.target.value);
+            }}
             dir="rtl"
           >
             <option value="">— בחר —</option>
+            {jobId && !jobs.some((j) => j.id === jobId) && (
+              <option value="__custom__">{jobId}</option>
+            )}
             {jobs.map((j) => (
               <option key={j.id} value={j.id}>
                 {jobLabel(j)}
               </option>
             ))}
           </select>
+          <input
+            className="visio-admin-input"
+            style={{ marginTop: 8 }}
+            placeholder="או הדבק job id"
+            value={jobId}
+            onChange={(e) => setJobId(e.target.value.trim())}
+            dir="ltr"
+          />
         </div>
         <button type="button" className="visio-admin-btn-ghost" onClick={() => loadJobs()}>
           <RefreshCw size={14} />
@@ -670,7 +701,7 @@ export default function TourEditor() {
                       }}
                     >
                       <div style={{ fontSize: 13, fontWeight: 600 }}>
-                        {scene.title || scene.id}
+                        {friendlyRoomLabel(scene)}
                         {scene.hidden ? " · מוסתר" : ""}
                       </div>
                       <div style={{ fontSize: 10, color: ADMIN.muted, marginTop: 4 }}>

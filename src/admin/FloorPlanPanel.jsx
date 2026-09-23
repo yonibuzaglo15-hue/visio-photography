@@ -72,13 +72,20 @@ export default function FloorPlanPanel({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [panning, setPanning] = useState(false);
+  const [debug, setDebug] = useState(false);
   const panStart = useRef(null);
   const viewportRef = useRef(null);
   const imgRef = useRef(null);
   const fileRef = useRef(null);
-  const debug =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("debug") === "1";
+  const chromeCheckRef = useRef("");
+
+  useEffect(() => {
+    try {
+      setDebug(new URLSearchParams(window.location.search).get("debug") === "1");
+    } catch {
+      setDebug(false);
+    }
+  }, []);
 
   const plan = useMemo(
     () => floorPlans.find((p) => Number(p.floor) === Number(activeFloor)) || floorPlans[0] || null,
@@ -157,6 +164,38 @@ export default function FloorPlanPanel({
     }
   }, [floorPlans, activeFloor]);
 
+  // If the stored plan still looks like a full screenshot (browser chrome / dock),
+  // force the crop flow rather than rendering it.
+  useEffect(() => {
+    if (!plan?.url || cropSession || uploading) return;
+    if (plan.cropped === true) return;
+    if (chromeCheckRef.current === plan.url) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const session = await prepareCropSession(plan.url);
+        if (cancelled) return;
+        chromeCheckRef.current = plan.url;
+        if (session.detection?.needsCrop) {
+          setCropSession({
+            ...session,
+            floor: plan.floor ?? activeFloor,
+            remap: placed.length > 0,
+          });
+          setUploadErr(
+            "התוכנית עדיין נראית כמו צילום מסך מלא (כולל chrome/dock). חתוך לפני המשך."
+          );
+        }
+      } catch {
+        chromeCheckRef.current = plan.url;
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-check when plan URL changes
+  }, [plan?.url, plan?.cropped, plan?.floor, cropSession, uploading, activeFloor, placed.length]);
+
   const markDirty = () => onDirty?.();
 
   const updateMeta = (patch) => {
@@ -215,11 +254,12 @@ export default function FloorPlanPanel({
       if (!data.ok) throw new Error(data.error || "העלאה נכשלה");
       const next = [
         ...floorPlans.filter((p) => Number(p.floor) !== Number(data.floorPlan.floor)),
-        data.floorPlan,
+        { ...data.floorPlan, cropped: true },
       ];
       next.sort((a, b) => a.floor - b.floor);
       onFloorPlansChange(next);
       setActiveFloor(data.floorPlan.floor);
+      chromeCheckRef.current = data.floorPlan.url;
       if (cropSession.remap) {
         onScenesChange(remapScenesToCrop(scenes, floor, crop));
       }

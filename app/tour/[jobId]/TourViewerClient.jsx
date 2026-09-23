@@ -68,10 +68,18 @@ export default function TourViewerClient({ config: initialConfig }) {
   const [loading, setLoading] = useState(true);
   const [sceneId, setSceneId] = useState(initialConfig?.default?.firstScene || "");
   const [yaw, setYaw] = useState(0);
+  // Defer ?debug=1 until after mount — otherwise SSR (no arrows) ≠ client (arrows)
+  // and Next throws a hydration error ("1 error" badge).
+  const [debug, setDebug] = useState(false);
   const loadStarted = useRef(typeof performance !== "undefined" ? performance.now() : 0);
-  const debug =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("debug") === "1";
+
+  useEffect(() => {
+    try {
+      setDebug(new URLSearchParams(window.location.search).get("debug") === "1");
+    } catch {
+      setDebug(false);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

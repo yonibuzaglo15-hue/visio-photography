@@ -39,22 +39,29 @@ export async function GET(request, { params }) {
 
   try {
     const job = await getJob(params.id);
-    if (!job) {
+    const blobBase =
+      process.env.NEXT_PUBLIC_BLOB_BASE_URL ||
+      "https://5ltyuhgj5vbqjxug.public.blob.vercel-storage.com";
+
+    const panoramas = job ? panoramasFromJob(job) : [];
+    const existingConfig = await fetchTourConfig(
+      job?.outputs?.tourJsonUrl || `${blobBase}/tours/${params.id}/tour.json`
+    );
+
+    if (!job && !existingConfig) {
       return NextResponse.json({ ok: false, error: "Job not found" }, { status: 404 });
     }
 
-    const panoramas = panoramasFromJob(job);
-    const existingConfig = await fetchTourConfig(job.outputs?.tourJsonUrl);
     let scenes = configToEditorScenes(existingConfig);
     const { floorPlans: fromConfig, floorPlanMeta } =
       configToFloorPlanState(existingConfig);
 
+    // Prefer job.outputs (updated immediately on crop upload) over tour.json
+    // so the editor never keeps rendering a stale uncropped blob URL.
     const floorPlans =
-      fromConfig.length > 0
-        ? fromConfig
-        : Array.isArray(job.outputs?.floorPlans)
-          ? job.outputs.floorPlans
-          : [];
+      Array.isArray(job?.outputs?.floorPlans) && job.outputs.floorPlans.length > 0
+        ? job.outputs.floorPlans
+        : fromConfig;
 
     if (scenes.length === 0 && panoramas.length > 0) {
       scenes = panoramasToEditorScenes(panoramas);
@@ -69,24 +76,24 @@ export async function GET(request, { params }) {
     const firstSceneId =
       existingConfig?.default?.firstScene || scenes[0]?.id || null;
 
-    let tourUrl = job.outputs?.tourUrl || null;
+    let tourUrl = job?.outputs?.tourUrl || `/tour/${params.id}`;
     if (!tourUrl || String(tourUrl).includes("blob.vercel-storage.com")) {
-      tourUrl = `/tour/${job.id}`;
+      tourUrl = `/tour/${params.id}`;
     }
 
     return NextResponse.json({
       ok: true,
-      jobId: job.id,
-      booking: job.booking || null,
-      status: job.status,
+      jobId: params.id,
+      booking: job?.booking || null,
+      status: job?.status || "blob-only",
       tourUrl,
-      tourJsonUrl: job.outputs?.tourJsonUrl || null,
-      provider: job.outputs?.tourUrl?.includes("kuula") ? "kuula" : "pannellum",
+      tourJsonUrl: job?.outputs?.tourJsonUrl || `${blobBase}/tours/${params.id}/tour.json`,
+      provider: job?.outputs?.tourUrl?.includes("kuula") ? "kuula" : "pannellum",
       firstSceneId,
       scenes,
       floorPlans,
       floorPlanMeta,
-      panoramaCount: panoramas.length,
+      panoramaCount: panoramas.length || scenes.length,
     });
   } catch (err) {
     return NextResponse.json({ ok: false, error: err.message }, { status: 500 });

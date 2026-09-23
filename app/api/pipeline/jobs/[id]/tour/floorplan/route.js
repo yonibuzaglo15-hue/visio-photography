@@ -58,7 +58,10 @@ export async function POST(request, { params }) {
           : "jpg";
     const contentType =
       ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
-    const filename = `floorplan-f${floor}.${ext}`;
+    // Unique path per upload so CDN/browser never serve a cached uncropped plan
+    // under the same URL as the cropped one.
+    const stamp = Date.now().toString(36);
+    const filename = `floorplan-f${floor}-${stamp}.${ext}`;
     const safeJobId = String(params.id).replace(/[^a-zA-Z0-9_-]/g, "_");
     const url = await uploadBuffer(
       `tours/${safeJobId}/${filename}`,
@@ -70,7 +73,7 @@ export async function POST(request, { params }) {
       ? [...job.outputs.floorPlans]
       : [];
     const next = existing.filter((p) => Number(p.floor) !== floor);
-    next.push({ floor, url, label });
+    next.push({ floor, url, label, cropped: true, uploadedAt: Date.now() });
     next.sort((a, b) => a.floor - b.floor);
 
     await updateOutputs(params.id, { floorPlans: next });

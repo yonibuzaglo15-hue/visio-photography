@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { mapBearing } from "../../lib/tour/floor-plan.js";
+import { friendlyRoomLabel, mapBearing } from "../../lib/tour/floor-plan.js";
 
 /**
  * Matterport-style mini-map for the public tour viewer.
@@ -46,12 +46,13 @@ export default function TourMiniMap({
         northOffset: Number.isFinite(Number(sc.northOffset))
           ? Number(sc.northOffset)
           : 0,
-        title: sc.title || id,
+        title: friendlyRoomLabel({ title: sc.title, id }),
         hotSpots: sc.hotSpots || [],
       }));
   }, [scenes, plan]);
 
   const debugArrows = useMemo(() => {
+    // Only draw after client mount with debug=true (avoids SSR/client <line> mismatch).
     if (!debug || !currentSceneId) return [];
     const from = points.find((p) => p.id === currentSceneId);
     if (!from) return [];
