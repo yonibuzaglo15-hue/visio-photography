@@ -5,7 +5,10 @@ import { getJob, findJobByBookingId, updateJob } from "@/lib/pipeline/store.js";
 import { uploadAsset } from "@/lib/storage/index.js";
 import { runPipeline } from "@/lib/agents/ariel.js";
 import { requireAllowedApi } from "@/lib/auth/require.js";
-import { readImageDimensions } from "@/lib/images/dimensions.js";
+import {
+  readImageDimensions,
+  fetchImageDimensionsFromUrl,
+} from "@/lib/images/dimensions.js";
 
 function mimeFromName(name) {
   const ext = path.extname(name).toLowerCase();
@@ -14,10 +17,18 @@ function mimeFromName(name) {
   return "image/jpeg";
 }
 
+async function ensureDimensions(entry) {
+  if (entry.width && entry.height) return entry;
+  if (!entry.url) return entry;
+  const dims = await fetchImageDimensionsFromUrl(entry.url);
+  if (!dims) return entry;
+  return { ...entry, width: dims.width, height: dims.height };
+}
+
 /**
  * POST /api/pipeline/upload
  * Accepts:
- *  - JSON: { bookingId, jobId?, files: [{ name, url, type? }] }
+ *  - JSON: { bookingId, jobId?, files: [{ name, url, type?, width?, height? }] }
  *  - multipart/form-data: bookingId, jobId?, files[], urls[]
  */
 export async function POST(request) {
@@ -79,6 +90,9 @@ export async function POST(request) {
     if (!job) {
       return NextResponse.json({ ok: false, error: `Job not found: ${targetId}` }, { status: 404 });
     }
+
+    // Client→Blob uploads often omit width/height — fill from JPEG/PNG headers via Range.
+    fileEntries = await Promise.all(fileEntries.map(ensureDimensions));
 
     const enriched = fileEntries.map((f) => ({
       id: crypto.randomBytes(6).toString("hex"),
