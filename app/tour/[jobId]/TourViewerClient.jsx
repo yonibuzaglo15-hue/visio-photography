@@ -1,148 +1,50 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  FLOOR_NAV_CSS,
-  installFloorNav,
-  prepareFloorHotspots,
-} from "../../../lib/tour/floor-nav.js";
-import {
-  applyDevicePanoramas,
-  probeMaxTextureSize,
-} from "../../../lib/tour/viewer-sizes.js";
-import TourMiniMap from "../../../src/tour/TourMiniMap.jsx";
-
-const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
-const PANNELLUM_JS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
-
-let pannellumPromise = null;
-let cssInjected = false;
-
-function ensureCss() {
-  if (typeof document === "undefined" || cssInjected) return;
-  if (!document.querySelector(`link[href="${PANNELLUM_CSS}"]`)) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = PANNELLUM_CSS;
-    document.head.appendChild(link);
-  }
-  if (!document.getElementById("visio-floor-nav-css")) {
-    const style = document.createElement("style");
-    style.id = "visio-floor-nav-css";
-    style.textContent = FLOOR_NAV_CSS;
-    document.head.appendChild(style);
-  }
-  cssInjected = true;
-}
-
-function loadPannellum() {
-  if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
-  if (window.pannellum) return Promise.resolve(window.pannellum);
-  if (pannellumPromise) return pannellumPromise;
-  pannellumPromise = new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${PANNELLUM_JS}"]`);
-    if (existing) {
-      existing.addEventListener("load", () => resolve(window.pannellum));
-      existing.addEventListener("error", () => reject(new Error("Pannellum load failed")));
-      if (window.pannellum) resolve(window.pannellum);
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = PANNELLUM_JS;
-    script.async = true;
-    script.onload = () => resolve(window.pannellum);
-    script.onerror = () => reject(new Error("Pannellum load failed"));
-    document.body.appendChild(script);
-  });
-  return pannellumPromise;
-}
+import { createPsvTourViewer } from "../../../lib/tour/create-psv-viewer.js";
 
 /**
- * Public tour viewer — same floor-nav runtime as published HTML.
+ * Public tour viewer — Photo Sphere Viewer + VirtualTour + Map plugins.
  */
 export default function TourViewerClient({ config: initialConfig }) {
   const containerRef = useRef(null);
-  const viewerRef = useRef(null);
-  const navRef = useRef(null);
+  const apiRef = useRef(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [sceneId, setSceneId] = useState(initialConfig?.default?.firstScene || "");
-  const [yaw, setYaw] = useState(0);
-  // Defer ?debug=1 until after mount — otherwise SSR (no arrows) ≠ client (arrows)
-  // and Next throws a hydration error ("1 error" badge).
-  const [debug, setDebug] = useState(false);
   const loadStarted = useRef(typeof performance !== "undefined" ? performance.now() : 0);
 
   useEffect(() => {
-    try {
-      setDebug(new URLSearchParams(window.location.search).get("debug") === "1");
-    } catch {
-      setDebug(false);
-    }
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
-    let yawTimer = null;
     async function boot() {
       if (!initialConfig || !containerRef.current) return;
-      ensureCss();
       setLoading(true);
       setError("");
       try {
-        const pannellum = await loadPannellum();
-        if (cancelled || !containerRef.current) return;
-
-        const config = JSON.parse(JSON.stringify(initialConfig));
-        applyDevicePanoramas(config, probeMaxTextureSize());
-        if (config.default) {
-          config.default.sceneFadeDuration = 400;
-          config.default.hotSpotDebug = false;
-        }
-
-        const walkRef = { current: null };
-        prepareFloorHotspots(config, {
-          onHover: (sceneIdNext) => navRef.current?.preloadScene?.(sceneIdNext),
-          onClick: (hs) => walkRef.current?.(hs),
-        });
-
         containerRef.current.innerHTML = "";
-        const viewer = pannellum.viewer(containerRef.current, config);
-        const nav = installFloorNav(viewer, config, {
-          walkRef,
-          onSceneChange: (id) => {
-            if (id) setSceneId(id);
+        const api = await createPsvTourViewer(containerRef.current, initialConfig, {
+          startNodeId: initialConfig?.default?.firstScene,
+          enableMap: true,
+          onNodeChange: () => {
+            if (cancelled) return;
+            setLoading(false);
           },
         });
-        viewerRef.current = viewer;
-        navRef.current = nav;
-        setSceneId(viewer.getScene?.() || config.default?.firstScene || "");
-        if (typeof window !== "undefined") {
-          window.__visioViewer = viewer;
-          window.__visioNav = nav;
+        if (cancelled) {
+          api.destroy();
+          return;
         }
-
-        viewer.on("load", () => {
-          if (cancelled) return;
-          setLoading(false);
-          const ms = performance.now() - loadStarted.current;
-          if (typeof window !== "undefined") {
-            window.__visioFirstSceneLoadMs = Math.round(ms);
-            console.info("[visio-tour] first scene load ms", Math.round(ms));
-          }
-        });
-
-        yawTimer = setInterval(() => {
-          try {
-            if (viewerRef.current) setYaw(viewerRef.current.getYaw());
-          } catch {
-            /* ignore */
-          }
-        }, 120);
-
-        setTimeout(() => {
-          if (!cancelled) setLoading(false);
-        }, 8000);
+        apiRef.current = api;
+        if (typeof window !== "undefined") {
+          window.__visioViewer = api.viewer;
+          window.__visioTour = api.virtualTour;
+          window.__visioMap = api.map;
+        }
+        const ms = performance.now() - loadStarted.current;
+        if (typeof window !== "undefined") {
+          window.__visioFirstSceneLoadMs = Math.round(ms);
+          console.info("[visio-tour] PSV first scene load ms", Math.round(ms));
+        }
+        setLoading(false);
       } catch (err) {
         if (!cancelled) {
           setError(err.message || "שגיאה בטעינת הסיור");
@@ -153,23 +55,14 @@ export default function TourViewerClient({ config: initialConfig }) {
     boot();
     return () => {
       cancelled = true;
-      if (yawTimer) clearInterval(yawTimer);
       try {
-        navRef.current?.destroy?.();
+        apiRef.current?.destroy?.();
       } catch {
         /* ignore */
       }
-      try {
-        viewerRef.current?.destroy?.();
-      } catch {
-        /* ignore */
-      }
-      navRef.current = null;
-      viewerRef.current = null;
+      apiRef.current = null;
     };
   }, [initialConfig]);
-
-  const floorPlans = initialConfig?.floorPlans || [];
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#0a0a0a" }}>
@@ -213,14 +106,6 @@ export default function TourViewerClient({ config: initialConfig }) {
           {error}
         </div>
       )}
-      <TourMiniMap
-        floorPlans={floorPlans}
-        scenes={initialConfig?.scenes || {}}
-        currentSceneId={sceneId}
-        yaw={yaw}
-        onJump={(id) => navRef.current?.jumpToScene?.(id)}
-        debug={debug}
-      />
       <div
         style={{
           position: "fixed",

@@ -261,15 +261,8 @@ button:hover { opacity: 0.85; }
   gap: 16px;
   align-items: start;
 }
-.visio-tour-editor-viewer .pnlm-container { background: #0a0a0a; }
-/* Floor discs: styles injected from lib/tour/floor-nav.js (FLOOR_NAV_CSS) */
-.pnlm-hotspot.visio-editor-hotspot {
-  background: transparent;
-  border: none;
-  width: 0;
-  height: 0;
-  box-shadow: none;
-}
+.visio-tour-editor-viewer .psv-container { background: #0a0a0a; width: 100%; height: 100%; min-height: 420px; }
+.visio-floor-disc { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55)); }
 @media (max-width: 1100px) {
   .visio-tour-editor-grid {
     grid-template-columns: 1fr;

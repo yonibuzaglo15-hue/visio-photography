@@ -18,65 +18,12 @@ import {
   analyzeTourGraph,
   buildPannellumConfig,
 } from "../../lib/tour/pannellum-config.js";
-import {
-  FLOOR_NAV_CSS,
-  installFloorNav,
-  prepareFloorHotspots,
-} from "../../lib/tour/floor-nav.js";
+import { createPsvTourViewer } from "../../lib/tour/create-psv-viewer.js";
 import FloorPlanPanel from "./FloorPlanPanel.jsx";
 import {
   DEFAULT_SHORT_SIDE_METERS,
   friendlyRoomLabel,
 } from "../../lib/tour/floor-plan.js";
-
-const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
-const PANNELLUM_JS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
-
-let pannellumLoadPromise = null;
-let floorCssInjected = false;
-
-function ensureFloorCss() {
-  if (typeof document === "undefined" || floorCssInjected) return;
-  if (!document.getElementById("visio-floor-nav-css")) {
-    const style = document.createElement("style");
-    style.id = "visio-floor-nav-css";
-    style.textContent = FLOOR_NAV_CSS;
-    document.head.appendChild(style);
-  }
-  floorCssInjected = true;
-}
-
-function loadPannellum() {
-  if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
-  if (window.pannellum) return Promise.resolve(window.pannellum);
-  if (pannellumLoadPromise) return pannellumLoadPromise;
-
-  pannellumLoadPromise = new Promise((resolve, reject) => {
-    if (!document.querySelector(`link[href="${PANNELLUM_CSS}"]`)) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = PANNELLUM_CSS;
-      document.head.appendChild(link);
-    }
-
-    const existing = document.querySelector(`script[src="${PANNELLUM_JS}"]`);
-    if (existing) {
-      existing.addEventListener("load", () => resolve(window.pannellum));
-      existing.addEventListener("error", () => reject(new Error("Pannellum load failed")));
-      if (window.pannellum) resolve(window.pannellum);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = PANNELLUM_JS;
-    script.async = true;
-    script.onload = () => resolve(window.pannellum);
-    script.onerror = () => reject(new Error("Pannellum load failed"));
-    document.body.appendChild(script);
-  });
-
-  return pannellumLoadPromise;
-}
 
 function jobLabel(job) {
   const addr = job.booking?.address;
@@ -153,13 +100,14 @@ export default function TourEditor() {
   });
 
   const viewerRef = useRef(null);
-  const floorNavRef = useRef(null);
-  const walkRef = useRef(null);
+  const psvApiRef = useRef(null);
   const containerRef = useRef(null);
   const placeModeRef = useRef(false);
   const pendingTargetRef = useRef("");
   const scenesRef = useRef(scenes);
   const activeSceneIdRef = useRef(activeSceneId);
+  const floorPlansRef = useRef(floorPlans);
+  const floorPlanMetaRef = useRef(floorPlanMeta);
   const skipRemountRef = useRef(false);
 
   useEffect(() => {
@@ -174,10 +122,15 @@ export default function TourEditor() {
   useEffect(() => {
     activeSceneIdRef.current = activeSceneId;
   }, [activeSceneId]);
+  useEffect(() => {
+    floorPlansRef.current = floorPlans;
+  }, [floorPlans]);
+  useEffect(() => {
+    floorPlanMetaRef.current = floorPlanMeta;
+  }, [floorPlanMeta]);
 
   useEffect(() => {
     setTextureLimit(probeTextureLimit());
-    ensureFloorCss();
   }, []);
 
   const graphStats = useMemo(
@@ -221,22 +174,15 @@ export default function TourEditor() {
   }, []);
 
   const destroyViewer = useCallback(() => {
-    if (floorNavRef.current) {
+    if (psvApiRef.current) {
       try {
-        floorNavRef.current.destroy();
+        psvApiRef.current.destroy();
       } catch {
         /* ignore */
       }
-      floorNavRef.current = null;
+      psvApiRef.current = null;
     }
-    if (viewerRef.current) {
-      try {
-        viewerRef.current.destroy();
-      } catch {
-        /* ignore */
-      }
-      viewerRef.current = null;
-    }
+    viewerRef.current = null;
     setViewerReady(false);
   }, []);
 
@@ -255,7 +201,7 @@ export default function TourEditor() {
       if (!data.ok) throw new Error(data.error || "טעינה נכשלה");
 
       if (data.provider === "kuula") {
-        setError("הסיור הזה ב-Kuula — עורך הקישורים תומך רק ב-Pannellum על Blob.");
+        setError("הסיור הזה ב-Kuula — עורך הקישורים תומך רק בסיורי VISIO (Photo Sphere Viewer).");
         setScenes([]);
         setTourUrl(data.tourUrl);
         return;
@@ -376,12 +322,8 @@ export default function TourEditor() {
 
     destroyViewer();
     setViewerReady(false);
-    ensureFloorCss();
 
     try {
-      const pannellum = await loadPannellum();
-      if (!containerRef.current) return;
-
       const startId =
         activeSceneIdRef.current ||
         scenesRef.current.find((s) => !s.hidden)?.id ||
@@ -391,45 +333,32 @@ export default function TourEditor() {
         scenes: scenesRef.current,
         firstSceneId: startId,
         includeHidden: true,
+        floorPlans: floorPlansRef.current,
+        floorPlanMeta: floorPlanMetaRef.current,
       });
       if (config.default) {
         config.default.firstScene = startId;
-        config.default.sceneFadeDuration = 400;
-        config.default.hotSpotDebug = false;
       }
 
-      const walkBridge = { current: null };
-      prepareFloorHotspots(config, {
-        cssClass: "visio-editor-hotspot",
-        onHover: (sceneId) => {
-          if (floorNavRef.current?.preloadScene) {
-            floorNavRef.current.preloadScene(sceneId);
-          }
-        },
-        onClick: (hs) => {
-          if (placeModeRef.current) return;
-          if (typeof walkBridge.current === "function") walkBridge.current(hs);
-        },
-      });
-
       containerRef.current.innerHTML = "";
-      const viewer = pannellum.viewer(containerRef.current, config);
-
-      const nav = installFloorNav(viewer, config, {
-        walkRef: walkBridge,
+      const api = await createPsvTourViewer(containerRef.current, config, {
+        startNodeId: startId,
+        includeHidden: true,
+        enableMap: true,
         isPlaceMode: () => placeModeRef.current,
-        onFloorPlace: (pitch, yaw) => placeHotspot(pitch, yaw),
-        onSceneChange: (sceneId) => {
-          if (sceneId && sceneId !== activeSceneIdRef.current) {
+        onPlaceClick: ({ pitch, yaw }) => {
+          placeHotspot(pitch, yaw);
+        },
+        onNodeChange: (node) => {
+          if (node?.id && node.id !== activeSceneIdRef.current) {
             skipRemountRef.current = true;
-            setActiveSceneId(sceneId);
+            setActiveSceneId(node.id);
           }
         },
       });
 
-      walkRef.current = walkBridge;
-      floorNavRef.current = nav;
-      viewerRef.current = viewer;
+      psvApiRef.current = api;
+      viewerRef.current = api.viewer;
       setViewerReady(true);
     } catch (err) {
       setError(err.message || "שגיאה בטעינת הצופה");
@@ -458,34 +387,26 @@ export default function TourEditor() {
 
   const selectScene = (sceneId) => {
     setActiveSceneId(sceneId);
-    const viewer = viewerRef.current;
-    if (viewer && typeof viewer.loadScene === "function") {
+    const api = psvApiRef.current;
+    if (api?.setCurrentNode) {
       try {
-        const sc = scenesRef.current.find((s) => s.id === sceneId);
-        if (sc && viewer.getConfig()?.scenes?.[sceneId]) {
-          skipRemountRef.current = true;
-          viewer.loadScene(
-            sceneId,
-            sc.pitch ?? 0,
-            sc.yaw ?? 0,
-            sc.hfov ?? 100
-          );
-          return;
-        }
+        skipRemountRef.current = true;
+        api.setCurrentNode(sceneId);
+        return;
       } catch {
-        /* fall through to remount via signature if needed */
+        /* fall through to remount */
       }
     }
   };
 
   const captureStartView = () => {
-    const viewer = viewerRef.current;
-    if (!viewer || !activeSceneId) return;
+    const api = psvApiRef.current;
+    if (!api || !activeSceneId) return;
+    const { yaw, pitch } = api.getPositionDegrees();
     applySceneUpdate(activeSceneId, (scene) => ({
       ...scene,
-      yaw: viewer.getYaw(),
-      pitch: viewer.getPitch(),
-      hfov: viewer.getHfov(),
+      yaw,
+      pitch,
     }));
     setOkMsg("מבט התחלתי נשמר לסצנה זו");
   };
