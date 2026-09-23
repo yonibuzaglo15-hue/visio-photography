@@ -69,6 +69,9 @@ export default function TourViewerClient({ config: initialConfig }) {
   const [sceneId, setSceneId] = useState(initialConfig?.default?.firstScene || "");
   const [yaw, setYaw] = useState(0);
   const loadStarted = useRef(typeof performance !== "undefined" ? performance.now() : 0);
+  const debug =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("debug") === "1";
 
   useEffect(() => {
     let cancelled = false;
@@ -208,6 +211,7 @@ export default function TourViewerClient({ config: initialConfig }) {
         currentSceneId={sceneId}
         yaw={yaw}
         onJump={(id) => navRef.current?.jumpToScene?.(id)}
+        debug={debug}
       />
       <div
         style={{

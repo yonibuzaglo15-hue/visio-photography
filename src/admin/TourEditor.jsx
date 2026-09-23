@@ -146,10 +146,12 @@ export default function TourEditor() {
   const [panoMeta, setPanoMeta] = useState(null);
   const [viewerReady, setViewerReady] = useState(false);
   const [floorPlans, setFloorPlans] = useState([]);
+  const [calibHint, setCalibHint] = useState("");
+  const [calibPreview, setCalibPreview] = useState(null);
   const [floorPlanMeta, setFloorPlanMeta] = useState({
     maxLinkMeters: DEFAULT_MAX_LINK_METERS,
     metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
-    cameraHeightM: 1.55,
+    cameraHeightM: 1.6,
     maxNeighbors: 3,
     scaleCalibrated: false,
     sameFloorOnly: true,
@@ -192,8 +194,25 @@ export default function TourEditor() {
         /* ignore */
       }
     };
+    const onArmPick = (ev) => {
+      window.__visioPanoPick = ev.detail || null;
+      setCalibHint(
+        ev.detail?.label
+          ? `לחץ בפנורמה על הפתח ל־${ev.detail.label}`
+          : "לחץ בפנורמה על הפתח"
+      );
+    };
+    const onPreview = (ev) => {
+      setCalibPreview(ev.detail || null);
+    };
     window.addEventListener("visio-read-yaw", onReadYaw);
-    return () => window.removeEventListener("visio-read-yaw", onReadYaw);
+    window.addEventListener("visio-arm-pano-pick", onArmPick);
+    window.addEventListener("visio-calib-preview", onPreview);
+    return () => {
+      window.removeEventListener("visio-read-yaw", onReadYaw);
+      window.removeEventListener("visio-arm-pano-pick", onArmPick);
+      window.removeEventListener("visio-calib-preview", onPreview);
+    };
   }, []);
 
   const graphStats = useMemo(
@@ -281,7 +300,7 @@ export default function TourEditor() {
           : {
               maxLinkMeters: DEFAULT_MAX_LINK_METERS,
               metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
-              cameraHeightM: 1.55,
+              cameraHeightM: 1.6,
               maxNeighbors: 3,
               scaleCalibrated: false,
               sameFloorOnly: true,
@@ -714,12 +733,59 @@ export default function TourEditor() {
             )}
           </aside>
 
-          <section style={{ ...glassPanel, padding: 0, overflow: "hidden", minHeight: 420 }}>
+          <section style={{ ...glassPanel, padding: 0, overflow: "hidden", minHeight: 420, position: "relative" }}>
             <div
               ref={containerRef}
               className="visio-tour-editor-viewer"
               style={{ width: "100%", height: 420, background: "#0a0a0a" }}
+              onClick={(e) => {
+                const pick = window.__visioPanoPick;
+                const viewer = viewerRef.current;
+                if (!pick || !viewer) return;
+                try {
+                  const coords = viewer.mouseEventToCoords(e.nativeEvent || e);
+                  if (!coords) return;
+                  const yaw = coords[1];
+                  window.__visioPanoPick = null;
+                  setCalibHint("");
+                  window.dispatchEvent(
+                    new CustomEvent("visio-pano-pick-done", {
+                      detail: {
+                        fromId: pick.fromId,
+                        toId: pick.toId,
+                        yaw,
+                        pitch: coords[0],
+                      },
+                    })
+                  );
+                } catch {
+                  /* ignore */
+                }
+              }}
             />
+            {calibHint && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 12,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  zIndex: 30,
+                  background: "rgba(201,168,76,0.95)",
+                  color: "#0a0a0a",
+                  padding: "8px 14px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  pointerEvents: "none",
+                }}
+              >
+                {calibHint}
+              </div>
+            )}
+            {calibPreview && viewerReady && (
+              <CalibPreviewOverlay viewerRef={viewerRef} preview={calibPreview} />
+            )}
             {!viewerReady && activeScene && (
               <div style={{ position: "relative", marginTop: -420, height: 420, display: "flex", alignItems: "center", justifyContent: "center", color: ADMIN.muted, pointerEvents: "none" }}>
                 <Loader2 size={22} className="visio-spin" color={ADMIN.gold} />
@@ -897,6 +963,70 @@ export default function TourEditor() {
           onDirty={() => setDirty(true)}
         />
       )}
+    </div>
+  );
+}
+
+function CalibPreviewOverlay({ viewerRef, preview }) {
+  const [pos, setPos] = useState(null);
+
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      const viewer = viewerRef.current;
+      if (viewer && preview && Number.isFinite(preview.yaw)) {
+        try {
+          const screen = viewer.coordsToScreen(preview.pitch ?? -25, preview.yaw);
+          if (screen && Number.isFinite(screen.x) && Number.isFinite(screen.y)) {
+            setPos({ x: screen.x, y: screen.y });
+          } else {
+            setPos(null);
+          }
+        } catch {
+          setPos(null);
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [viewerRef, preview]);
+
+  if (!pos || !preview) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: pos.x,
+        top: pos.y,
+        transform: "translate(-50%, -120%)",
+        zIndex: 25,
+        pointerEvents: "none",
+        textAlign: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 0,
+          height: 0,
+          margin: "0 auto 4px",
+          borderLeft: "8px solid transparent",
+          borderRight: "8px solid transparent",
+          borderBottom: "14px solid rgba(201,168,76,0.95)",
+        }}
+      />
+      <div
+        style={{
+          background: "rgba(10,10,10,0.85)",
+          color: "#f5f5f5",
+          padding: "4px 8px",
+          fontSize: 12,
+          borderRadius: 2,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {preview.label || "חדר"}
+      </div>
     </div>
   );
 }

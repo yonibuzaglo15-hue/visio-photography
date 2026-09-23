@@ -20,11 +20,14 @@ import {
   DEFAULT_MAX_NEIGHBORS,
   DEFAULT_SHORT_SIDE_METERS,
   applyAutoLinksToScenes,
+  findCalibrationConflicts,
+  friendlyRoomLabel,
   generateAutoLinks,
   hotspotPitch,
   hotspotYaw,
   mapBearing,
   metersPerNormFromLine,
+  northOffsetFromDoorway,
   remapScenesToCrop,
   resolveMaxLinkMeters,
   resolveMetersPerNorm,
@@ -57,13 +60,15 @@ export default function FloorPlanPanel({
   const [uploadErr, setUploadErr] = useState("");
   const [cropSession, setCropSession] = useState(null);
   const [linkSummary, setLinkSummary] = useState(null);
-  const [mode, setMode] = useState("place"); // place | orient | link | scale
+  const [mode, setMode] = useState("place"); // place | orient | quickOrient | link | scale
   const [dragSceneId, setDragSceneId] = useState(null);
   const [selectedMapId, setSelectedMapId] = useState(null);
   const [linkFromId, setLinkFromId] = useState(null);
   const [scalePts, setScalePts] = useState([]);
   const [scaleMeters, setScaleMeters] = useState("3");
   const [orientPanoYaw, setOrientPanoYaw] = useState(0);
+  const [quickTargetId, setQuickTargetId] = useState(null);
+  const [calibConflicts, setCalibConflicts] = useState([]);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [panning, setPanning] = useState(false);
@@ -71,6 +76,9 @@ export default function FloorPlanPanel({
   const viewportRef = useRef(null);
   const imgRef = useRef(null);
   const fileRef = useRef(null);
+  const debug =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("debug") === "1";
 
   const plan = useMemo(
     () => floorPlans.find((p) => Number(p.floor) === Number(activeFloor)) || floorPlans[0] || null,
@@ -80,7 +88,7 @@ export default function FloorPlanPanel({
   const meta = floorPlanMeta || {
     maxLinkMeters: DEFAULT_MAX_LINK_METERS,
     metersPerNorm: DEFAULT_SHORT_SIDE_METERS,
-    cameraHeightM: 1.55,
+    cameraHeightM: 1.6,
     maxNeighbors: DEFAULT_MAX_NEIGHBORS,
     scaleCalibrated: false,
     sameFloorOnly: true,
@@ -236,7 +244,7 @@ export default function FloorPlanPanel({
       maxLinkMeters,
       metersPerNorm,
       maxNeighbors: meta.maxNeighbors ?? DEFAULT_MAX_NEIGHBORS,
-      cameraHeightM: meta.cameraHeightM ?? 1.55,
+      cameraHeightM: meta.cameraHeightM ?? 1.6,
       sameFloorOnly: meta.sameFloorOnly !== false,
       deletedLinks: meta.deletedLinks || [],
       addedLinks: meta.addedLinks || [],
@@ -245,8 +253,73 @@ export default function FloorPlanPanel({
     const next = applyAutoLinksToScenes(scenes, edges);
     onScenesChange(next);
     setLinkSummary(summarizeAutoLinks(next, edges));
+    setCalibConflicts(findCalibrationConflicts(next));
     markDirty();
   };
+
+  // Quick-calibrate: listen for panorama doorway clicks from TourEditor
+  useEffect(() => {
+    const onPick = (ev) => {
+      const { fromId, toId, yaw } = ev.detail || {};
+      if (!fromId || !toId || !Number.isFinite(Number(yaw))) return;
+      const a = scenes.find((s) => s.id === fromId);
+      const b = scenes.find((s) => s.id === toId);
+      if (!a || !b) return;
+      if (!Number.isFinite(a.mapX) || !Number.isFinite(b.mapX)) return;
+      const offset = northOffsetFromDoorway(a.mapX, a.mapY, b.mapX, b.mapY, yaw);
+      const withOffset = scenes.map((s) =>
+        s.id === fromId ? { ...s, northOffset: offset } : s
+      );
+      const edges = generateAutoLinks(
+        withOffset.filter(
+          (s) => !s.hidden && Number.isFinite(Number(s.mapX)) && Number.isFinite(Number(s.mapY))
+        ),
+        {
+          maxLinkMeters,
+          metersPerNorm,
+          maxNeighbors: meta.maxNeighbors ?? DEFAULT_MAX_NEIGHBORS,
+          cameraHeightM: meta.cameraHeightM ?? 1.6,
+          sameFloorOnly: meta.sameFloorOnly !== false,
+          deletedLinks: meta.deletedLinks || [],
+          addedLinks: meta.addedLinks || [],
+          scaleCalibrated: meta.scaleCalibrated,
+        }
+      );
+      const next = applyAutoLinksToScenes(withOffset, edges);
+      onScenesChange(next);
+      setCalibConflicts(findCalibrationConflicts(next));
+      setLinkSummary(summarizeAutoLinks(next, edges));
+      markDirty();
+      setMode("orient");
+      setQuickTargetId(null);
+      try {
+        window.dispatchEvent(
+          new CustomEvent("visio-calib-preview", {
+            detail: {
+              fromId,
+              toId,
+              yaw: hotspotYaw(a.mapX, a.mapY, b.mapX, b.mapY, offset),
+              pitch: hotspotPitch(Math.hypot(b.mapX - a.mapX, b.mapY - a.mapY), {
+                metersPerNorm,
+                cameraHeightM: meta.cameraHeightM ?? 1.6,
+                distM:
+                  Math.hypot(b.mapX - a.mapX, b.mapY - a.mapY) * metersPerNorm,
+              }),
+              label: friendlyRoomLabel(b),
+            },
+          })
+        );
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("visio-pano-pick-done", onPick);
+    return () => window.removeEventListener("visio-pano-pick-done", onPick);
+  }, [scenes, metersPerNorm, meta.cameraHeightM]);
+
+  useEffect(() => {
+    setCalibConflicts(findCalibrationConflicts(scenes));
+  }, [scenes]);
 
   const clientToNorm = useCallback((clientX, clientY) => {
     const img = imgRef.current;
@@ -340,7 +413,7 @@ export default function FloorPlanPanel({
     const d = Math.hypot(b.mapX - a.mapX, b.mapY - a.mapY);
     const pitchOpts = {
       metersPerNorm,
-      cameraHeightM: meta.cameraHeightM ?? 1.55,
+      cameraHeightM: meta.cameraHeightM ?? 1.6,
       distM: d * metersPerNorm,
     };
     const stamp = Date.now().toString(36);
@@ -357,7 +430,7 @@ export default function FloorPlanPanel({
                 yaw: hotspotYaw(a.mapX, a.mapY, b.mapX, b.mapY, a.northOffset),
                 pitch: hotspotPitch(d, pitchOpts),
                 targetSceneId: bId,
-                text: b.title || bId,
+                text: friendlyRoomLabel(b),
                 source: "auto",
               },
             ],
@@ -374,7 +447,7 @@ export default function FloorPlanPanel({
                 yaw: hotspotYaw(b.mapX, b.mapY, a.mapX, a.mapY, b.northOffset),
                 pitch: hotspotPitch(d, pitchOpts),
                 targetSceneId: aId,
-                text: a.title || aId,
+                text: friendlyRoomLabel(a),
                 source: "auto",
               },
             ],
@@ -420,6 +493,36 @@ export default function FloorPlanPanel({
       const bearing = mapBearing(sc.mapX, sc.mapY, norm.x, norm.y);
       const offset = bearing - panoYaw;
       setNorthOffset(selectedMapId, offset);
+      const neighbor = placed.find((s) => s.id !== selectedMapId);
+      if (neighbor) {
+        try {
+          window.dispatchEvent(
+            new CustomEvent("visio-calib-preview", {
+              detail: {
+                fromId: selectedMapId,
+                toId: neighbor.id,
+                yaw: hotspotYaw(
+                  sc.mapX,
+                  sc.mapY,
+                  neighbor.mapX,
+                  neighbor.mapY,
+                  offset
+                ),
+                pitch: hotspotPitch(
+                  Math.hypot(neighbor.mapX - sc.mapX, neighbor.mapY - sc.mapY),
+                  {
+                    metersPerNorm,
+                    cameraHeightM: meta.cameraHeightM ?? 1.6,
+                  }
+                ),
+                label: friendlyRoomLabel(neighbor),
+              },
+            })
+          );
+        } catch {
+          /* ignore */
+        }
+      }
       return;
     }
 
@@ -582,6 +685,7 @@ export default function FloorPlanPanel({
         {[
           { id: "place", label: "מיקום", Icon: Crosshair },
           { id: "orient", label: "כיוון צפון", Icon: Navigation },
+          { id: "quickOrient", label: "כיול מהיר", Icon: Navigation },
           { id: "link", label: "קישורים", Icon: Link2 },
           { id: "scale", label: "קנה־מידה", Icon: Ruler },
         ].map(({ id, label, Icon }) => (
@@ -597,6 +701,7 @@ export default function FloorPlanPanel({
               setMode(id);
               setLinkFromId(null);
               setScalePts([]);
+              setQuickTargetId(null);
             }}
           >
             <Icon size={13} /> {label}
@@ -686,8 +791,8 @@ export default function FloorPlanPanel({
       {mode === "orient" && selected && (
         <div style={{ marginBottom: 10, padding: 10, background: "var(--visio-input-bg)", border: "1px solid var(--visio-border-subtle)", fontSize: 12, color: ADMIN.text, lineHeight: 1.6 }}>
           <div style={{ marginBottom: 6 }}>
-            כיול ל־<strong>{selected.title || selected.id}</strong>: סובב את הפנורמה לכיוון מוכר,
-            הזן את ה־yaw הנוכחי, ואז לחץ על התוכנית באותו כיוון.
+            כיול ל־<strong>{friendlyRoomLabel(selected)}</strong>: סובב את הפנורמה לכיוון מוכר,
+            ואז לחץ על התוכנית באותו כיוון. אחרי הכיול תופיע חץ בתצוגה לחדר הבא.
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <label>yaw פנורמה (מעלות)</label>
@@ -703,7 +808,6 @@ export default function FloorPlanPanel({
               type="button"
               className="visio-admin-btn-ghost"
               onClick={() => {
-                // Try read from parent viewer via custom event
                 const ev = new CustomEvent("visio-read-yaw", { detail: {} });
                 window.dispatchEvent(ev);
                 if (typeof window.__visioEditorYaw === "number") {
@@ -719,6 +823,63 @@ export default function FloorPlanPanel({
               </span>
             )}
           </div>
+        </div>
+      )}
+
+      {mode === "quickOrient" && selected && Number.isFinite(selected.mapX) && (
+        <div style={{ marginBottom: 10, padding: 10, background: "var(--visio-input-bg)", border: "1px solid var(--visio-border-subtle)", fontSize: 12, color: ADMIN.text, lineHeight: 1.6 }}>
+          <div style={{ marginBottom: 8 }}>
+            <strong>כיול מהיר</strong> ל־{friendlyRoomLabel(selected)}: בחר חדר שכן, ואז לחץ
+            בפנורמה על הפתח שמוביל אליו. בלי חוגה.
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {placed
+              .filter((s) => s.id !== selected.id)
+              .map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className="visio-admin-btn-ghost"
+                  style={{
+                    color: quickTargetId === s.id ? ADMIN.gold : undefined,
+                    borderColor:
+                      quickTargetId === s.id ? "var(--visio-gold-border-strong)" : undefined,
+                  }}
+                  onClick={() => {
+                    setQuickTargetId(s.id);
+                    onSelectScene?.(selected.id);
+                    window.dispatchEvent(
+                      new CustomEvent("visio-arm-pano-pick", {
+                        detail: {
+                          fromId: selected.id,
+                          toId: s.id,
+                          label: friendlyRoomLabel(s),
+                        },
+                      })
+                    );
+                  }}
+                >
+                  {friendlyRoomLabel(s)}
+                </button>
+              ))}
+          </div>
+          {quickTargetId && (
+            <div style={{ marginTop: 8, color: ADMIN.gold }}>
+              לחץ עכשיו בפנורמה על הפתח ל־
+              {friendlyRoomLabel(scenes.find((s) => s.id === quickTargetId) || {})}
+            </div>
+          )}
+        </div>
+      )}
+
+      {calibConflicts.length > 0 && (
+        <div
+          className="visio-admin-error"
+          style={{ marginBottom: 10, fontSize: 12, lineHeight: 1.5 }}
+        >
+          {calibConflicts.slice(0, 4).map((c) => (
+            <div key={`${c.aId}-${c.bId}`}>{c.message}</div>
+          ))}
         </div>
       )}
 
@@ -817,6 +978,30 @@ export default function FloorPlanPanel({
                   }}
                 />
               ))}
+              {debug &&
+                placed.flatMap((s) =>
+                  (s.hotSpots || [])
+                    .filter((h) => h.targetSceneId)
+                    .map((h) => {
+                      const t = placed.find((x) => x.id === h.targetSceneId);
+                      if (!t) return null;
+                      const bearing = mapBearing(s.mapX, s.mapY, t.mapX, t.mapY);
+                      const len = 5;
+                      return (
+                        <line
+                          key={`dbg-${s.id}-${h.targetSceneId}`}
+                          x1={s.mapX * 100}
+                          y1={s.mapY * 100}
+                          x2={s.mapX * 100 + Math.sin((bearing * Math.PI) / 180) * len}
+                          y2={s.mapY * 100 - Math.cos((bearing * Math.PI) / 180) * len}
+                          stroke="#60b0f0"
+                          strokeWidth={0.55}
+                          markerEnd="url(#arrow)"
+                        />
+                      );
+                    })
+                    .filter(Boolean)
+                )}
               {scalePts.length === 2 && (
                 <line
                   x1={scalePts[0].x * 100}

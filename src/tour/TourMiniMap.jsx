@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Map } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { mapBearing } from "../../lib/tour/floor-plan.js";
 
 /**
  * Matterport-style mini-map for the public tour viewer.
  * Hidden when no floor plan is present.
+ * Pass debug=true (or ?debug=1) to draw disc-direction arrows.
  */
 export default function TourMiniMap({
   floorPlans = [],
@@ -13,6 +15,7 @@ export default function TourMiniMap({
   currentSceneId,
   yaw = 0,
   onJump,
+  debug = false,
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -44,8 +47,33 @@ export default function TourMiniMap({
           ? Number(sc.northOffset)
           : 0,
         title: sc.title || id,
+        hotSpots: sc.hotSpots || [],
       }));
   }, [scenes, plan]);
+
+  const debugArrows = useMemo(() => {
+    if (!debug || !currentSceneId) return [];
+    const from = points.find((p) => p.id === currentSceneId);
+    if (!from) return [];
+    const byId = new Map(points.map((p) => [p.id, p]));
+    const arrows = [];
+    for (const h of from.hotSpots || []) {
+      const toId = h.targetSceneId || h.sceneId;
+      const to = byId.get(toId);
+      if (!to) continue;
+      const bearing = mapBearing(from.mapX, from.mapY, to.mapX, to.mapY);
+      arrows.push({
+        key: `${from.id}-${toId}`,
+        x1: from.mapX * 100,
+        y1: from.mapY * 100,
+        x2: from.mapX * 100 + Math.sin((bearing * Math.PI) / 180) * 8,
+        y2: from.mapY * 100 - Math.cos((bearing * Math.PI) / 180) * 8,
+        label: to.title,
+        yaw: Number(h.yaw),
+      });
+    }
+    return arrows;
+  }, [debug, currentSceneId, points]);
 
   if (!plans.length || !plan) return null;
 
@@ -159,10 +187,34 @@ export default function TourMiniMap({
             preserveAspectRatio="none"
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
             onClick={(e) => {
-              // Let point circles handle jumps; prevent toggle when clicking map body on desktop
               e.stopPropagation();
             }}
           >
+            <defs>
+              <marker
+                id="visio-debug-arrow"
+                markerWidth="4"
+                markerHeight="4"
+                refX="3"
+                refY="2"
+                orient="auto"
+              >
+                <path d="M0,0 L4,2 L0,4 Z" fill="#60b0f0" />
+              </marker>
+            </defs>
+            {debugArrows.map((a) => (
+              <g key={a.key}>
+                <line
+                  x1={a.x1}
+                  y1={a.y1}
+                  x2={a.x2}
+                  y2={a.y2}
+                  stroke="#60b0f0"
+                  strokeWidth={0.7}
+                  markerEnd="url(#visio-debug-arrow)"
+                />
+              </g>
+            ))}
             {points.map((p) => {
               const isCurrent = p.id === currentSceneId;
               return (
@@ -195,32 +247,65 @@ export default function TourMiniMap({
               );
             })}
           </svg>
+          {debug && (
+            <div
+              style={{
+                position: "absolute",
+                top: 4,
+                left: 4,
+                fontSize: 9,
+                color: "#60b0f0",
+                background: "rgba(0,0,0,0.65)",
+                padding: "2px 5px",
+                borderRadius: 2,
+                pointerEvents: "none",
+              }}
+            >
+              debug
+            </div>
+          )}
           <div
             style={{
               position: "absolute",
-              top: 6,
-              left: 6,
+              bottom: 4,
+              left: 4,
+              right: 4,
               display: "flex",
               alignItems: "center",
               gap: 4,
-              background: "rgba(0,0,0,0.55)",
-              color: "#c9a84c",
-              fontSize: 10,
-              padding: "2px 6px",
-              borderRadius: 2,
               pointerEvents: "none",
             }}
           >
-            <Map size={10} /> מפה
+            <MapIconFallback />
+            <span
+              style={{
+                fontSize: 10,
+                color: "#eee",
+                textShadow: "0 1px 2px #000",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {current?.title || "מפה"}
+            </span>
           </div>
         </button>
       )}
-
-      <style>{`
-        @media (max-width: 640px) {
-          .visio-tour-minimap { bottom: 12px; right: 10px; }
-        }
-      `}</style>
     </div>
+  );
+}
+
+function MapIconFallback() {
+  return (
+    <span
+      style={{
+        width: 12,
+        height: 12,
+        borderRadius: 2,
+        background: "rgba(201,168,76,0.9)",
+        flexShrink: 0,
+      }}
+    />
   );
 }
