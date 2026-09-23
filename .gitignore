@@ -5,6 +5,7 @@ dist
 .env.local
 .DS_Store
 .data/
+.tmp-fp-verify/
 public/tours/
 .vercel/
 .vercel
