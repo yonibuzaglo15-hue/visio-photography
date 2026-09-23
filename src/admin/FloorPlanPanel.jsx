@@ -7,8 +7,11 @@ import FloorPlanCropModal, { prepareCropSession } from "./FloorPlanCropModal.jsx
 import {
   DEFAULT_SHORT_SIDE_METERS,
   friendlyRoomLabel,
-  remapScenesToCrop,
 } from "../../lib/tour/floor-plan.js";
+import {
+  planIdFromFloorPlan,
+  reconcileMapPlacements,
+} from "../../lib/tour/map-plan.js";
 
 /**
  * Floor plan = mini-map positions only.
@@ -57,17 +60,17 @@ export default function FloorPlanPanel({
     addedLinks: [],
   };
 
-  const placed = useMemo(
-    () =>
-      scenes.filter(
-        (s) =>
-          !s.hidden &&
-          Number.isFinite(Number(s.mapX)) &&
-          Number.isFinite(Number(s.mapY)) &&
-          (s.floor ?? 0) === (plan?.floor ?? activeFloor)
-      ),
-    [scenes, plan, activeFloor]
-  );
+  const placed = useMemo(() => {
+    const planId = planIdFromFloorPlan(plan);
+    return scenes.filter((s) => {
+      if (s.hidden) return false;
+      if (!Number.isFinite(Number(s.mapX)) || !Number.isFinite(Number(s.mapY))) return false;
+      if ((s.floor ?? 0) !== (plan?.floor ?? activeFloor)) return false;
+      // Hide pins stamped for a different plan version (stale space).
+      if (s.mapPlanId && planId && s.mapPlanId !== planId) return false;
+      return true;
+    });
+  }, [scenes, plan, activeFloor]);
 
   const unplaced = useMemo(
     () =>
@@ -181,16 +184,30 @@ export default function FloorPlanPanel({
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "העלאה נכשלה");
+      const stampedPlan = {
+        ...data.floorPlan,
+        cropped: true,
+        planId: planIdFromFloorPlan(data.floorPlan),
+        ...(crop ? { cropRect: crop } : {}),
+      };
       const next = [
         ...floorPlans.filter((p) => Number(p.floor) !== Number(data.floorPlan.floor)),
-        { ...data.floorPlan, cropped: true },
+        stampedPlan,
       ];
       next.sort((a, b) => a.floor - b.floor);
       onFloorPlansChange(next);
       setActiveFloor(data.floorPlan.floor);
       chromeCheckRef.current = data.floorPlan.url;
       if (cropSession.remap) {
-        onScenesChange(remapScenesToCrop(scenes, floor, crop));
+        const newPlanId = stampedPlan.planId;
+        const previousPlanId = planIdFromFloorPlan(cropSession.plan || plan);
+        const { scenes: reconciled } = reconcileMapPlacements(scenes, {
+          floor,
+          newPlanId,
+          cropRect: crop,
+          previousPlanId,
+        });
+        onScenesChange(reconciled);
       }
       if (!meta.scaleCalibrated) {
         onFloorPlanMetaChange({
@@ -208,10 +225,17 @@ export default function FloorPlanPanel({
   };
 
   const placeAt = (sceneId, x, y) => {
+    const planId = planIdFromFloorPlan(plan);
     onScenesChange(
       scenes.map((s) =>
         s.id === sceneId
-          ? { ...s, mapX: x, mapY: y, floor: plan?.floor ?? activeFloor }
+          ? {
+              ...s,
+              mapX: x,
+              mapY: y,
+              floor: plan?.floor ?? activeFloor,
+              ...(planId ? { mapPlanId: planId } : {}),
+            }
           : s
       )
     );
@@ -225,7 +249,7 @@ export default function FloorPlanPanel({
     onScenesChange(
       scenes.map((s) => {
         if (s.id !== sceneId) return s;
-        const { mapX, mapY, floor, ...rest } = s;
+        const { mapX, mapY, floor, mapPlanId, ...rest } = s;
         return rest;
       })
     );
@@ -234,8 +258,18 @@ export default function FloorPlanPanel({
   };
 
   const movePoint = (sceneId, x, y) => {
+    const planId = planIdFromFloorPlan(plan);
     onScenesChange(
-      scenes.map((s) => (s.id === sceneId ? { ...s, mapX: x, mapY: y } : s))
+      scenes.map((s) =>
+        s.id === sceneId
+          ? {
+              ...s,
+              mapX: x,
+              mapY: y,
+              ...(planId ? { mapPlanId: planId } : {}),
+            }
+          : s
+      )
     );
     markDirty();
   };

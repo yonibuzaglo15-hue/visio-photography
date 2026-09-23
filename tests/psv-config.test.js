@@ -11,6 +11,7 @@ describe("psv-config", () => {
             panorama: "a.jpg",
             mapX: 0.25,
             mapY: 0.5,
+            mapPlanId: "plan-v1",
             hotSpots: [
               { id: "h1", yaw: -42.5, pitch: -35.1, sceneId: "b", text: "to B" },
             ],
@@ -20,11 +21,12 @@ describe("psv-config", () => {
             panorama: "b.jpg",
             mapX: 0.75,
             mapY: 0.5,
+            mapPlanId: "plan-v1",
             hotSpots: [],
           },
         },
       },
-      { mapSize: { width: 1000, height: 800 } }
+      { mapSize: { width: 1000, height: 800 }, planId: "plan-v1" }
     );
 
     expect(nodes).toHaveLength(2);
@@ -36,6 +38,25 @@ describe("psv-config", () => {
     });
     expect(a.links[0].linkOffset).toBeUndefined();
     expect(a.map).toEqual({ x: 250, y: 400 });
+  });
+
+  it("hides map pins stamped for a different plan id", () => {
+    const nodes = buildVirtualTourNodes(
+      {
+        scenes: {
+          a: {
+            title: "A",
+            panorama: "a.jpg",
+            mapX: 0.25,
+            mapY: 0.5,
+            mapPlanId: "old-plan",
+            hotSpots: [],
+          },
+        },
+      },
+      { mapSize: { width: 1000, height: 800 }, planId: "new-plan" }
+    );
+    expect(nodes[0].map).toBe(false);
   });
 
   it("degStr and normToMapPixels helpers", () => {
