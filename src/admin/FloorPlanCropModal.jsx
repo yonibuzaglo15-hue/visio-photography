@@ -7,8 +7,8 @@ import {
   assertCropAcceptable,
   cropImageToBlob,
   detectContentBounds,
+  MIN_CONTENT_RATIO,
 } from "../../lib/tour/floor-plan-crop.js";
-import { MIN_CONTENT_RATIO } from "../../lib/tour/floor-plan.js";
 
 /**
  * Crop confirmation UI after floor-plan upload / re-crop.

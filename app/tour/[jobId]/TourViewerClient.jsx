@@ -24,11 +24,13 @@ export default function TourViewerClient({ config: initialConfig }) {
         const api = await createPsvTourViewer(containerRef.current, initialConfig, {
           startNodeId: initialConfig?.default?.firstScene,
           enableMap: true,
+          isCancelled: () => cancelled,
           onNodeChange: () => {
             if (cancelled) return;
             setLoading(false);
           },
         });
+        if (!api) return;
         if (cancelled) {
           api.destroy();
           return;
@@ -66,7 +68,12 @@ export default function TourViewerClient({ config: initialConfig }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#0a0a0a" }}>
-      <div ref={containerRef} id="panorama" style={{ width: "100%", height: "100%" }} />
+      <div
+        ref={containerRef}
+        id="panorama"
+        data-testid="tour-viewer"
+        style={{ width: "100%", height: "100%" }}
+      />
       {loading && !error && (
         <div
           style={{

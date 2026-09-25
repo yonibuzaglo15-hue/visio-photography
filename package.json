@@ -9,7 +9,10 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:gate": "node --env-file=.env.local tests/forged-session-gate.mjs",
-    "test:gate:prod": "node tests/forged-session-gate.mjs"
+    "test:gate:prod": "node tests/forged-session-gate.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:desktop": "playwright test --project=desktop",
+    "test:acceptance": "playwright test e2e/tour-acceptance.spec.js --project=desktop && playwright test e2e/tour-acceptance.spec.js --project=mobile -g 'MOBILE'"
   },
   "dependencies": {
     "@photo-sphere-viewer/core": "^5.15.1",
@@ -28,8 +31,10 @@
     "twilio": "^6.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
+    "playwright": "^1.63.0",
     "vitest": "^2.1.9"
   }
 }

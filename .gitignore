@@ -9,3 +9,13 @@ dist
 public/tours/
 .vercel/
 .vercel
+
+e2e-results/
+e2e-report/
+test-output/
+playwright-report/
+
+
+.tmp-psv-verify/
+.tmp-sfm-spike/
+tools/floorplan-cv/__pycache__/

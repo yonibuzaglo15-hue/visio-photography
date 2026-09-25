@@ -130,6 +130,7 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
               type="button"
               className={`visio-admin-nav-item${activeTab === id ? " active" : ""}`}
               onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
+              data-testid={`admin-tab-${id}`}
             >
               <Icon size={18} strokeWidth={1.5} />
               {label}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isEmailAllowed } from "@/lib/auth/allowlist.js";
+import { isDevAuthBypassEnabled } from "@/lib/auth/dev-bypass.js";
 
 /**
  * Hard gate for /admin and pipeline APIs.
@@ -12,6 +13,9 @@ import { isEmailAllowed } from "@/lib/auth/allowlist.js";
  *
  * Public tours live at /tour/[jobId] — intentionally NOT in the matcher below,
  * so they stay unauthenticated. Do not add /tour to this matcher.
+ *
+ * LOCAL-ONLY: DEV_AUTH_BYPASS=1 with NODE_ENV!==production skips the gate
+ * so Playwright can drive /admin. Impossible in production (see tests).
  */
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
@@ -26,6 +30,13 @@ export async function middleware(request) {
   }
 
   if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
+  if (isDevAuthBypassEnabled()) {
+    if (pathname.startsWith("/admin/")) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
     return NextResponse.next();
   }
 
