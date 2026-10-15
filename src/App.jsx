@@ -23,13 +23,30 @@ const PROPERTY_IMAGES = {
 const fmt = (n) => Math.round(n).toLocaleString("he-IL");
 const VAT = 0.18;
 
+/* ─── BIDI ─── */
+// Latin runs (incl. leading digits like "4K" and inner separators like "RE/MAX", "9:16")
+// are isolated so neighbouring Hebrew punctuation and word order don't flip.
+const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
+
+function Bidi({ children: text }) {
+  const parts = [];
+  let last = 0;
+  for (const m of text.matchAll(LATIN_RUN)) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push(<bdi key={m.index} lang="en" dir="ltr">{m[0]}</bdi>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
 /* ─── SECTION TITLE ─── */
 function SectionTitle({ sup, title, sub }) {
   return (
     <div className="visio-section-head">
-      <div className="visio-kicker">{sup}</div>
-      <h2 className="visio-section-title">{title}</h2>
-      {sub && <p className="visio-section-sub">{sub}</p>}
+      <div className="visio-kicker"><Bidi>{sup}</Bidi></div>
+      <h2 className="visio-section-title"><Bidi>{title}</Bidi></h2>
+      {sub && <p className="visio-section-sub"><Bidi>{sub}</Bidi></p>}
     </div>
   );
 }
@@ -39,7 +56,7 @@ function StoryImage({ id, title }) {
   const src = PROPERTY_IMAGES[id]?.hero;
   return (
     <div className="visio-story-img">
-      {src ? <img src={src} alt={title} /> : <div className="visio-placeholder">VISIO</div>}
+      {src ? <img src={src} alt={title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
     </div>
   );
 }
@@ -90,9 +107,9 @@ function HomeSection({ onNav }) {
           <img src={PROPERTY_IMAGES[COVER_ID].hero} alt={PORTFOLIO.find(p => p.id === COVER_ID).title} />
           <div className="visio-cover-shade" />
           <div className="visio-cover-text">
-            <div className="visio-kicker">VISIO PHOTOGRAPHY</div>
+            <div className="visio-kicker"><Bidi>VISIO PHOTOGRAPHY</Bidi></div>
             <h1 className="visio-cover-title">נדל״ן. בצילום שמוכר.</h1>
-            <p className="visio-cover-sub">צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</p>
+            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
             <div className="visio-cover-btns">
               <button className="visio-btn on-image" onClick={() => onNav("booking")}>הזמן צילום עכשיו</button>
               <button className="visio-btn on-image outline" onClick={() => onNav("portfolio")}>צפה בעבודות</button>
@@ -110,7 +127,7 @@ function HomeSection({ onNav }) {
             <div className="visio-kicker" style={{ marginTop: 18 }}>{lead.tag}</div>
             <h3 className="visio-story-title lead">{lead.title}</h3>
             <p className="visio-story-dek">{lead.sub}</p>
-            <div className="visio-credit">צילום: VISIO · {lead.partner}</div>
+            <div className="visio-credit"><Bidi>{`צילום: VISIO · ${lead.partner}`}</Bidi></div>
           </button>
           <div className="visio-story-list">
             {side.slice(0, 4).map(p => (
@@ -118,7 +135,7 @@ function HomeSection({ onNav }) {
                 <div>
                   <div className="visio-kicker">{p.tag}</div>
                   <h3 className="visio-story-title">{p.title}</h3>
-                  <div className="visio-credit">צילום: VISIO · {p.partner}</div>
+                  <div className="visio-credit"><Bidi>{`צילום: VISIO · ${p.partner}`}</Bidi></div>
                 </div>
                 <StoryImage id={p.id} title={p.title} />
               </button>
@@ -132,7 +149,7 @@ function HomeSection({ onNav }) {
         <div className="visio-stats">
           {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["5","חבילות + ייעוץ חינם"]].map(([n,l]) => (
             <div key={l} className="visio-stat">
-              <div className="visio-stat-num">{n}</div>
+              <div className="visio-stat-num"><Bidi>{n}</Bidi></div>
               <div className="visio-kicker muted">{l}</div>
             </div>
           ))}
@@ -145,8 +162,8 @@ function HomeSection({ onNav }) {
         <div className="visio-partners">
           {PARTNERS.map(p => (
             <div key={p.id}>
-              <div className="visio-partner-name">{p.name}</div>
-              <div className="visio-credit" style={{ marginTop: 4 }}>{p.sub}</div>
+              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
+              <div className="visio-credit" style={{ marginTop: 4 }}><Bidi>{p.sub}</Bidi></div>
             </div>
           ))}
         </div>
@@ -202,8 +219,8 @@ function PortfolioSection() {
 
               <div className="visio-portfolio-img-wrap" style={{ cursor: gallery.length ? "zoom-in" : "default" }}
                 onClick={() => { if (gallery.length) openGallery(gallery); }}>
-                {imgs?.hero ? <img src={imgs.hero} alt={p.title} /> : <div className="visio-placeholder">VISIO</div>}
-                <div className="visio-img-label">{p.type}</div>
+                {imgs?.hero ? <img src={imgs.hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
+                <div className="visio-img-label"><Bidi>{p.type}</Bidi></div>
                 {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
 
                 {active === p.id && (p.matterport || gallery.length > 0) && (
@@ -227,7 +244,7 @@ function PortfolioSection() {
                 <h3 className="visio-story-title">{p.title}</h3>
                 <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
                 <div className="visio-credit">
-                  {[...p.tags, p.matterport && "3D TOUR", p.partner].filter(Boolean).join(" · ")}
+                  <Bidi>{[...p.tags, p.matterport && "3D TOUR", p.partner].filter(Boolean).join(" · ")}</Bidi>
                 </div>
               </div>
             </article>
@@ -262,11 +279,11 @@ function PricingSection({ onNav }) {
           <div key={pkg.id} className={`visio-price-card${pkg.popular ? " featured" : ""}`}>
             {(pkg.free || pkg.popular) && <div className="visio-badge">{pkg.free ? "חינם" : "הנפוץ ביותר"}</div>}
             <div className="visio-kicker muted">{pkg.hebrew || "חבילת צילום"}</div>
-            <div className="visio-price-name">{pkg.name}</div>
+            <div className="visio-price-name"><Bidi>{pkg.name}</Bidi></div>
             <div className="visio-price">{pkg.free ? "₪0" : `₪${p(pkg.price)}`}</div>
             <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.free ? "ייעוץ חינם · ללא התחייבות" : `לצילום · ${showVat ? "כולל" : "ללא"} מע״מ`}</div>
             <ul className="visio-price-features">
-              {pkg.features.map(f => <li key={f}>— {f}</li>)}
+              {pkg.features.map(f => <li key={f}>— <Bidi>{f}</Bidi></li>)}
             </ul>
             <button className={`visio-btn block${pkg.popular ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
               הזמן עכשיו ← תשלום ביום הצילום
@@ -279,8 +296,8 @@ function PricingSection({ onNav }) {
       <div className="visio-addons">
         {[["סיור וירטואלי","אירוח חודשי",80,"/ חודש"],["תמונות נוספות","מעבר להיקף החבילה",25,"/ תמונה"],["אקספרס 6 שעות","אספקה מזורזת",150,"לחבילה"],["Reels לרשתות","Instagram / TikTok 9:16",200,"לסרטון"]].map(([name,desc,price,unit]) => (
           <div key={name} className="visio-addon">
-            <div className="visio-story-title" style={{ margin: "0 0 4px" }}>{name}</div>
-            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>{desc}</div>
+            <div className="visio-story-title" style={{ margin: "0 0 4px" }}><Bidi>{name}</Bidi></div>
+            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}><Bidi>{desc}</Bidi></div>
             <div className="visio-price" style={{ fontSize: 30 }}>₪{p(price)}</div>
             <div className="visio-credit" style={{ marginTop: 6 }}>{unit}</div>
           </div>
@@ -362,17 +379,17 @@ function BookingSection() {
 
   if (done) return (
     <section className="visio-section" style={{ textAlign: "center" }}>
-      <div className="visio-kicker">BOOKING CONFIRMED</div>
+      <div className="visio-kicker"><Bidi>BOOKING CONFIRMED</Bidi></div>
       <h2 className="visio-section-title">הצילום נקבע ✓</h2>
-      <p style={{ fontSize: 14, color: C.muted, lineHeight: 2, margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
-      <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0", fontSize: 14, lineHeight: 1.8 }}>
+      <p style={{ fontSize: 14, color: C.muted, margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
+      <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0", fontSize: 14 }}>
         התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
       </p>
       <div className="visio-done-grid">
         {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", `VISIO ${form.pkg}`], ["כתובת", form.address]].map(([l, v]) => (
           <div key={l}>
             <div className="visio-kicker muted" style={{ marginBottom: 6 }}>{l}</div>
-            <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}>{v}</div>
+            <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}><Bidi>{v}</Bidi></div>
           </div>
         ))}
       </div>
@@ -409,7 +426,7 @@ function BookingSection() {
           <button className="visio-icon-btn" aria-label="החודש הבא" onClick={() => { if (mo === 11) { setYr(y => y + 1); setMo(0); } else setMo(m => m + 1); }}>›</button>
         </div>
         <div className="visio-cal-dow">
-          {LAT_DAYS.map((d, i) => <div key={d} style={i >= 5 ? { color: C.faint } : undefined}>{d}</div>)}
+          {LAT_DAYS.map((d, i) => <div key={d} style={i >= 5 ? { color: C.faint } : undefined}><Bidi>{d}</Bidi></div>)}
         </div>
         <div className="visio-cal-grid">
           {Array(first).fill(null).map((_, i) => <div key={`e${i}`} className="visio-calendar-day" />)}
@@ -427,7 +444,7 @@ function BookingSection() {
           })}
         </div>
         <div className="visio-panel-foot">
-          ● זמינות מסונכרנת עם Google Calendar · שישי-שבת חסומים
+          <Bidi>● זמינות מסונכרנת עם Google Calendar · שישי-שבת חסומים</Bidi>
         </div>
       </div>
 
@@ -516,7 +533,7 @@ function BookingSection() {
                     {wm.wantAgentPhoto ? "✓" : ""}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
+                    <div style={{ fontSize: 13, color: C.text }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
                     <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>הסוכן יוצב בפינה על כל תמונה</div>
                   </div>
                 </div>
@@ -573,11 +590,11 @@ function CharterSection() {
         {publicTerms.map(t => (
           <div key={t.title} className="visio-term">
             <div className="visio-term-title">{t.title}</div>
-            <p>{t.body}</p>
+            <p><Bidi>{t.body}</Bidi></p>
           </div>
         ))}
         <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: C.muted }}>
-          לשאלות ובירורים: <a href="mailto:visio.photography.il@gmail.com" style={{ color: C.ink }}>visio.photography.il@gmail.com</a>
+          לשאלות ובירורים: <a href="mailto:visio.photography.il@gmail.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>visio.photography.il@gmail.com</a>
         </p>
       </div>
     </section>
@@ -592,8 +609,8 @@ function AboutSection({ onNav }) {
 
       <div className="visio-narrow visio-article">
         <div className="visio-kicker" style={{ marginBottom: 16 }}>החזון שלנו</div>
-        <p className="visio-dropcap">
-          VISIO נוסדה מתוך אמונה שכל נכס ראוי לצילום שמספר את הסיפור שלו. אנחנו משלבים צילום מקצועי עם עיבוד AI מתקדם כדי ליצור תמונות שמוכרות — מהיר יותר, במחיר גבוה יותר.
+        <p>
+          <Bidi>VISIO נוסדה מתוך אמונה שכל נכס ראוי לצילום שמספר את הסיפור שלו. אנחנו משלבים צילום מקצועי עם עיבוד AI מתקדם כדי ליצור תמונות שמוכרות — מהיר יותר, במחיר גבוה יותר.</Bidi>
         </p>
 
         <blockquote className="visio-pullquote">נדל״ן. בצילום שמוכר.</blockquote>
@@ -603,7 +620,7 @@ function AboutSection({ onNav }) {
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
-              <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.7 }}>{desc}</div>
+              <div style={{ fontSize: 14, color: C.muted }}><Bidi>{desc}</Bidi></div>
             </div>
           ))}
         </div>
@@ -612,8 +629,8 @@ function AboutSection({ onNav }) {
         <div className="visio-partners" style={{ marginBottom: 48 }}>
           {PARTNERS.map(p => (
             <div key={p.id} style={{ textAlign: "center" }}>
-              <div className="visio-partner-name">{p.name}</div>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>{p.desc}</div>
+              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
             </div>
           ))}
         </div>
@@ -652,7 +669,7 @@ export default function VisioApp() {
       <header>
         <div className="visio-topbar">
           <div className="visio-topbar-inner">
-            <span className="visio-topbar-text">צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים</span>
+            <span className="visio-topbar-text"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים</Bidi></span>
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginInlineStart: "auto" }}>
               <button className="visio-link" onClick={() => nav("booking")}>הזמן צילום</button>
               <ThemeToggle />
@@ -660,8 +677,8 @@ export default function VisioApp() {
           </div>
         </div>
         <div className="visio-masthead-block">
-          <button className="visio-masthead" onClick={() => nav("home")} aria-label="VISIO — דף הבית">VISIO</button>
-          <div className="visio-masthead-tag visio-kicker muted">REAL ESTATE PHOTOGRAPHY</div>
+          <button className="visio-masthead" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
+          <div className="visio-masthead-tag visio-kicker muted"><Bidi>REAL ESTATE PHOTOGRAPHY</Bidi></div>
         </div>
       </header>
 
@@ -669,7 +686,7 @@ export default function VisioApp() {
       <nav className="visio-nav">
         <div className="visio-nav-inner">
           <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="תפריט">☰</button>
-          <button className="visio-nav-mini" onClick={() => nav("home")} aria-label="VISIO — דף הבית">VISIO</button>
+          <button className="visio-nav-mini" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
           <div className="nav-desktop">
             {NAV.map(n => (
               <button key={n.id} className={`visio-nav-link${page === n.id ? " active" : ""}`} onClick={() => nav(n.id)}>
@@ -682,7 +699,7 @@ export default function VisioApp() {
 
       {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
       <aside className={`nav-drawer ${menuOpen ? "open" : ""}`}>
-        <div className="nav-drawer-mark">VISIO</div>
+        <div className="nav-drawer-mark"><Bidi>VISIO</Bidi></div>
         {NAV.map(n => (
           <button key={n.id} className={`nav-drawer-btn ${page === n.id ? "active" : ""}`} onClick={() => nav(n.id)}>
             {n.label}
@@ -705,7 +722,7 @@ export default function VisioApp() {
 
       {/* ── FOOTER ── */}
       <footer className="visio-footer">
-        <button className="visio-footer-mark" onClick={() => nav("home")} aria-label="VISIO — דף הבית">VISIO</button>
+        <button className="visio-footer-mark" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
         <p className="visio-footer-tag">נדל״ן. בצילום שמוכר.</p>
         <div className="visio-footer-nav">
           {NAV.map(n => (
@@ -713,7 +730,7 @@ export default function VisioApp() {
           ))}
         </div>
         <p className="visio-footer-legal">
-          © 2025 VISIO Photography · כל הזכויות שמורות · <a href="/admin/login">כניסת צוות</a>
+          <Bidi>© 2025 VISIO Photography · כל הזכויות שמורות · </Bidi><a href="/admin/login">כניסת צוות</a>
         </p>
       </footer>
     </div>

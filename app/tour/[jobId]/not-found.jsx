@@ -25,7 +25,7 @@ export default function TourNotFound() {
         href="/"
         style={{ marginTop: 16, color: "#c9a84c", fontSize: 14, textDecoration: "underline" }}
       >
-        חזרה לאתר VISIO
+        חזרה לאתר <bdi lang="en" dir="ltr">VISIO</bdi>
       </a>
     </main>
   );
