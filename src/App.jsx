@@ -63,15 +63,15 @@ function StoryImage({ id, title }) {
 
 /* ─── DATA ─── */
 const PORTFOLIO = [
-  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", type: "PRESTIGE", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
-  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", type: "PRESTIGE", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת","נוף"] },
-  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", type: "PRESTIGE", tag: "בוטיק", partner: "ReHouse", matterport: "cEtmuBEsSNq", tags: ["קיר שיש","פרקט","בוטיק"] },
-  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", type: "PRESTIGE", tag: "לובי יוקרה", partner: "ReHouse", matterport: "9YJGFmX8KbJ", tags: ["לובי יוקרה","שיש"] },
-  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", type: "PRESTIGE", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
-  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", type: "PRESTIGE", tag: "גינה + שיש", partner: "ReHouse", matterport: "C6Uvbihrqvm", tags: ["גינה","שיש","סלון"] },
-  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", type: "PRESTIGE", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
-  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", type: "PRESTIGE", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
-  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", type: "PRESTIGE", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
+  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
+  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", tag: "בוטיק", partner: "ReHouse", matterport: "cEtmuBEsSNq", tags: ["קיר שיש","פרקט","בוטיק"] },
+  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", tag: "לובי יוקרה", partner: "ReHouse", matterport: "9YJGFmX8KbJ", tags: ["לובי יוקרה","שיש"] },
+  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
+  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", tag: "דירת גן", partner: "ReHouse", matterport: "C6Uvbihrqvm", tags: ["גינה","שיש","סלון"] },
+  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
+  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
+  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
 ];
 
 const COVER_ID = 8;
@@ -220,7 +220,6 @@ function PortfolioSection() {
               <div className="visio-portfolio-img-wrap" style={{ cursor: gallery.length ? "zoom-in" : "default" }}
                 onClick={() => { if (gallery.length) openGallery(gallery); }}>
                 {imgs?.hero ? <img src={imgs.hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
-                <div className="visio-img-label"><Bidi>{p.type}</Bidi></div>
                 {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
 
                 {active === p.id && (p.matterport || gallery.length > 0) && (
