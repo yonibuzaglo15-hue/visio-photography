@@ -64,14 +64,14 @@ function StoryImage({ id, title }) {
 /* ─── DATA ─── */
 const PORTFOLIO = [
   { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", type: "PRESTIGE", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
-  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", type: "PRESTIGE", tag: "נוף", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת","נוף"] },
+  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", type: "PRESTIGE", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת","נוף"] },
   { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", type: "PRESTIGE", tag: "בוטיק", partner: "ReHouse", matterport: "cEtmuBEsSNq", tags: ["קיר שיש","פרקט","בוטיק"] },
   { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", type: "PRESTIGE", tag: "לובי יוקרה", partner: "ReHouse", matterport: "9YJGFmX8KbJ", tags: ["לובי יוקרה","שיש"] },
-  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", type: "PRESTIGE", tag: "גינה", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
+  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", type: "PRESTIGE", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
   { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", type: "PRESTIGE", tag: "גינה + שיש", partner: "ReHouse", matterport: "C6Uvbihrqvm", tags: ["גינה","שיש","סלון"] },
-  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", type: "PRESTIGE", tag: "גינה + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
+  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", type: "PRESTIGE", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
   { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", type: "PRESTIGE", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
-  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", type: "PRESTIGE", tag: "וילה + גינה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", type: "PRESTIGE", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
 ];
 
 const COVER_ID = 8;
@@ -124,7 +124,7 @@ function HomeSection({ onNav }) {
         <div className="visio-feature-grid">
           <button className="visio-story" onClick={() => onNav("portfolio")}>
             <StoryImage id={lead.id} title={lead.title} />
-            <div className="visio-kicker" style={{ marginTop: 18 }}>{lead.tag}</div>
+            {lead.tag && <div className="visio-kicker" style={{ marginTop: 18 }}>{lead.tag}</div>}
             <h3 className="visio-story-title lead">{lead.title}</h3>
             <p className="visio-story-dek">{lead.sub}</p>
             <div className="visio-credit"><Bidi>{`צילום: VISIO · ${lead.partner}`}</Bidi></div>
@@ -133,7 +133,7 @@ function HomeSection({ onNav }) {
             {side.slice(0, 4).map(p => (
               <button key={p.id} className="visio-story" onClick={() => onNav("portfolio")}>
                 <div>
-                  <div className="visio-kicker">{p.tag}</div>
+                  {p.tag && <div className="visio-kicker">{p.tag}</div>}
                   <h3 className="visio-story-title">{p.title}</h3>
                   <div className="visio-credit"><Bidi>{`צילום: VISIO · ${p.partner}`}</Bidi></div>
                 </div>
@@ -240,7 +240,7 @@ function PortfolioSection() {
               </div>
 
               <div className="visio-portfolio-meta">
-                <div className="visio-kicker">{p.tag}</div>
+                {p.tag && <div className="visio-kicker">{p.tag}</div>}
                 <h3 className="visio-story-title">{p.title}</h3>
                 <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
                 <div className="visio-credit">
@@ -610,7 +610,7 @@ function AboutSection({ onNav }) {
       <div className="visio-narrow visio-article">
         <div className="visio-kicker" style={{ marginBottom: 16 }}>החזון שלנו</div>
         <p>
-          <Bidi>VISIO נוסדה מתוך אמונה שכל נכס ראוי לצילום שמספר את הסיפור שלו. אנחנו משלבים צילום מקצועי עם עיבוד AI מתקדם כדי ליצור תמונות שמוכרות — מהיר יותר, במחיר גבוה יותר.</Bidi>
+          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
         </p>
 
         <blockquote className="visio-pullquote">נדל״ן. בצילום שמוכר.</blockquote>
