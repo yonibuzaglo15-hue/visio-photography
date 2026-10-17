@@ -1,0 +1,343 @@
+/*
+ * Hosted 360 tour chrome.
+ * The panorama stage MUST stay direction:ltr. The page is RTL; if the
+ * Pannellum container inherits that, floor-ring hotspots land one viewport
+ * width away from the point they were authored at.
+ */
+
+html:has(.visio-tour),
+body:has(.visio-tour) {
+  overflow: hidden;
+  height: 100%;
+}
+
+.visio-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #000;
+  color: #fff;
+  font-family: "Heebo", system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.visio-tour-pano {
+  position: fixed;
+  inset: 0;
+  direction: ltr;
+  background: #000;
+}
+
+.visio-tour-pano .pnlm-container {
+  background: #060606;
+}
+
+/* Room name lives in the header. Pannellum's own title sits under the footer. */
+.visio-tour-pano .pnlm-panorama-info,
+.visio-tour-pano .pnlm-load-box,
+.visio-tour-pano .pnlm-lbox {
+  display: none !important;
+}
+
+.visio-tour-pano .pnlm-hotspot-base {
+  left: 0;
+  top: 0;
+  right: auto;
+}
+
+.visio-tour-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(#000a, #0000);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.visio-tour-brand {
+  pointer-events: auto;
+  font-family: "Bodoni Moda", "Times New Roman", serif;
+  font-weight: 500;
+  font-size: 28px;
+  letter-spacing: 0.18em;
+  color: #fff;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.visio-tour-title {
+  margin: 6px 0 0;
+  font-family: "Frank Ruhl Libre", "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.visio-tour-room {
+  font-size: 13px;
+  opacity: 0.85;
+  min-height: 1.2em;
+}
+
+.visio-tour-ctl {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+  direction: ltr;
+}
+
+.visio-tour button {
+  font-family: "Heebo", sans-serif;
+}
+
+.visio-tour-ctl button,
+.visio-tour-fbar button {
+  border: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+}
+
+.visio-tour-ctl button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  padding: 0;
+}
+
+.visio-tour-ctl button.on,
+.visio-tour-fbar button.on {
+  background: #fff;
+  color: #000;
+}
+
+.visio-tour button:hover {
+  opacity: 1;
+}
+
+.visio-tour-note {
+  position: fixed;
+  top: 72px;
+  right: 14px;
+  max-width: min(320px, calc(100vw - 28px));
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  padding: 12px 14px;
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  z-index: 6;
+  display: none;
+}
+
+.visio-tour-note.show {
+  display: block;
+}
+
+.visio-tour-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  pointer-events: none;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.visio-tour-fbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  pointer-events: auto;
+}
+
+.visio-tour-fbar button {
+  padding: 7px 12px;
+  border-radius: 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.visio-tour-credit {
+  font-size: 12px;
+  opacity: 0.9;
+  text-shadow: 0 1px 3px #000;
+  text-align: center;
+}
+
+.visio-tour-rooms {
+  display: none;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 10px;
+  scrollbar-width: none;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+
+.visio-tour-rooms.open {
+  display: flex;
+}
+
+.visio-tour-rooms::-webkit-scrollbar {
+  display: none;
+}
+
+.visio-tour-rooms button {
+  flex: 0 0 auto;
+  width: 92px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 0;
+  overflow: hidden;
+  background: #16140f;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.visio-tour-rooms button img {
+  width: 100%;
+  height: 52px;
+  object-fit: cover;
+  display: block;
+}
+
+.visio-tour-rooms button span {
+  display: block;
+  padding: 3px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.visio-tour-rooms button.on {
+  border-color: #fff;
+}
+
+.visio-tour-map {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 12px;
+  width: min(300px, 45vw);
+  z-index: 6;
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 0;
+  padding: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.visio-tour-map.open {
+  display: block;
+}
+
+.visio-tour-map-in {
+  position: relative;
+  direction: ltr;
+}
+
+.visio-tour-map-in img {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+  opacity: 0.92;
+}
+
+.visio-tour-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  padding: 0;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.visio-tour-dot.on {
+  background: #000;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.visio-tour .pnlm-hotspot-base.ring {
+  width: 0;
+  height: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.visio-tour .ring .rg {
+  position: absolute;
+  left: -38px;
+  top: -19px;
+  width: 76px;
+  height: 38px;
+  border-radius: 50%;
+  border: 5px solid #fff;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6), inset 0 0 6px rgba(0, 0, 0, 0.35);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.visio-tour .ring:hover .rg {
+  background: rgba(255, 255, 255, 0.42);
+  border-color: #fff;
+}
+
+.visio-tour .ring .tt {
+  visibility: hidden;
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  padding: 4px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-family: "Heebo", sans-serif;
+}
+
+.visio-tour .ring:hover .tt {
+  visibility: visible;
+}
+
+.visio-tour-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 6, 4, 0.72);
+  color: #fff;
+  font-family: "Heebo", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.visio-tour-loading.is-error {
+  pointer-events: auto;
+  background: #060604;
+}

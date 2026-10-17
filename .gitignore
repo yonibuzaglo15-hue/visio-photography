@@ -6,7 +6,7 @@ dist
 .DS_Store
 .data/
 .tmp-fp-verify/
-public/tours/
+# Hosted tours in public/tours/<slug>/ are committed. Do not ignore that tree.
 .vercel/
 .vercel
 

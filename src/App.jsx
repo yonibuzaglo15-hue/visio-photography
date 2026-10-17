@@ -72,6 +72,7 @@ const PORTFOLIO = [
   { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
   { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
   { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 10, title: "דירה · אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", hero: "/tours/ashdod-apartment/card.jpg", gallery: ["/tours/ashdod-apartment/card.jpg", "/tours/ashdod-apartment/stills/living.jpg", "/tours/ashdod-apartment/stills/entrance.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
 ];
 
 const COVER_ID = 8;
@@ -212,22 +213,31 @@ function PortfolioSection() {
       <div className="visio-portfolio-grid">
         {PORTFOLIO.map(p => {
           const imgs = PROPERTY_IMAGES[p.id];
-          const gallery = imgs?.gallery || [];
+          const hero = p.hero || imgs?.hero;
+          const gallery = p.gallery || imgs?.gallery || [];
+          const tourHref = p.tour
+            ? `/tours/${p.tour}`
+            : (p.matterport ? `https://my.matterport.com/show/?m=${p.matterport}` : null);
           return (
             <article key={p.id} className="visio-portfolio-card"
               onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
 
               <div className="visio-portfolio-img-wrap" style={{ cursor: gallery.length ? "zoom-in" : "default" }}
                 onClick={() => { if (gallery.length) openGallery(gallery); }}>
-                {imgs?.hero ? <img src={imgs.hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
+                {hero ? <img src={hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
                 {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
 
-                {active === p.id && (p.matterport || gallery.length > 0) && (
+                {active === p.id && (tourHref || gallery.length > 0) && (
                   <div className="visio-portfolio-hover" onClick={e => e.stopPropagation()}>
-                    {p.matterport && (
-                      <button className="visio-btn on-image" onClick={() => window.open(`https://my.matterport.com/show/?m=${p.matterport}`, "_blank")}>
+                    {tourHref && (
+                      <a
+                        className="visio-btn on-image"
+                        href={tourHref}
+                        style={{ textDecoration: "none" }}
+                        {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                      >
                         ▶ סיור וירטואלי 3D
-                      </button>
+                      </a>
                     )}
                     {gallery.length > 0 && (
                       <button className="visio-btn on-image outline" onClick={() => openGallery(gallery)}>
@@ -243,7 +253,7 @@ function PortfolioSection() {
                 <h3 className="visio-story-title">{p.title}</h3>
                 <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
                 <div className="visio-credit">
-                  <Bidi>{[...p.tags, p.matterport && "3D TOUR", p.partner].filter(Boolean).join(" · ")}</Bidi>
+                  <Bidi>{[...p.tags, (p.tour || p.matterport) && "3D TOUR", p.partner].filter(Boolean).join(" · ")}</Bidi>
                 </div>
               </div>
             </article>
