@@ -1,0 +1,303 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import "./tour.css";
+
+const PANNELLUM_SRC = "/vendor/pannellum/pannellum.js";
+
+function ensurePannellum() {
+  if (typeof window !== "undefined" && window.pannellum?.viewer) {
+    return Promise.resolve(window.pannellum);
+  }
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${PANNELLUM_SRC}"]`);
+    const done = () => {
+      if (window.pannellum?.viewer) resolve(window.pannellum);
+      else reject(new Error("pannellum missing viewer"));
+    };
+    if (existing) {
+      if (window.pannellum?.viewer) {
+        resolve(window.pannellum);
+        return;
+      }
+      existing.addEventListener("load", done, { once: true });
+      existing.addEventListener("error", () => reject(new Error("pannellum failed")), { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = PANNELLUM_SRC;
+    script.async = true;
+    script.onload = done;
+    script.onerror = () => reject(new Error("pannellum failed"));
+    document.body.appendChild(script);
+  });
+}
+
+/** Same choice as the original tour: medium pano when the GPU can take 4096px. */
+function textureSuffix() {
+  let max = 0;
+  try {
+    const gl = document.createElement("canvas").getContext("webgl");
+    if (gl) max = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 0;
+  } catch {
+    max = 0;
+  }
+  return max >= 4096 ? "_m" : "_s";
+}
+
+function tip(hotSpotDiv, text) {
+  hotSpotDiv.classList.add("ring");
+  const ring = document.createElement("div");
+  ring.className = "rg";
+  hotSpotDiv.appendChild(ring);
+  const label = document.createElement("span");
+  label.className = "tt";
+  label.textContent = text;
+  hotSpotDiv.appendChild(label);
+}
+
+export default function TourViewer({ tour }) {
+  const panoRef = useRef(null);
+  const viewerRef = useRef(null);
+  const [room, setRoom] = useState("");
+  const [sceneId, setSceneId] = useState(tour.firstScene || tour.scenes[0]?.id || "");
+  const [roomsOpen, setRoomsOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [gyroOn, setGyroOn] = useState(false);
+  const [gyroAvailable, setGyroAvailable] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setGyroAvailable("DeviceOrientationEvent" in window);
+    setMapOpen(window.innerWidth > 900);
+  }, []);
+
+  useEffect(() => {
+    const el = panoRef.current;
+    if (!el) return undefined;
+    let cancelled = false;
+    setReady(false);
+    setFailed(false);
+    const base = tour.assetBase;
+    const suffix = textureSuffix();
+    const pitch = Number.isFinite(tour.pitch) ? tour.pitch : -10;
+    const byId = Object.fromEntries(tour.scenes.map((scene) => [scene.id, scene]));
+    const scenes = {};
+
+    for (const scene of tour.scenes) {
+      scenes[scene.id] = {
+        title: scene.title,
+        type: "equirectangular",
+        panorama: `${base}/pano/${scene.id}${suffix}.jpg`,
+        preview: `${base}/pano/${scene.id}_s.jpg`,
+        pitch,
+        hotSpots: (scene.hotspots || []).map((hotspot) => ({
+          pitch: hotspot.pitch,
+          yaw: hotspot.yaw,
+          type: "scene",
+          sceneId: hotspot.scene,
+          cssClass: "ring",
+          createTooltipFunc: tip,
+          createTooltipArgs: byId[hotspot.scene]?.title || hotspot.scene,
+          targetYaw: "sameAzimuth",
+          targetPitch: pitch,
+        })),
+      };
+    }
+
+    // Defer past React strict-mode's setup/cleanup so the viewer is created once.
+    // Otherwise a fast second visit paints, gets destroyed, and flashes the loader.
+    const timer = setTimeout(() => {
+    ensurePannellum()
+      .then((pannellum) => {
+        if (cancelled) return;
+        const viewer = pannellum.viewer(el, {
+          default: {
+            firstScene: tour.firstScene || tour.scenes[0].id,
+            autoLoad: true,
+            sceneFadeDuration: 800,
+            hfov: Number.isFinite(tour.hfov) ? tour.hfov : 105,
+            pitch,
+            showFullscreenCtrl: false,
+            showControls: false,
+            hotSpotDebug: false,
+          },
+          scenes,
+        });
+        viewerRef.current = viewer;
+        const mark = () => {
+          const id = viewer.getScene();
+          setSceneId(id);
+          setRoom(byId[id]?.title || "");
+          setReady(true);
+        };
+        viewer.on("scenechange", mark);
+        viewer.on("load", mark);
+        viewer.on("error", () => {
+          if (!cancelled) setFailed(true);
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      if (viewerRef.current) {
+        viewerRef.current.destroy();
+        viewerRef.current = null;
+      }
+    };
+  }, [tour]);
+
+  function loadScene(id) {
+    viewerRef.current?.loadScene(id);
+  }
+
+  function toggleGyro() {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    if (viewer.isOrientationActive()) {
+      viewer.stopOrientation();
+      setGyroOn(false);
+      return;
+    }
+    const start = () => {
+      viewer.startOrientation();
+      setGyroOn(true);
+    };
+    const orientation = window.DeviceOrientationEvent;
+    if (orientation && typeof orientation.requestPermission === "function") {
+      orientation.requestPermission().then((result) => {
+        if (result === "granted") start();
+      });
+    } else {
+      start();
+    }
+  }
+
+  const heading = [tour.title, tour.location].filter(Boolean).join(" · ");
+  const planSrc = tour.plan ? `${tour.assetBase}/${tour.plan}` : null;
+  const noteLines = (tour.note || "").split("\n").filter(Boolean);
+
+  return (
+    <div className="visio-tour" dir="rtl" data-scene={sceneId} data-tour={tour.slug}>
+      <link rel="stylesheet" href="/vendor/pannellum/pannellum.css" />
+      <div id="pano" ref={panoRef} className="visio-tour-pano" dir="ltr" />
+
+      {!ready && (
+        <div className={`visio-tour-loading${failed ? " is-error" : ""}`}>
+          {failed ? "שגיאה בטעינת הסיור" : "טוען סיור וירטואלי…"}
+        </div>
+      )}
+
+      <header className="visio-tour-header">
+        <div>
+          <a className="visio-tour-brand" href="/">VISIO</a>
+          <h1 className="visio-tour-title">{heading}</h1>
+          <div className="visio-tour-room">{room}</div>
+        </div>
+        <div className="visio-tour-ctl" dir="ltr">
+          <button
+            type="button"
+            title="מידע"
+            aria-label="מידע"
+            aria-pressed={noteOpen}
+            className={noteOpen ? "on" : undefined}
+            onClick={() => setNoteOpen((open) => !open)}
+          >
+            i
+          </button>
+          {gyroAvailable && (
+            <button
+              type="button"
+              title="חיישן תנועה"
+              aria-label="חיישן תנועה"
+              aria-pressed={gyroOn}
+              className={gyroOn ? "on" : undefined}
+              onClick={toggleGyro}
+            >
+              📱
+            </button>
+          )}
+          <button
+            type="button"
+            title="מסך מלא"
+            aria-label="מסך מלא"
+            onClick={() => viewerRef.current?.toggleFullscreen()}
+          >
+            ⛶
+          </button>
+        </div>
+      </header>
+
+      {noteLines.length > 0 && (
+        <div id="note" className={`visio-tour-note${noteOpen ? " show" : ""}`}>
+          {noteLines.map((line) => (
+            <div key={line}>{line}</div>
+          ))}
+        </div>
+      )}
+
+      {planSrc && (
+        <div id="map" className={`visio-tour-map${mapOpen ? " open" : ""}`}>
+          <div className="visio-tour-map-in" dir="ltr">
+            <img src={planSrc} alt="תוכנית הדירה" />
+            {tour.scenes.map((scene) => (
+              <button
+                key={scene.id}
+                type="button"
+                className={`visio-tour-dot${scene.id === sceneId ? " on" : ""}`}
+                title={scene.title}
+                aria-label={scene.title}
+                style={{ left: `${scene.map.x}%`, top: `${scene.map.y}%` }}
+                onClick={() => loadScene(scene.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <footer className="visio-tour-footer">
+        <nav id="rooms" className={`visio-tour-rooms${roomsOpen ? " open" : ""}`} aria-label="חדרים">
+          {tour.scenes.map((scene) => (
+            <button
+              key={scene.id}
+              type="button"
+              className={scene.id === sceneId ? "on" : undefined}
+              onClick={() => loadScene(scene.id)}
+            >
+              <img loading="lazy" src={`${tour.assetBase}/pano/${scene.id}_s.jpg`} alt="" />
+              <span>{scene.title}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="visio-tour-fbar">
+          <button
+            type="button"
+            className={roomsOpen ? "on" : undefined}
+            aria-pressed={roomsOpen}
+            onClick={() => setRoomsOpen((open) => !open)}
+          >
+            ☰ חדרים
+          </button>
+          <span className="visio-tour-credit">{tour.credit || "VISIO"}</span>
+          {planSrc && (
+            <button
+              type="button"
+              className={mapOpen ? "on" : undefined}
+              aria-pressed={mapOpen}
+              onClick={() => setMapOpen((open) => !open)}
+            >
+              ⌖ מפה
+            </button>
+          )}
+        </div>
+      </footer>
+    </div>
+  );
+}
