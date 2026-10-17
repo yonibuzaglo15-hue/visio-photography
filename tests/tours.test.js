@@ -67,7 +67,10 @@ describe("portfolio tour wiring", () => {
     expect(card?.title).toBe("דירה · אשדוד");
     expect(card?.sub.startsWith("שבט לוי 11")).toBe(true);
     expect(card?.tour).toBe("ashdod-apartment");
-    expect(card?.hero).toBe("/tours/ashdod-apartment/card.jpg");
+    const order = ["16", "17", "18", "19", "20", "21", "13", "14", "15", "09", "10", "11", "12", "01", "02", "03", "04", "05", "06", "07", "08"];
+    expect(card?.hero).toBe("/portfolio/shevet-levi-11/16.jpg");
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-levi-11/${n}.jpg`));
+    expect(card?.gallery.join(" ")).not.toMatch(/card\.jpg|stills\//);
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
