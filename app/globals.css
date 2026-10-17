@@ -267,6 +267,9 @@ button:hover { opacity: 0.85; }
 .visio-portfolio-img-wrap { aspect-ratio: 4 / 3; background: var(--pub-bg-2); position: relative; overflow: hidden; }
 .visio-portfolio-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
 .visio-portfolio-card:hover .visio-portfolio-img-wrap img { transform: scale(1.03); }
+/* Full frame for photos with a bottom banner. Other cards stay cover-cropped. */
+.visio-portfolio-img-wrap.contain img { object-fit: contain; object-position: center; }
+.visio-portfolio-card:hover .visio-portfolio-img-wrap.contain img { transform: none; }
 .visio-img-label { position: absolute; top: 12px; right: 12px; background: var(--pub-bg); color: var(--pub-ink); padding: 5px 10px; font-size: 10px; font-weight: 600; letter-spacing: .2em; }
 .visio-img-label.left { right: auto; left: 12px; }
 .visio-portfolio-hover { position: absolute; inset: 0; background: var(--pub-scrim); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }

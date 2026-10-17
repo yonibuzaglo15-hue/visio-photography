@@ -72,7 +72,7 @@ const PORTFOLIO = [
   { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
   { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
   { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
-  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
+  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
 ];
 
 const COVER_ID = 8;
@@ -222,7 +222,7 @@ function PortfolioSection() {
             <article key={p.id} className="visio-portfolio-card"
               onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
 
-              <div className="visio-portfolio-img-wrap" style={{ cursor: gallery.length ? "zoom-in" : "default" }}
+              <div className={`visio-portfolio-img-wrap${p.fit === "contain" ? " contain" : ""}`} style={{ cursor: gallery.length ? "zoom-in" : "default" }}
                 onClick={() => { if (gallery.length) openGallery(gallery); }}>
                 {hero ? <img src={hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
                 {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
