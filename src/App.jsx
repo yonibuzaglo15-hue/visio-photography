@@ -16,67 +16,79 @@ const PROPERTY_IMAGES = {
 
 /* ════════════════════════════════════════════════
    VISIO — Real Estate Photography Agency
-   Gold-black luxury aesthetic · RTL Hebrew
+   Editorial monochrome aesthetic · RTL Hebrew
 ════════════════════════════════════════════════ */
 
 
 const fmt = (n) => Math.round(n).toLocaleString("he-IL");
 const VAT = 0.18;
 
-/* ─── VISIO MARK LOGO ─── */
-function VisioMark({ size = 40, animate = false }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="36" stroke={C.gold} strokeWidth="1.5" />
-      <circle cx="40" cy="40" r="24" stroke={C.gold} strokeWidth="0.8" opacity="0.5" />
-      <circle cx="40" cy="40" r="3" fill={C.gold} />
-      <line x1="40" y1="4" x2="40" y2="76" stroke={C.gold} strokeWidth="0.8" opacity="0.4" />
-      <line x1="4" y1="40" x2="76" y2="40" stroke={C.gold} strokeWidth="0.8" opacity="0.4" />
-      <circle cx="40" cy="40" r="12" stroke={C.gold} strokeWidth="0.8" opacity="0.3" strokeDasharray="4 4" />
-    </svg>
-  );
+/* ─── BIDI ─── */
+// Latin runs (incl. leading digits like "4K" and inner separators like "RE/MAX", "9:16")
+// are isolated so neighbouring Hebrew punctuation and word order don't flip.
+const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
+
+function Bidi({ children: text }) {
+  const parts = [];
+  let last = 0;
+  for (const m of text.matchAll(LATIN_RUN)) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push(<bdi key={m.index} lang="en" dir="ltr">{m[0]}</bdi>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
 }
 
 /* ─── SECTION TITLE ─── */
 function SectionTitle({ sup, title, sub }) {
   return (
-    <div style={{ textAlign: "center", marginBottom: 48, direction: "rtl" }}>
-      <div style={{ fontSize: 10, letterSpacing: 6, color: C.goldDim, marginBottom: 12, fontFamily: "'Bebas Neue', sans-serif" }}>
-        {sup}
-      </div>
-      <h2 className="visio-section-title" style={{ color: C.text, margin: "0 0 12px" }}>
-        {title}
-      </h2>
-      {sub && <p style={{ fontSize: 13, color: C.muted, letterSpacing: 1, margin: 0 }}>{sub}</p>}
+    <div className="visio-section-head">
+      <div className="visio-kicker"><Bidi>{sup}</Bidi></div>
+      <h2 className="visio-section-title"><Bidi>{title}</Bidi></h2>
+      {sub && <p className="visio-section-sub"><Bidi>{sub}</Bidi></p>}
+    </div>
+  );
+}
+
+/* ─── STORY IMAGE ─── */
+function StoryImage({ id, title }) {
+  const src = PROPERTY_IMAGES[id]?.hero;
+  return (
+    <div className="visio-story-img">
+      {src ? <img src={src} alt={title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
     </div>
   );
 }
 
 /* ─── DATA ─── */
 const PORTFOLIO = [
-  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", type: "PRESTIGE", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
-  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", type: "PRESTIGE", tag: "נוף", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת","נוף"] },
-  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", type: "PRESTIGE", tag: "בוטיק", partner: "ReHouse", matterport: "cEtmuBEsSNq", tags: ["קיר שיש","פרקט","בוטיק"] },
-  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", type: "PRESTIGE", tag: "לובי יוקרה", partner: "ReHouse", matterport: "9YJGFmX8KbJ", tags: ["לובי יוקרה","שיש"] },
-  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", type: "PRESTIGE", tag: "גינה", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
-  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", type: "PRESTIGE", tag: "גינה + שיש", partner: "ReHouse", matterport: "C6Uvbihrqvm", tags: ["גינה","שיש","סלון"] },
-  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", type: "PRESTIGE", tag: "גינה + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
-  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", type: "PRESTIGE", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
-  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", type: "PRESTIGE", tag: "וילה + גינה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
+  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
+  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", tag: "בוטיק", partner: "ReHouse", matterport: "cEtmuBEsSNq", tags: ["קיר שיש","פרקט","בוטיק"] },
+  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", tag: "לובי יוקרה", partner: "ReHouse", matterport: "9YJGFmX8KbJ", tags: ["לובי יוקרה","שיש"] },
+  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
+  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", tag: "דירת גן", partner: "ReHouse", matterport: "C6Uvbihrqvm", tags: ["גינה","שיש","סלון"] },
+  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
+  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
+  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 10, title: "דירה · אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", hero: "/tours/ashdod-apartment/card.jpg", gallery: ["/tours/ashdod-apartment/card.jpg", "/tours/ashdod-apartment/stills/living.jpg", "/tours/ashdod-apartment/stills/entrance.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
 ];
 
+const COVER_ID = 8;
+
 const PARTNERS = [
-  { id: "remax", name: "RE/MAX", sub: "ישראל", color: "#c8102e", desc: "רשת התיווך הגדולה בעולם" },
-  { id: "rehouse", name: "ReHouse", sub: 'נדל"ן', color: C.gold, desc: 'חברת נדל"ן בוטיק' },
-  { id: "lbd", name: "L.B.D", sub: "Real Estate", color: C.text, desc: "נדל״ן יוקרה" },
-  { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', color: C.gold, desc: "סוכנות נדל״ן מובילה" },
+  { id: "remax", name: "RE/MAX", sub: "ישראל", desc: "רשת התיווך הגדולה בעולם" },
+  { id: "rehouse", name: "ReHouse", sub: 'נדל"ן', desc: 'חברת נדל"ן בוטיק' },
+  { id: "lbd", name: "L.B.D", sub: "Real Estate", desc: "נדל״ן יוקרה" },
+  { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
 ];
 
 const PACKAGES = [
-  { id: "consultation", name: "CONSULTATION", hebrew: "ייעוץ טלפוני", price: 0, color: "#6fcf6f", popular: false, free: true, features: ["שיחת ייעוץ 15 דקות","הצעת מחיר מותאמת אישית","ללא התחייבות","קביעה מיידית"] },
-  { id: "essential", name: "ESSENTIAL", price: 350, color: "#5a5040", popular: false, features: ["15 תמונות מעובדות AI","עיבוד תאורה מקצועי","הספקה ב-24 שעות ל-Drive","פורמט עבור יד2 / מדלן"] },
-  { id: "signature", name: "SIGNATURE", price: 400, color: C.gold, popular: true, features: ["25 תמונות AI","סרטון 60 שניות","3 פנורמות 360°","הספקה ב-24 שעות","+ סיור וירטואלי ₪80/חודש"] },
-  { id: "prestige", name: "PRESTIGE", price: 750, color: "#e8dfc8", popular: false, features: ["תמונות ללא הגבלה","סרטון 90 שניות + מוזיקה","פנורמות ללא הגבלה","צילום רחפן","סיור וירטואלי — חודש ראשון","RAW files","גיבוי 90 יום"] },
+  { id: "consultation", name: "CONSULTATION", hebrew: "ייעוץ טלפוני", price: 0, popular: false, free: true, features: ["שיחת ייעוץ 15 דקות","הצעת מחיר מותאמת אישית","ללא התחייבות","קביעה מיידית"] },
+  { id: "essential", name: "ESSENTIAL", price: 350, popular: false, features: ["15 תמונות מעובדות AI","עיבוד תאורה מקצועי","הספקה ב-24 שעות ל-Drive","פורמט עבור יד2 / מדלן"] },
+  { id: "signature", name: "SIGNATURE", price: 400, popular: true, features: ["25 תמונות AI","סרטון 60 שניות","3 פנורמות 360°","הספקה ב-24 שעות","+ סיור וירטואלי ₪80/חודש"] },
+  { id: "prestige", name: "PRESTIGE", price: 750, popular: false, features: ["תמונות ללא הגבלה","סרטון 90 שניות + מוזיקה","פנורמות ללא הגבלה","צילום רחפן","סיור וירטואלי — חודש ראשון","RAW files","גיבוי 90 יום"] },
 ];
 
 
@@ -86,96 +98,114 @@ const PACKAGES = [
 
 /* ─── HOME ─── */
 function HomeSection({ onNav }) {
-  const headlines = ["נדל״ן. בצילום שמוכר."];
-  const tick = 0;
+  const [lead, ...side] = PORTFOLIO.filter(p => PROPERTY_IMAGES[p.id] && p.id !== COVER_ID);
 
   return (
-    <div style={{ direction: "rtl" }}>
-      {/* Hero */}
-      <div className="visio-hero">
-        {/* Background grid */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${C.border} 1px, transparent 1px), linear-gradient(90deg, ${C.border} 1px, transparent 1px)`, backgroundSize: "60px 60px", opacity: 0.4 }} />
-        <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, transparent 40%, ${C.bg} 90%)` }} />
+    <>
+      {/* Cover */}
+      <div className="visio-cover-wrap">
+        <section className="visio-cover">
+          <img src={PROPERTY_IMAGES[COVER_ID].hero} alt={PORTFOLIO.find(p => p.id === COVER_ID).title} />
+          <div className="visio-cover-shade" />
+          <div className="visio-cover-text">
+            <div className="visio-kicker"><Bidi>VISIO PHOTOGRAPHY</Bidi></div>
+            <h1 className="visio-cover-title">נדל״ן. בצילום שמוכר.</h1>
+            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
+            <div className="visio-cover-btns">
+              <button className="visio-btn on-image" onClick={() => onNav("booking")}>הזמן צילום עכשיו</button>
+              <button className="visio-btn on-image outline" onClick={() => onNav("portfolio")}>צפה בעבודות</button>
+            </div>
+          </div>
+        </section>
+      </div>
 
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <VisioMark size={72} />
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 10, color: C.goldDim, margin: "20px 0 8px" }}>VISIO PHOTOGRAPHY</div>
-          <h1 className="visio-hero-title">
-            {headlines[tick % headlines.length]}
-          </h1>
-          <p className="visio-hero-sub">
-            צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות
-          </p>
-          <div className="visio-hero-btns">
-            <button className="visio-btn-primary" onClick={() => onNav("booking")} style={{ padding: "14px 36px", background: `linear-gradient(135deg,${C.gold},${C.goldDim})`, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: 4, color: C.onGold, cursor: "pointer", boxShadow: `0 8px 32px ${C.goldGlow}` }}>
-              הזמן צילום עכשיו
-            </button>
-            <button className="visio-btn-primary" onClick={() => onNav("portfolio")} style={{ padding: "14px 36px", background: "none", border: `1px solid ${C.border}`, fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: 4, color: C.muted, cursor: "pointer" }}>
-              צפה בעבודות
-            </button>
+      {/* Latest work */}
+      <section className="visio-section">
+        <div className="visio-rule-head visio-wrap"><span className="visio-kicker">עבודות אחרונות</span></div>
+        <div className="visio-feature-grid">
+          <button className="visio-story" onClick={() => onNav("portfolio")}>
+            <StoryImage id={lead.id} title={lead.title} />
+            {lead.tag && <div className="visio-kicker" style={{ marginTop: 18 }}>{lead.tag}</div>}
+            <h3 className="visio-story-title lead">{lead.title}</h3>
+            <p className="visio-story-dek">{lead.sub}</p>
+            <div className="visio-credit"><Bidi>{`צילום: VISIO · ${lead.partner}`}</Bidi></div>
+          </button>
+          <div className="visio-story-list">
+            {side.slice(0, 4).map(p => (
+              <button key={p.id} className="visio-story" onClick={() => onNav("portfolio")}>
+                <div>
+                  {p.tag && <div className="visio-kicker">{p.tag}</div>}
+                  <h3 className="visio-story-title">{p.title}</h3>
+                  <div className="visio-credit"><Bidi>{`צילום: VISIO · ${p.partner}`}</Bidi></div>
+                </div>
+                <StoryImage id={p.id} title={p.title} />
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Stats bar */}
-      <div className="visio-stats">
-        {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["5","חבילות + ייעוץ חינם"]].map(([n,l]) => (
-          <div key={l} style={{ background: C.bg2, padding: "24px 16px", textAlign: "center" }}>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, letterSpacing: 3, color: C.gold }}>{n}</div>
-            <div style={{ fontSize: 10, color: C.muted, letterSpacing: 2, marginTop: 4 }}>{l}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Partners */}
-      <div style={{ padding: "60px 20px 0" }}>
-        <div style={{ fontSize: 9, letterSpacing: 5, color: C.muted, textAlign: "center", marginBottom: 24 }}>שותפים עסקיים</div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 32, flexWrap: "wrap", paddingBottom: 60, borderBottom: `1px solid ${C.border}` }}>
-          {PARTNERS.map(p => (
-            <div key={p.id} style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: 3, color: p.color }}>{p.name}</div>
-              <div style={{ fontSize: 9, color: C.muted, letterSpacing: 2 }}>{p.sub}</div>
+      {/* Stats */}
+      <div style={{ padding: "0 20px" }}>
+        <div className="visio-stats">
+          {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["5","חבילות + ייעוץ חינם"]].map(([n,l]) => (
+            <div key={l} className="visio-stat">
+              <div className="visio-stat-num"><Bidi>{n}</Bidi></div>
+              <div className="visio-kicker muted">{l}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* CTA strip */}
-      <div style={{ padding: "60px 20px", textAlign: "center" }}>
-        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: 4, color: C.text, marginBottom: 16 }}>מוכן לשדרג את הנכס שלך?</div>
-        <p style={{ fontSize: 13, color: C.muted, marginBottom: 24 }}>קבל הצעת מחיר תוך 24 שעות · ללא התחייבות</p>
-        <button onClick={() => onNav("booking")} style={{ padding: "14px 40px", background: `linear-gradient(135deg,${C.gold},${C.goldDim})`, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: 4, color: C.onGold, cursor: "pointer" }}>
-          צרו קשר
-        </button>
-      </div>
-    </div>
+      {/* Partners */}
+      <section className="visio-section" style={{ textAlign: "center" }}>
+        <div className="visio-kicker muted" style={{ marginBottom: 28 }}>שותפים עסקיים</div>
+        <div className="visio-partners">
+          {PARTNERS.map(p => (
+            <div key={p.id}>
+              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
+              <div className="visio-credit" style={{ marginTop: 4 }}><Bidi>{p.sub}</Bidi></div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="visio-section visio-wrap" style={{ textAlign: "center", borderTop: `1px solid ${C.rule}` }}>
+        <h2 className="visio-section-title">מוכן לשדרג את הנכס שלך?</h2>
+        <p className="visio-section-sub" style={{ marginBottom: 28 }}>קבל הצעת מחיר תוך 24 שעות · ללא התחייבות</p>
+        <button className="visio-btn" onClick={() => onNav("booking")}>צרו קשר</button>
+      </section>
+    </>
   );
 }
 
 /* ─── PORTFOLIO ─── */
 function PortfolioSection() {
   const [active, setActive] = useState(null);
-  const [lightbox, setLightbox] = useState(null);
   const [lightboxImgs, setLightboxImgs] = useState([]);
   const [lightboxIdx, setLightboxIdx] = useState(0);
 
+  const openGallery = (gallery) => { setLightboxImgs(gallery); setLightboxIdx(0); };
+  const stepGallery = (d) => setLightboxIdx(i => (i + d + lightboxImgs.length) % lightboxImgs.length);
+
   return (
-    <div style={{ padding: "60px 20px", direction: "rtl" }}>
+    <section className="visio-section">
       <SectionTitle sup="PORTFOLIO" title="עבודות נבחרות" sub="נכסי יוקרה · אשדוד ויבנה" />
 
       {/* Lightbox */}
-      {lightbox && (
-        <div className="visio-lightbox" onClick={() => setLightbox(null)}>
-          <img src={lightboxImgs[lightboxIdx]} alt="" style={{ maxHeight: "80vh", maxWidth: "90vw", objectFit: "contain", border: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()} />
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      {lightboxImgs.length > 0 && (
+        <div className="visio-lightbox" onClick={() => setLightboxImgs([])}>
+          <img src={lightboxImgs[lightboxIdx]} alt="" onClick={e => e.stopPropagation()} />
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }} onClick={e => e.stopPropagation()}>
             {lightboxImgs.length > 1 && (
               <>
-                <button onClick={e => { e.stopPropagation(); setLightboxIdx(i => (i - 1 + lightboxImgs.length) % lightboxImgs.length); }} style={{ background: "none", border: `1px solid ${C.border}`, color: C.muted, fontSize: 24, width: 44, height: 44, cursor: "pointer" }}>‹</button>
-                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: 3, color: C.muted }}>{lightboxIdx + 1} / {lightboxImgs.length}</span>
-                <button onClick={e => { e.stopPropagation(); setLightboxIdx(i => (i + 1) % lightboxImgs.length); }} style={{ background: "none", border: `1px solid ${C.border}`, color: C.muted, fontSize: 24, width: 44, height: 44, cursor: "pointer" }}>›</button>
+                <button className="visio-icon-btn" onClick={() => stepGallery(-1)} aria-label="הקודם">‹</button>
+                <span className="visio-credit">{lightboxIdx + 1} / {lightboxImgs.length}</span>
+                <button className="visio-icon-btn" onClick={() => stepGallery(1)} aria-label="הבא">›</button>
               </>
             )}
-            <button onClick={() => setLightbox(null)} style={{ background: "none", border: `1px solid ${C.border}`, color: C.muted, fontSize: 16, padding: "8px 16px", cursor: "pointer", fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 2 }}>✕ סגור</button>
+            <button className="visio-icon-btn" onClick={() => setLightboxImgs([])} style={{ fontSize: 12, letterSpacing: ".2em" }}>✕ סגור</button>
           </div>
         </div>
       )}
@@ -183,80 +213,54 @@ function PortfolioSection() {
       <div className="visio-portfolio-grid">
         {PORTFOLIO.map(p => {
           const imgs = PROPERTY_IMAGES[p.id];
-          const heroImg = imgs?.hero;
-          const gallery = imgs?.gallery || [];
+          const hero = p.hero || imgs?.hero;
+          const gallery = p.gallery || imgs?.gallery || [];
+          const tourHref = p.tour
+            ? `/tours/${p.tour}`
+            : (p.matterport ? `https://my.matterport.com/show/?m=${p.matterport}` : null);
           return (
-          <div key={p.id} style={{ background: C.bg2, position: "relative", overflow: "hidden" }}
-            onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
+            <article key={p.id} className="visio-portfolio-card"
+              onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
 
-            {/* Image area */}
-            <div className="visio-portfolio-img-wrap" style={{ cursor: gallery.length ? "zoom-in" : "default" }}
-              onClick={() => { if (gallery.length) { setLightbox(p.id); setLightboxImgs(gallery); setLightboxIdx(0); } }}>
-              {heroImg ? (
-                <img src={heroImg} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .4s" }}
-                  onMouseEnter={e => e.currentTarget.style.transform = "scale(1.04)"}
-                  onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} />
-              ) : (
-                <>
-                  <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(45deg,${C.border} 0,${C.border} 1px,transparent 0,transparent 50%)`, backgroundSize: "20px 20px", opacity: 0.5 }} />
-                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><VisioMark size={48} /></div>
-                </>
-              )}
+              <div className="visio-portfolio-img-wrap" style={{ cursor: gallery.length ? "zoom-in" : "default" }}
+                onClick={() => { if (gallery.length) openGallery(gallery); }}>
+                {hero ? <img src={hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
+                {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
 
-              {/* Type badge */}
-              <div style={{ position: "absolute", top: 12, right: 12, background: `var(--visio-overlay)`, border: `1px solid ${C.border}`, padding: "4px 10px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: 3, color: C.goldDim }}>
-                {p.type}
-              </div>
-              {/* Gallery count badge */}
-              {gallery.length > 1 && (
-                <div style={{ position: "absolute", top: 12, left: 12, background: `var(--visio-overlay)`, border: `1px solid ${C.border}`, padding: "4px 10px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: 2, color: C.muted }}>
-                  ⊞ {gallery.length}
-                </div>
-              )}
-              {/* Partner */}
-              <div style={{ position: "absolute", bottom: 12, left: 12, fontSize: 10, color: "rgba(232,223,200,.7)", letterSpacing: 1, background: "var(--visio-overlay)", padding: "3px 8px" }}>{p.partner}</div>
-
-              {/* Hover overlay */}
-              {active === p.id && (
-                <div style={{ position: "absolute", inset: 0, background: "rgba(6,6,4,.75)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}
-                  onClick={e => e.stopPropagation()}>
-                  {p.matterport && (
-                    <button onClick={e => { e.stopPropagation(); window.open(`https://my.matterport.com/show/?m=${p.matterport}`, "_blank"); }}
-                      style={{ padding: "10px 24px", background: `linear-gradient(135deg,${C.gold},${C.goldDim})`, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: 3, color: C.onGold, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 16 }}>▶</span> סיור וירטואלי 3D
-                    </button>
-                  )}
-                  {gallery.length > 0 && (
-                    <button onClick={e => { e.stopPropagation(); setLightbox(p.id); setLightboxImgs(gallery); setLightboxIdx(0); }}
-                      style={{ padding: "8px 20px", background: "none", border: `1px solid ${C.gold}55`, fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 3, color: C.gold, cursor: "pointer" }}>
-                      ⊞ גלריית תמונות ({gallery.length})
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div style={{ padding: "16px 18px 20px" }}>
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 3, color: C.text, marginBottom: 4 }}>{p.title}</div>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 12, letterSpacing: 0.5 }}>{p.sub}</div>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {p.tags.map(t => (
-                  <span key={t} style={{ fontSize: 9, letterSpacing: 2, color: C.goldDim, border: `1px solid ${C.border}`, padding: "3px 8px" }}>
-                    {t}
-                  </span>
-                ))}
-                {p.matterport && (
-                  <span style={{ fontSize: 9, letterSpacing: 2, color: C.gold, border: `1px solid ${C.gold}44`, padding: "3px 8px" }}>
-                    ▶ 3D TOUR
-                  </span>
+                {active === p.id && (tourHref || gallery.length > 0) && (
+                  <div className="visio-portfolio-hover" onClick={e => e.stopPropagation()}>
+                    {tourHref && (
+                      <a
+                        className="visio-btn on-image"
+                        href={tourHref}
+                        style={{ textDecoration: "none" }}
+                        {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                      >
+                        ▶ סיור וירטואלי 3D
+                      </a>
+                    )}
+                    {gallery.length > 0 && (
+                      <button className="visio-btn on-image outline" onClick={() => openGallery(gallery)}>
+                        ⊞ גלריית תמונות ({gallery.length})
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
-            </div>
-          </div>
+
+              <div className="visio-portfolio-meta">
+                {p.tag && <div className="visio-kicker">{p.tag}</div>}
+                <h3 className="visio-story-title">{p.title}</h3>
+                <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
+                <div className="visio-credit">
+                  <Bidi>{[...p.tags, (p.tour || p.matterport) && "3D TOUR", p.partner].filter(Boolean).join(" · ")}</Bidi>
+                </div>
+              </div>
+            </article>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -266,47 +270,31 @@ function PricingSection({ onNav }) {
   const p = (base) => fmt(showVat ? base * (1 + VAT) : base);
 
   return (
-    <div style={{ padding: "60px 20px", direction: "rtl" }}>
+    <section className="visio-section">
       <SectionTitle sup="PRICING" title="חבילות ומחירים" sub="מחירים שקופים · ללא הפתעות" />
 
       {/* VAT toggle */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 40, alignItems: "center" }}>
-        <span style={{ fontSize: 11, color: C.muted, letterSpacing: 2 }}>ללא מע״מ</span>
-        <div onClick={() => setShowVat(v => !v)} style={{ width: 44, height: 24, background: showVat ? C.goldDim : C.border, borderRadius: 12, position: "relative", cursor: "pointer", transition: "background .2s" }}>
-          <div style={{ position: "absolute", top: 3, left: showVat ? 22 : 3, width: 18, height: 18, borderRadius: "50%", background: showVat ? C.gold : C.muted, transition: "left .2s" }} />
-        </div>
-        <span style={{ fontSize: 11, color: showVat ? C.gold : C.muted, letterSpacing: 2 }}>כולל מע״מ (18%)</span>
+      <div className="visio-switch">
+        <span className="visio-credit" style={{ color: showVat ? C.muted : C.ink }}>ללא מע״מ</span>
+        <button type="button" className="visio-switch-track" onClick={() => setShowVat(v => !v)} aria-pressed={showVat} aria-label="הצג מחירים כולל מע״מ">
+          <span style={{ left: showVat ? 23 : 3 }} />
+        </button>
+        <span className="visio-credit" style={{ color: showVat ? C.ink : C.muted }}>כולל מע״מ (18%)</span>
       </div>
 
       {/* Cards */}
       <div className="visio-pricing-grid">
         {PACKAGES.map(pkg => (
-          <div key={pkg.id} className={pkg.free ? "visio-pricing-card-free" : ""} style={{ background: pkg.popular ? C.bg3 : C.bg2, padding: "32px 24px", position: "relative" }}>
-            {pkg.free && (
-              <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", background: "#6fcf6f", padding: "4px 20px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: 3, color: C.onGold }}>
-                חינם
-              </div>
-            )}
-            {pkg.popular && (
-              <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", background: C.gold, padding: "4px 20px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: 3, color: C.onGold }}>
-                הנפוץ ביותר
-              </div>
-            )}
-            {pkg.hebrew && <div style={{ fontSize: 12, color: pkg.color, letterSpacing: 2, marginBottom: 4, marginTop: (pkg.free || pkg.popular) ? 16 : 0 }}>{pkg.hebrew}</div>}
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: 5, color: pkg.color, marginBottom: 4, marginTop: (!pkg.hebrew && pkg.popular) ? 16 : 0 }}>{pkg.name}</div>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 48, color: pkg.free ? "#6fcf6f" : pkg.popular ? C.gold : C.text, lineHeight: 1, marginBottom: 4 }}>
-              {pkg.free ? "₪0" : `₪${p(pkg.price)}`}
-            </div>
-            <div style={{ fontSize: 10, color: C.muted, letterSpacing: 1, marginBottom: 24 }}>{pkg.free ? "ייעוץ חינם · ללא התחייבות" : `לצילום · ${showVat ? "כולל" : "ללא"} מע״מ`}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {pkg.features.map(f => (
-                <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <span style={{ color: pkg.free ? "#6fcf6f" : C.gold, fontSize: 12, marginTop: 1 }}>◈</span>
-                  <span style={{ fontSize: 12, color: C.muted, letterSpacing: 0.5, lineHeight: 1.4 }}>{f}</span>
-                </div>
-              ))}
-            </div>
-            <button className="visio-btn-primary" onClick={() => onNav("booking")} style={{ width: "100%", padding: 11, background: pkg.free ? "rgba(111,207,111,.12)" : "none", border: `1px solid ${pkg.color}`, fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: 2, color: pkg.color, cursor: "pointer" }}>
+          <div key={pkg.id} className={`visio-price-card${pkg.popular ? " featured" : ""}`}>
+            {(pkg.free || pkg.popular) && <div className="visio-badge">{pkg.free ? "חינם" : "הנפוץ ביותר"}</div>}
+            <div className="visio-kicker muted">{pkg.hebrew || "חבילת צילום"}</div>
+            <div className="visio-price-name"><Bidi>{pkg.name}</Bidi></div>
+            <div className="visio-price">{pkg.free ? "₪0" : `₪${p(pkg.price)}`}</div>
+            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.free ? "ייעוץ חינם · ללא התחייבות" : `לצילום · ${showVat ? "כולל" : "ללא"} מע״מ`}</div>
+            <ul className="visio-price-features">
+              {pkg.features.map(f => <li key={f}>— <Bidi>{f}</Bidi></li>)}
+            </ul>
+            <button className={`visio-btn block${pkg.popular ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
               הזמן עכשיו ← תשלום ביום הצילום
             </button>
           </div>
@@ -314,18 +302,17 @@ function PricingSection({ onNav }) {
       </div>
 
       {/* Addons */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 1, background: C.border, border: `1px solid ${C.border}` }}>
-        {[["⬡","סיור וירטואלי","אירוח חודשי",80,"/ חודש"],["⬡","תמונות נוספות","מעבר להיקף החבילה",25,"/ תמונה"],["⬡","אקספרס 6 שעות","אספקה מזורזת",150,"לחבילה"],["⬡","Reels לרשתות","Instagram / TikTok 9:16",200,"לסרטון"]].map(([icon,name,desc,price,unit]) => (
-          <div key={name} style={{ background: C.dark, padding: "18px 16px" }}>
-            <div style={{ fontSize: 16, color: C.gold, marginBottom: 8 }}>{icon}</div>
-            <div style={{ fontSize: 13, color: "#d0c8b8", marginBottom: 4, fontWeight: 500 }}>{name}</div>
-            <div style={{ fontSize: 11, color: "#333", marginBottom: 10 }}>{desc}</div>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: C.gold }}>₪{p(price)}</div>
-            <div style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>{unit}</div>
+      <div className="visio-addons">
+        {[["סיור וירטואלי","אירוח חודשי",80,"/ חודש"],["תמונות נוספות","מעבר להיקף החבילה",25,"/ תמונה"],["אקספרס 6 שעות","אספקה מזורזת",150,"לחבילה"],["Reels לרשתות","Instagram / TikTok 9:16",200,"לסרטון"]].map(([name,desc,price,unit]) => (
+          <div key={name} className="visio-addon">
+            <div className="visio-story-title" style={{ margin: "0 0 4px" }}><Bidi>{name}</Bidi></div>
+            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}><Bidi>{desc}</Bidi></div>
+            <div className="visio-price" style={{ fontSize: 30 }}>₪{p(price)}</div>
+            <div className="visio-credit" style={{ marginTop: 6 }}>{unit}</div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -397,26 +384,28 @@ function BookingSection() {
     completeBooking();
   };
 
+  const formIncomplete = !form.name || !form.phone || !form.address;
+
   if (done) return (
-    <div style={{ padding: "60px 20px", direction: "rtl", textAlign: "center" }}>
-      <VisioMark size={64} />
-      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: 6, color: C.gold, margin: "24px 0 12px" }}>הצילום נקבע ✓</div>
-      <p style={{ fontSize: 13, color: C.muted, lineHeight: 2 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
-      <p style={{ fontSize: 14, color: C.gold, lineHeight: 1.8, margin: "16px auto 0", maxWidth: 420, padding: "12px 16px", border: `1px solid ${C.gold}44`, background: C.bg3 }}>
+    <section className="visio-section" style={{ textAlign: "center" }}>
+      <div className="visio-kicker"><Bidi>BOOKING CONFIRMED</Bidi></div>
+      <h2 className="visio-section-title">הצילום נקבע ✓</h2>
+      <p style={{ fontSize: 14, color: C.muted, margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
+      <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0", fontSize: 14 }}>
         התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
       </p>
       <div className="visio-done-grid">
         {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", `VISIO ${form.pkg}`], ["כתובת", form.address]].map(([l, v]) => (
-          <div key={l} style={{ background: C.dark, padding: 14, textAlign: "center" }}>
-            <div style={{ fontSize: 9, letterSpacing: 3, color: C.muted, marginBottom: 5, textTransform: "uppercase" }}>{l}</div>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 2, color: C.gold }}>{v}</div>
+          <div key={l}>
+            <div className="visio-kicker muted" style={{ marginBottom: 6 }}>{l}</div>
+            <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}><Bidi>{v}</Bidi></div>
           </div>
         ))}
       </div>
-      <button onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); }} style={{ marginTop: 20, padding: "10px 24px", background: "none", border: `1px solid ${C.border}`, fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 3, color: C.muted, cursor: "pointer" }}>
+      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); }}>
         ← קביעת צילום נוסף
       </button>
-    </div>
+    </section>
   );
 
   return (
@@ -424,66 +413,65 @@ function BookingSection() {
       <SectionTitle sup="BOOKING" title="תיאום מועד צילום" sub="בחר תאריך ושעה · מסונכרן עם יומן העסק" />
 
       {/* Steps */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 32 }}>
+      <div className="visio-steps">
         {["תאריך", "שעה", "פרטים"].map((s, i) => (
           <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? "1" : undefined }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${step > i + 1 ? C.gold : step === i + 1 ? C.gold : C.border}`, background: step > i + 1 ? C.gold : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontFamily: "'Bebas Neue', sans-serif", color: step > i + 1 ? C.bg : step === i + 1 ? C.gold : C.muted }}>
+              <div className={`visio-step-dot${step > i + 1 ? " done" : step === i + 1 ? " current" : ""}`}>
                 {step > i + 1 ? "✓" : i + 1}
               </div>
-              <div style={{ fontSize: 10, letterSpacing: 1.5, color: step === i + 1 ? C.gold : C.muted }}>{s}</div>
+              <div className="visio-credit" style={{ color: step === i + 1 ? C.ink : C.muted }}>{s}</div>
             </div>
-            {i < 2 && <div style={{ flex: 1, height: 1, background: C.border, margin: "0 8px 22px" }} />}
+            {i < 2 && <div style={{ flex: 1, height: 1, background: C.rule, margin: "0 8px 22px" }} />}
           </div>
         ))}
       </div>
 
       {/* Calendar */}
-      <div style={{ border: `1px solid ${C.border}`, marginBottom: 24, overflow: "hidden" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: C.bg2, borderBottom: `1px solid ${C.border}` }}>
-          <button onClick={() => { if (mo === 0) { setYr(y => y - 1); setMo(11); } else setMo(m => m - 1); }} style={{ width: 32, height: 32, background: "none", border: `1px solid ${C.border}`, color: C.muted, cursor: "pointer", fontSize: 16 }}>‹</button>
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 5, color: "#f0e8d0" }}>{HEB_MONTHS[mo]} {yr}</div>
-          <button onClick={() => { if (mo === 11) { setYr(y => y + 1); setMo(0); } else setMo(m => m + 1); }} style={{ width: 32, height: 32, background: "none", border: `1px solid ${C.border}`, color: C.muted, cursor: "pointer", fontSize: 16 }}>›</button>
+      <div className="visio-panel">
+        <div className="visio-panel-head">
+          <button className="visio-icon-btn" aria-label="החודש הקודם" onClick={() => { if (mo === 0) { setYr(y => y - 1); setMo(11); } else setMo(m => m - 1); }}>‹</button>
+          <div className="visio-panel-title">{HEB_MONTHS[mo]} {yr}</div>
+          <button className="visio-icon-btn" aria-label="החודש הבא" onClick={() => { if (mo === 11) { setYr(y => y + 1); setMo(0); } else setMo(m => m + 1); }}>›</button>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", background: C.surfaceInset, borderBottom: `1px solid ${C.border}` }}>
-          {LAT_DAYS.map((d, i) => <div key={d} style={{ textAlign: "center", padding: "8px 0", fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: 2, color: i >= 5 ? C.border : C.muted }}>{d}</div>)}
+        <div className="visio-cal-dow">
+          {LAT_DAYS.map((d, i) => <div key={d} style={i >= 5 ? { color: C.faint } : undefined}><Bidi>{d}</Bidi></div>)}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 1, background: C.border }}>
-          {Array(first).fill(null).map((_, i) => <div key={`e${i}`} style={{ background: "#060604", minHeight: 56 }} />)}
+        <div className="visio-cal-grid">
+          {Array(first).fill(null).map((_, i) => <div key={`e${i}`} className="visio-calendar-day" />)}
           {Array(dim).fill(null).map((_, i) => {
             const day = i + 1, key = toKey(yr, mo, day);
-            const wknd = isWknd(yr, mo, day), past = isPast(yr, mo, day), avail = !wknd && !past, sel = selDate === key;
+            const avail = !isWknd(yr, mo, day) && !isPast(yr, mo, day), sel = selDate === key;
             const isT = key === toKey(today.getFullYear(), today.getMonth(), today.getDate());
+            const cls = ["visio-calendar-day", avail ? "available" : "blocked", isT && "today", sel && "selected"].filter(Boolean).join(" ");
             return (
-              <div key={day} onClick={() => { if (!avail) return; setSelDate(key); setStep(2); }}
-                className="visio-calendar-day" style={{ background: sel ? "var(--visio-slot-selected-bg)" : isT ? "#0e0c08" : C.dark, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, cursor: avail ? "pointer" : "default", boxShadow: sel ? `inset 0 0 0 1px rgba(201,168,76,.3)` : "none" }}>
-                <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 1, color: sel ? C.gold : wknd || past ? C.border : C.dayIdle }}>{day}</span>
-                <span style={{ fontSize: 8, color: sel ? "rgba(201,168,76,.5)" : wknd || past ? "#141210" : "#252218", letterSpacing: .5 }}>{getHebDate(yr, mo, day)}</span>
+              <div key={day} className={cls} onClick={() => { if (!avail) return; setSelDate(key); setStep(2); }}>
+                <span className="num">{day}</span>
+                <span className="heb">{getHebDate(yr, mo, day)}</span>
               </div>
             );
           })}
         </div>
-        <div style={{ padding: "8px 16px", background: C.surfaceInset, borderTop: `1px solid ${C.border}`, fontSize: 10, color: C.muted, letterSpacing: 1 }}>
-          ● זמינות מסונכרנת עם Google Calendar · שישי-שבת חסומים
+        <div className="visio-panel-foot">
+          <Bidi>● זמינות מסונכרנת עם Google Calendar · שישי-שבת חסומים</Bidi>
         </div>
       </div>
 
       {/* Time slots */}
       {step >= 2 && (
-        <div style={{ border: `1px solid ${C.border}`, marginBottom: 24, overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", background: C.bg2, borderBottom: `1px solid ${C.border}` }}>
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 4, color: "#f0e8d0" }}>בחר שעה</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 10, color: C.muted, cursor: "pointer" }} onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>← שנה</span>
-              <span style={{ fontSize: 11, color: C.gold, letterSpacing: 1 }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
+        <div className="visio-panel">
+          <div className="visio-panel-head">
+            <span className="visio-panel-title">בחר שעה</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <button className="visio-link" style={{ fontSize: 11 }} onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>← שנה</button>
+              <span style={{ fontSize: 12, color: C.ink }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
             </div>
           </div>
           <div className="visio-time-slots">
             {SLOTS.map(sl => (
-              <button key={sl} className="visio-time-slot" onClick={() => { setSelSlot(sl); setStep(3); }}
-                style={{ background: selSlot === sl ? "var(--visio-slot-selected-bg)" : C.dark, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 17, letterSpacing: 2, color: selSlot === sl ? C.gold : C.slotIdle, cursor: "pointer", textAlign: "center" }}>
+              <button key={sl} className={`visio-time-slot${selSlot === sl ? " selected" : ""}`} onClick={() => { setSelSlot(sl); setStep(3); }}>
                 {sl}
-                <div style={{ fontSize: 9, letterSpacing: 2, marginTop: 3, color: selSlot === sl ? C.gold : C.slotLabel }}>פנוי</div>
+                <small>פנוי</small>
               </button>
             ))}
           </div>
@@ -492,20 +480,20 @@ function BookingSection() {
 
       {/* Form */}
       {step >= 3 && (
-        <div id="booking-form" style={{ border: `1px solid ${C.border}`, overflow: "hidden" }}>
-          <div className="visio-form-grid-2" style={{ borderBottom: `1px solid ${C.border}` }}>
+        <div id="booking-form" className="visio-panel">
+          <div className="visio-form-grid-2">
             {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot]].map(([l, v]) => (
-              <div key={l} style={{ background: C.bg2, padding: "12px 16px" }}>
-                <div style={{ fontSize: 9, letterSpacing: 3, color: C.muted, marginBottom: 4, textTransform: "uppercase" }}>{l}</div>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 2, color: C.gold }}>{v}</div>
+              <div key={l}>
+                <div className="visio-kicker muted" style={{ marginBottom: 4 }}>{l}</div>
+                <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}>{v}</div>
               </div>
             ))}
           </div>
-          <div style={{ padding: "24px 20px", background: C.bg2, display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="visio-form-body">
             {/* Package select */}
             <div>
-              <label style={{ fontSize: 9, letterSpacing: 3, color: C.gold, display: "block", marginBottom: 6, textTransform: "uppercase" }}>חבילה</label>
-              <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))} style={{ width: "100%", background: C.surfaceInset, border: `1px solid ${C.border}`, color: C.text, outline: "none" }}>
+              <label className="visio-label">חבילה</label>
+              <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
                 <option value="CONSULTATION">ייעוץ טלפוני — חינם</option>
                 <option value="ESSENTIAL">ESSENTIAL — ₪350</option>
                 <option value="SIGNATURE">SIGNATURE — ₪400</option>
@@ -514,68 +502,64 @@ function BookingSection() {
             </div>
             {[["שם מלא *", "name", "שם פרטי + משפחה", "rtl"], ["טלפון *", "phone", "05X-XXXXXXX", "ltr"], ["כתובת הנכס *", "address", "רחוב, מספר, עיר", "rtl"]].map(([lbl, key, ph, dir]) => (
               <div key={key}>
-                <label style={{ fontSize: 9, letterSpacing: 3, color: C.gold, display: "block", marginBottom: 6, textTransform: "uppercase" }}>{lbl}</label>
-                <input className="visio-input" placeholder={ph} dir={dir} value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                  style={{ width: "100%", background: C.surfaceInset, border: `1px solid ${C.border}`, color: C.text, outline: "none", boxSizing: "border-box" }} />
+                <label className="visio-label">{lbl}</label>
+                <input className="visio-input" placeholder={ph} dir={dir} value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
               </div>
             ))}
             <div>
-              <label style={{ fontSize: 9, letterSpacing: 3, color: C.gold, display: "block", marginBottom: 6, textTransform: "uppercase" }}>הערות לצלם</label>
-              <textarea rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                style={{ width: "100%", background: C.surfaceInset, border: `1px solid ${C.border}`, color: C.text, fontFamily: "'Heebo', sans-serif", fontSize: 14, padding: "10px 14px", outline: "none", resize: "none", boxSizing: "border-box" }} />
+              <label className="visio-label">הערות לצלם</label>
+              <textarea className="visio-input" rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
             </div>
 
             {/* Watermark section */}
-            <div style={{ border: `1px solid ${C.gold}22`, background: "#0a0902", padding: "20px 18px" }}>
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: 4, color: C.gold, marginBottom: 4 }}>◈ בראנדינג על התמונות</div>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 18, letterSpacing: 1 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · אופציונלי</div>
-
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 9, letterSpacing: 3, color: C.gold, display: "block", marginBottom: 6, textTransform: "uppercase" }}>מספר טלפון על התמונה</label>
-                <input placeholder="05X-XXXXXXX" dir="ltr" value={wm.agentPhone} onChange={e => setWm(w => ({ ...w, agentPhone: e.target.value }))}
-                  style={{ width: "100%", background: C.surfaceInset, border: `1px solid ${C.border}`, color: C.text, fontFamily: "'Heebo', sans-serif", fontSize: 14, padding: "10px 14px", outline: "none", boxSizing: "border-box" }} />
-              </div>
+            <div style={{ border: `1px solid ${C.rule}`, background: C.bg2, padding: "20px 18px" }}>
+              <div className="visio-panel-title" style={{ marginBottom: 4 }}>בראנדינג על התמונות</div>
+              <div style={{ fontSize: 12, color: C.muted, marginBottom: 18 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · אופציונלי</div>
 
               <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 9, letterSpacing: 3, color: C.gold, display: "block", marginBottom: 6, textTransform: "uppercase" }}>לוגו חברה / סוכנות</label>
+                <label className="visio-label">מספר טלפון על התמונה</label>
+                <input className="visio-input" placeholder="05X-XXXXXXX" dir="ltr" value={wm.agentPhone} onChange={e => setWm(w => ({ ...w, agentPhone: e.target.value }))} />
+              </div>
+
+              <div style={{ marginBottom: 18 }}>
+                <label className="visio-label">לוגו חברה / סוכנות</label>
                 <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("logoFile", "logoUrl", e)} />
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                  <button type="button" onClick={() => logoRef.current?.click()} style={{ padding: "9px 18px", background: "none", border: `1px solid ${C.border}`, fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 3, color: C.muted, cursor: "pointer" }}>
+                  <button type="button" className="visio-btn outline" style={{ minHeight: 40, padding: "9px 18px", fontSize: 11 }} onClick={() => logoRef.current?.click()}>
                     {wm.logoUrl ? "← החלף לוגו" : "↑ העלה לוגו"}
                   </button>
                   {wm.logoUrl && <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <img src={wm.logoUrl} alt="logo" style={{ height: 36, maxWidth: 100, objectFit: "contain", background: "#111", padding: 4, border: `1px solid ${C.border}` }} />
-                    <span style={{ fontSize: 10, color: C.gold, letterSpacing: 1 }}>✓ לוגו הועלה</span>
+                    <img src={wm.logoUrl} alt="logo" style={{ height: 36, maxWidth: 100, objectFit: "contain", background: C.bg, padding: 4, border: `1px solid ${C.rule}` }} />
+                    <span style={{ fontSize: 11, color: C.ink }}>✓ לוגו הועלה</span>
                   </div>}
                 </div>
               </div>
 
               <div>
-                <label style={{ fontSize: 9, letterSpacing: 3, color: C.gold, display: "block", marginBottom: 10, textTransform: "uppercase" }}>תמונת גוף של הסוכן</label>
+                <label className="visio-label" style={{ marginBottom: 10 }}>תמונת גוף של הסוכן</label>
                 <div onClick={() => setWm(w => ({ ...w, wantAgentPhoto: !w.wantAgentPhoto }))} style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginBottom: 14 }}>
-                  <div style={{ width: 22, height: 22, flexShrink: 0, border: `1px solid ${wm.wantAgentPhoto ? C.gold : "#333"}`, background: wm.wantAgentPhoto ? "#1a1508" : "#080806", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: C.gold }}>
+                  <div className={`visio-checkbox${wm.wantAgentPhoto ? " checked" : ""}`}>
                     {wm.wantAgentPhoto ? "✓" : ""}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, color: wm.wantAgentPhoto ? "#d8d0c0" : "#555", lineHeight: 1.5 }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
-                    <div style={{ fontSize: 10, color: "#333", marginTop: 3, letterSpacing: 1 }}>הסוכן יוצב בפינה על כל תמונה</div>
+                    <div style={{ fontSize: 13, color: C.text }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>הסוכן יוצב בפינה על כל תמונה</div>
                   </div>
                 </div>
 
                 {wm.wantAgentPhoto && (
-                  <div style={{ padding: 16, background: C.surfaceInset, border: `1px solid ${C.border}` }}>
+                  <div style={{ padding: 16, background: C.bg, border: `1px solid ${C.rule}` }}>
                     <input ref={photoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("agentPhotoFile", "agentPhotoUrl", e)} />
-                    <button type="button" onClick={() => photoRef.current?.click()} style={{ padding: "9px 18px", background: "none", border: `1px solid ${C.gold}44`, fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 3, color: C.gold, cursor: "pointer" }}>
+                    <button type="button" className="visio-btn outline" style={{ minHeight: 40, padding: "9px 18px", fontSize: 11 }} onClick={() => photoRef.current?.click()}>
                       {wm.agentPhotoUrl ? "← החלף תמונה" : "↑ העלה תמונת גוף"}
                     </button>
                     {wm.agentPhotoUrl && (
-                      <div style={{ marginTop: 12, position: "relative", height: 140, background: "linear-gradient(135deg,#1c1a14,#0e100a)", border: `1px solid ${C.border}`, overflow: "hidden" }}>
+                      <div style={{ marginTop: 12, position: "relative", height: 140, background: "#1a1a1a", overflow: "hidden" }}>
                         {wm.logoUrl && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,.6)", padding: "3px 6px" }}>
                           <img src={wm.logoUrl} alt="logo" style={{ height: 22, maxWidth: 72, objectFit: "contain", display: "block" }} />
                         </div>}
-                        {wm.agentPhone && <div style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,.7)", padding: "3px 10px", fontSize: 12, color: "#f0e8d0", letterSpacing: 1.5 }}>📞 {wm.agentPhone}</div>}
+                        {wm.agentPhone && <div style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,.7)", padding: "3px 10px", fontSize: 12, color: "#fff", letterSpacing: 1.5 }}>📞 {wm.agentPhone}</div>}
                         <img src={wm.agentPhotoUrl} alt="agent" style={{ position: "absolute", bottom: 0, left: 8, height: "85%", objectFit: "contain", objectPosition: "bottom" }} />
-                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.05 }}><VisioMark size={60} /></div>
                       </div>
                     )}
                   </div>
@@ -583,19 +567,11 @@ function BookingSection() {
               </div>
             </div>
 
-            {(!selDate || !selSlot) && (
-              <div style={{ padding: "10px 14px", background: "#0a0800", border: `1px solid ${C.goldDim}44`, fontSize: 12, color: C.goldDim, marginBottom: 8, letterSpacing: 1 }}>
-                ← גלול למעלה ובחר תאריך ושעה
-              </div>
-            )}
-            {selDate && selSlot && (!form.name || !form.phone || !form.address) && (
-              <div style={{ padding: "10px 14px", background: "#0a0800", border: `1px solid ${C.goldDim}44`, fontSize: 12, color: C.goldDim, marginBottom: 8, letterSpacing: 1 }}>
-                מלא שם, טלפון וכתובת הנכס
-              </div>
-            )}
-            <button className="visio-btn-primary" onClick={handleSubmitBooking} disabled={bookingLoading}
-              style={{ background: `linear-gradient(135deg,${C.gold},${C.goldDim})`, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 4, color: C.onGold, cursor: bookingLoading ? "wait" : "pointer", opacity: (!form.name || !form.phone || !form.address || !selDate || !selSlot) ? 0.5 : 1, width: "100%" }}>
-              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : (!form.name || !form.phone || !form.address) ? "מלא שם + טלפון + כתובת" : "אישור הזמנה →"}
+            {(!selDate || !selSlot) && <div className="visio-notice">← גלול למעלה ובחר תאריך ושעה</div>}
+            {selDate && selSlot && formIncomplete && <div className="visio-notice">מלא שם, טלפון וכתובת הנכס</div>}
+            <button className="visio-btn block" onClick={handleSubmitBooking} disabled={bookingLoading}
+              style={{ cursor: bookingLoading ? "wait" : "pointer", opacity: (formIncomplete || !selDate || !selSlot) ? 0.5 : 1 }}>
+              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : formIncomplete ? "מלא שם + טלפון + כתובת" : "אישור הזמנה →"}
             </button>
           </div>
         </div>
@@ -617,70 +593,62 @@ function CharterSection() {
   ];
 
   return (
-    <div style={{ padding: "60px 20px", maxWidth: 720, margin: "0 auto", direction: "rtl" }}>
+    <section className="visio-section">
       <SectionTitle sup="CHARTER" title="תנאי שירות" sub="שקיפות מלאה · תנאים ברורים" />
-
-      {publicTerms.map((t, i) => (
-        <div key={i} style={{ borderBottom: `1px solid ${C.border}`, padding: "20px 0" }}>
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 3, color: C.gold, marginBottom: 8 }}>{t.title}</div>
-          <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.8, margin: 0 }}>{t.body}</p>
-        </div>
-      ))}
-
-      <div style={{ marginTop: 32, padding: "16px 20px", background: C.bg3, border: `1px solid ${C.border}`, fontSize: 11, color: C.muted, letterSpacing: 1, lineHeight: 1.8 }}>
-        לשאלות ובירורים: <span style={{ color: C.gold }}>visio.photography.il@gmail.com</span>
+      <div className="visio-narrow">
+        {publicTerms.map(t => (
+          <div key={t.title} className="visio-term">
+            <div className="visio-term-title">{t.title}</div>
+            <p><Bidi>{t.body}</Bidi></p>
+          </div>
+        ))}
+        <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: C.muted }}>
+          לשאלות ובירורים: <a href="mailto:visio.photography.il@gmail.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>visio.photography.il@gmail.com</a>
+        </p>
       </div>
-    </div>
+    </section>
   );
 }
 
 /* ─── ABOUT ─── */
 function AboutSection({ onNav }) {
   return (
-    <div style={{ padding: "60px 20px", direction: "rtl" }}>
+    <section className="visio-section">
       <SectionTitle sup="ABOUT" title="על VISIO" sub="צילום נדל״ן שמוכר" />
 
-      <div style={{ maxWidth: 720, margin: "0 auto" }}>
-        {/* Mission */}
-        <div style={{ border: `1px solid ${C.border}`, padding: "32px 28px", marginBottom: 1, background: C.bg2 }}>
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 4, color: C.gold, marginBottom: 16 }}>◈ החזון שלנו</div>
-          <p style={{ fontSize: 14, color: C.muted, lineHeight: 2, margin: 0 }}>
-            VISIO נוסדה מתוך אמונה שכל נכס ראוי לצילום שמספר את הסיפור שלו. אנחנו משלבים צילום מקצועי עם עיבוד AI מתקדם כדי ליצור תמונות שמוכרות — מהיר יותר, במחיר גבוה יותר.
-          </p>
-        </div>
+      <div className="visio-narrow visio-article">
+        <div className="visio-kicker" style={{ marginBottom: 16 }}>החזון שלנו</div>
+        <p>
+          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
+        </p>
 
-        {/* Values */}
-        <div className="visio-about-grid" style={{ marginBottom: 1 }}>
-          {[["⬡", "מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["⬡", "דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["⬡", "טכנולוגיה", "מצלמות 4K · רחפן · Matterport 3D"], ["⬡", "שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([icon, title, desc]) => (
-            <div key={title} style={{ background: C.bg3, padding: "24px 20px" }}>
-              <div style={{ fontSize: 16, color: C.gold, marginBottom: 10 }}>{icon}</div>
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 3, color: C.text, marginBottom: 8 }}>{title}</div>
-              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{desc}</div>
+        <blockquote className="visio-pullquote">נדל״ן. בצילום שמוכר.</blockquote>
+
+        <div className="visio-about-grid">
+          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמות 4K · רחפן · Matterport 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
+            <div key={title}>
+              <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
+              <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
+              <div style={{ fontSize: 14, color: C.muted }}><Bidi>{desc}</Bidi></div>
             </div>
           ))}
         </div>
 
-        {/* Partners */}
-        <div style={{ border: `1px solid ${C.border}`, padding: "28px", background: C.bg2, marginBottom: 24 }}>
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 4, color: C.gold, marginBottom: 20 }}>שותפים עסקיים</div>
-          <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-            {PARTNERS.map(p => (
-              <div key={p.id}>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, letterSpacing: 2, color: p.color }}>{p.name}</div>
-                <div style={{ fontSize: 10, color: C.muted, letterSpacing: 1 }}>{p.desc}</div>
-              </div>
-            ))}
-          </div>
+        <div className="visio-rule-head"><span className="visio-kicker">שותפים עסקיים</span></div>
+        <div className="visio-partners" style={{ marginBottom: 48 }}>
+          {PARTNERS.map(p => (
+            <div key={p.id} style={{ textAlign: "center" }}>
+              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
+            </div>
+          ))}
         </div>
 
-        {/* CTA */}
-        <div style={{ textAlign: "center", padding: "32px 0" }}>
-          <button onClick={() => onNav("booking")} style={{ padding: "14px 40px", background: `linear-gradient(135deg,${C.gold},${C.goldDim})`, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: 4, color: C.onGold, cursor: "pointer" }}>
-            צרו קשר עכשיו
-          </button>
+        <div style={{ textAlign: "center" }}>
+          <button className="visio-btn" onClick={() => onNav("booking")}>צרו קשר עכשיו</button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -705,51 +673,54 @@ export default function VisioApp() {
   const nav = (p) => { setPage(p); setMenuOpen(false); window.scrollTo(0, 0); };
 
   return (
-    <>
+    <div className="visio-public">
+      {/* ── MASTHEAD ── */}
+      <header>
+        <div className="visio-topbar">
+          <div className="visio-topbar-inner">
+            <span className="visio-topbar-text"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים</Bidi></span>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginInlineStart: "auto" }}>
+              <button className="visio-link" onClick={() => nav("booking")}>הזמן צילום</button>
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+        <div className="visio-masthead-block">
+          <button className="visio-masthead" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
+          <div className="visio-masthead-tag visio-kicker muted"><Bidi>REAL ESTATE PHOTOGRAPHY</Bidi></div>
+        </div>
+      </header>
+
       {/* ── NAVBAR ── */}
       <nav className="visio-nav">
         <div className="visio-nav-inner">
-          <button onClick={() => nav("home")} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: 0, minHeight: 44 }}>
-            <VisioMark size={32} />
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, letterSpacing: 6, color: C.gold }}>VISIO</span>
-          </button>
-
+          <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="תפריט">☰</button>
+          <button className="visio-nav-mini" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
           <div className="nav-desktop">
             {NAV.map(n => (
-              <button key={n.id} onClick={() => nav(n.id)}
-                style={{ padding: "0 14px", height: 56, background: "none", border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 3, color: page === n.id ? C.gold : C.muted, cursor: "pointer", borderBottom: page === n.id ? `2px solid ${C.gold}` : "2px solid transparent", marginBottom: -1, whiteSpace: "nowrap", minWidth: 44 }}>
+              <button key={n.id} className={`visio-nav-link${page === n.id ? " active" : ""}`} onClick={() => nav(n.id)}>
                 {n.label}
               </button>
             ))}
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <ThemeToggle />
-            <button className="nav-cta-desktop visio-btn-primary" onClick={() => nav("booking")} style={{ padding: "8px 20px", background: `linear-gradient(135deg,${C.gold},${C.goldDim})`, border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: 3, color: C.onGold, cursor: "pointer" }}>
-              הזמן
-            </button>
-            <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="תפריט">☰</button>
           </div>
         </div>
       </nav>
 
       {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
       <aside className={`nav-drawer ${menuOpen ? "open" : ""}`}>
+        <div className="nav-drawer-mark"><Bidi>VISIO</Bidi></div>
         {NAV.map(n => (
           <button key={n.id} className={`nav-drawer-btn ${page === n.id ? "active" : ""}`} onClick={() => nav(n.id)}>
             {n.label}
           </button>
         ))}
-        <button className="nav-drawer-btn" onClick={() => nav("booking")} style={{ color: C.gold, marginTop: 8 }}>
-          הזמן צילום →
-        </button>
-        <div style={{ padding: "16px 24px" }}>
-          <ThemeToggle />
+        <div style={{ padding: 24 }}>
+          <button className="visio-btn block" onClick={() => nav("booking")}>הזמן צילום</button>
         </div>
       </aside>
 
       {/* ── CONTENT ── */}
-      <main style={{ maxWidth: 1200, margin: "0 auto" }} className="page-content" key={page}>
+      <main className="page-content" key={page}>
         {page === "home" && <HomeSection onNav={nav} />}
         {page === "portfolio" && <PortfolioSection />}
         {page === "pricing" && <PricingSection onNav={nav} />}
@@ -759,23 +730,18 @@ export default function VisioApp() {
       </main>
 
       {/* ── FOOTER ── */}
-      <footer style={{ borderTop: `1px solid ${C.border}`, padding: "24px 20px", textAlign: "center", direction: "rtl", marginTop: 40 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 12 }}>
-          <VisioMark size={28} />
-          <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 5, color: C.gold }}>VISIO</span>
-        </div>
-        <p style={{ fontSize: 11, color: "#2a2820", letterSpacing: 2, margin: "0 0 12px" }}>נדל״ן. בצילום שמוכר. · כל הזכויות שמורות © 2025</p>
-        <p style={{ fontSize: 10, color: "#1a1814", letterSpacing: 1, margin: "0 0 16px" }}>
-          <a href="/admin/login" style={{ color: "#2a2820", textDecoration: "none", opacity: 0.55 }}>כניסת צוות</a>
-        </p>
-        <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
+      <footer className="visio-footer">
+        <button className="visio-footer-mark" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
+        <p className="visio-footer-tag">נדל״ן. בצילום שמוכר.</p>
+        <div className="visio-footer-nav">
           {NAV.map(n => (
-            <button key={n.id} onClick={() => nav(n.id)} style={{ background: "none", border: "none", fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: 3, color: "#2a2820", cursor: "pointer" }}>
-              {n.label}
-            </button>
+            <button key={n.id} onClick={() => nav(n.id)}>{n.label}</button>
           ))}
         </div>
+        <p className="visio-footer-legal">
+          <Bidi>© 2025 VISIO Photography · כל הזכויות שמורות · </Bidi><a href="/admin/login">כניסת צוות</a>
+        </p>
       </footer>
-    </>
+    </div>
   );
 }

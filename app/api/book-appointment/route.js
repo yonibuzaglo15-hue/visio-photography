@@ -27,6 +27,7 @@ export async function POST(request) {
     });
 
     // Create pipeline job server-side (create-job API is admin-only).
+    // Maps public form fields into booking + details; agency/property extras stay empty until admin edits.
     let job = null;
     try {
       job = await createJob({
@@ -38,6 +39,26 @@ export async function POST(request) {
         date: date || "",
         time: time || "",
         notes: notes || "",
+        details: {
+          property: {
+            street: address || "",
+            houseNumber: "",
+            apartment: "",
+            floor: "",
+            city: "",
+            propertyType: "",
+            rooms: "",
+            sqm: "",
+          },
+          agency: { agencyId: "", agentId: "" },
+          client: { name: name || "", phone: phone || "", email: "" },
+          shoot: {
+            date: date || "",
+            time: time || "",
+            pkg: pkg || "SIGNATURE",
+          },
+          notes: notes || "",
+        },
       });
     } catch (jobErr) {
       console.error("book-appointment createJob:", jobErr.message);

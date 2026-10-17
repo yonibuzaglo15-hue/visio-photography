@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Loader2,
   MapPin,
   MousePointerClick,
   Eye,
+  EyeOff,
   Save,
   Trash2,
   ExternalLink,
@@ -13,43 +14,11 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { ADMIN, glassPanel } from "./theme.js";
-
-const PANNELLUM_CSS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
-const PANNELLUM_JS = "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
-
-let pannellumLoadPromise = null;
-
-function loadPannellum() {
-  if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
-  if (window.pannellum) return Promise.resolve(window.pannellum);
-  if (pannellumLoadPromise) return pannellumLoadPromise;
-
-  pannellumLoadPromise = new Promise((resolve, reject) => {
-    if (!document.querySelector(`link[href="${PANNELLUM_CSS}"]`)) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = PANNELLUM_CSS;
-      document.head.appendChild(link);
-    }
-
-    const existing = document.querySelector(`script[src="${PANNELLUM_JS}"]`);
-    if (existing) {
-      existing.addEventListener("load", () => resolve(window.pannellum));
-      existing.addEventListener("error", () => reject(new Error("Pannellum load failed")));
-      if (window.pannellum) resolve(window.pannellum);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = PANNELLUM_JS;
-    script.async = true;
-    script.onload = () => resolve(window.pannellum);
-    script.onerror = () => reject(new Error("Pannellum load failed"));
-    document.body.appendChild(script);
-  });
-
-  return pannellumLoadPromise;
-}
+import { analyzeTourGraph, buildTourConfig } from "../../lib/tour/tour-config.js";
+import { createPsvTourViewer } from "../../lib/tour/create-psv-viewer.js";
+import FloorPlanPanel from "./FloorPlanPanel.jsx";
+import { friendlyRoomLabel } from "../../lib/tour/room-label.js";
+import { discsFromYawCalibration } from "../../lib/tour/geo-nav.js";
 
 function jobLabel(job) {
   const addr = job.booking?.address;
@@ -114,17 +83,28 @@ export default function TourEditor() {
   const [okMsg, setOkMsg] = useState("");
   const [placeMode, setPlaceMode] = useState(false);
   const [pendingTarget, setPendingTarget] = useState("");
+  /** One-click yaw: click doorway toward this neighbour to solve mapYawOffset. */
+  const [yawCalibrateTarget, setYawCalibrateTarget] = useState("");
+  const [geoLinks, setGeoLinks] = useState([]);
   const [dirty, setDirty] = useState(false);
   const [textureLimit, setTextureLimit] = useState(null);
   const [panoMeta, setPanoMeta] = useState(null);
   const [viewerReady, setViewerReady] = useState(false);
+  const [floorPlans, setFloorPlans] = useState([]);
+  /** Saved version this editor loaded; the server rejects saves on top of a newer one. */
+  const [tourVersion, setTourVersion] = useState(null);
+  const [conflict, setConflict] = useState(false);
 
   const viewerRef = useRef(null);
+  const psvApiRef = useRef(null);
   const containerRef = useRef(null);
   const placeModeRef = useRef(false);
   const pendingTargetRef = useRef("");
+  const yawCalibrateTargetRef = useRef("");
+  const geoLinksRef = useRef(geoLinks);
   const scenesRef = useRef(scenes);
   const activeSceneIdRef = useRef(activeSceneId);
+  const floorPlansRef = useRef(floorPlans);
 
   useEffect(() => {
     placeModeRef.current = placeMode;
@@ -133,15 +113,44 @@ export default function TourEditor() {
     pendingTargetRef.current = pendingTarget;
   }, [pendingTarget]);
   useEffect(() => {
+    yawCalibrateTargetRef.current = yawCalibrateTarget;
+  }, [yawCalibrateTarget]);
+  useEffect(() => {
+    geoLinksRef.current = geoLinks;
+  }, [geoLinks]);
+  useEffect(() => {
     scenesRef.current = scenes;
   }, [scenes]);
   useEffect(() => {
     activeSceneIdRef.current = activeSceneId;
   }, [activeSceneId]);
+  useEffect(() => {
+    floorPlansRef.current = floorPlans;
+  }, [floorPlans]);
+  // Never lose unsaved placements / hotspots to a reload or tab close.
+  useEffect(() => {
+    if (!dirty) return undefined;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   useEffect(() => {
     setTextureLimit(probeTextureLimit());
   }, []);
+
+  const graphStats = useMemo(
+    () => analyzeTourGraph(scenes, firstSceneId),
+    [scenes, firstSceneId]
+  );
+  const statsById = useMemo(() => {
+    const m = new Map();
+    for (const g of graphStats) m.set(g.id, g);
+    return m;
+  }, [graphStats]);
 
   const loadJobs = useCallback(async () => {
     try {
@@ -154,25 +163,39 @@ export default function TourEditor() {
         return panos + allPanos > 0 || j.outputs?.tourJsonUrl || j.outputs?.tourUrl;
       });
       setJobs(withPanos);
-      if (!jobId && withPanos[0]) setJobId(withPanos[0].id);
+      // Functional update: a slow response must not replace a job the user already chose.
+      if (withPanos[0]) setJobId((current) => current || withPanos[0].id);
     } catch {
       /* ignore */
     }
-  }, [jobId]);
+  }, []);
 
   useEffect(() => {
     loadJobs();
   }, [loadJobs]);
 
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("job");
+      if (q) setJobId(q);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const mountTokenRef = useRef(0);
+  /** Scene ids this editor asked the viewer to open (not user navigation). */
+  const requestedNodesRef = useRef(new Set());
   const destroyViewer = useCallback(() => {
-    if (viewerRef.current) {
+    if (psvApiRef.current) {
       try {
-        viewerRef.current.destroy();
+        psvApiRef.current.destroy();
       } catch {
         /* ignore */
       }
-      viewerRef.current = null;
+      psvApiRef.current = null;
     }
+    viewerRef.current = null;
     setViewerReady(false);
   }, []);
 
@@ -183,6 +206,9 @@ export default function TourEditor() {
     setOkMsg("");
     setPlaceMode(false);
     setDirty(false);
+    setConflict(false);
+    setGeoLinks([]);
+    setYawCalibrateTarget("");
     destroyViewer();
 
     try {
@@ -191,16 +217,23 @@ export default function TourEditor() {
       if (!data.ok) throw new Error(data.error || "טעינה נכשלה");
 
       if (data.provider === "kuula") {
-        setError("הסיור הזה ב-Kuula — עורך הקישורים תומך רק ב-Pannellum על Blob.");
+        setError("הסיור הזה ב-Kuula — עורך הקישורים תומך רק בסיורי VISIO (Photo Sphere Viewer).");
         setScenes([]);
         setTourUrl(data.tourUrl);
         return;
       }
 
-      const list = data.scenes || [];
+      const list = (data.scenes || []).map((s, i) => ({
+        ...s,
+        title: friendlyRoomLabel(s, i + 1),
+        hidden: Boolean(s.hidden),
+        hotSpots: s.hotSpots || [],
+      }));
       setScenes(list);
-      setFirstSceneId(data.firstSceneId || list[0]?.id || "");
-      setActiveSceneId(list[0]?.id || "");
+      setFloorPlans(Array.isArray(data.floorPlans) ? data.floorPlans : []);
+      setTourVersion(data.version || null);
+      setFirstSceneId(data.firstSceneId || list.find((s) => !s.hidden)?.id || list[0]?.id || "");
+      setActiveSceneId(list.find((s) => !s.hidden)?.id || list[0]?.id || "");
       setTourUrl(data.tourUrl);
       if (list.length === 0) {
         setError("אין פנורמות ב-job. העלה קבצי X4 בטאב Pipeline קודם.");
@@ -240,106 +273,245 @@ export default function TourEditor() {
     setDirty(true);
   }, []);
 
-  const mountViewer = useCallback(async () => {
-    if (!activeScene?.panoramaUrl || !containerRef.current) return;
+  const placeHotspot = useCallback(
+    (pitch, yaw) => {
+      const calibrateTo = yawCalibrateTargetRef.current;
+      const sceneId = activeSceneIdRef.current;
+      const list = scenesRef.current;
+      const labelOf = (id) => {
+        const i = list.findIndex((s) => s.id === id);
+        return friendlyRoomLabel(list[i] || { id }, i + 1);
+      };
 
+      // One-click yaw: solve offset from the doorway click, write discs for every
+      // accepted geometric neighbour of this scene.
+      if (calibrateTo) {
+        const from = list.find((s) => s.id === sceneId);
+        if (
+          !from ||
+          !Number.isFinite(Number(from.mapX)) ||
+          !Number.isFinite(Number(from.mapY))
+        ) {
+          setError("מקמו את הסצנה על התוכנית לפני כיול כיוון");
+          return;
+        }
+        const neighbourIds = new Set();
+        for (const g of geoLinksRef.current || []) {
+          if (g.a === sceneId) neighbourIds.add(g.b);
+          if (g.b === sceneId) neighbourIds.add(g.a);
+        }
+        neighbourIds.add(calibrateTo);
+        const neighbours = [...neighbourIds]
+          .map((id) => {
+            const s = list.find((x) => x.id === id);
+            if (!s || !Number.isFinite(Number(s.mapX)) || !Number.isFinite(Number(s.mapY))) {
+              return null;
+            }
+            return { id, x: Number(s.mapX), y: Number(s.mapY) };
+          })
+          .filter(Boolean);
+        const discs = discsFromYawCalibration({
+          fromId: sceneId,
+          fromPos: { x: Number(from.mapX), y: Number(from.mapY) },
+          neighbours,
+          clickYaw: yaw,
+          clickPitch: pitch,
+          towardsId: calibrateTo,
+        });
+        if (!discs.length) {
+          setError("לא ניתן לחשב כיוון — בדקו שיש קישור מאושר לשכן");
+          return;
+        }
+        setScenes((prev) =>
+          prev.map((s) => {
+            if (s.id !== sceneId) return s;
+            const keep = (s.hotSpots || []).filter(
+              (h) => !discs.some((d) => d.targetSceneId === h.targetSceneId)
+            );
+            return {
+              ...s,
+              mapYawOffset: true,
+              hotSpots: [
+                ...keep,
+                ...discs.map((d) => ({
+                  id: newHotspotId(),
+                  pitch: d.pitch,
+                  yaw: d.yaw,
+                  targetSceneId: d.targetSceneId,
+                  source: "geo",
+                })),
+              ],
+            };
+          })
+        );
+        setDirty(true);
+        setYawCalibrateTarget("");
+        setPlaceMode(false);
+        setPendingTarget("");
+        setOkMsg(
+          `כיול כיוון ל־${labelOf(sceneId)}: ${discs.length} דיסקיות מהגיאומטריה — שמור כדי לפרסם`
+        );
+        return;
+      }
+
+      const targetId = pendingTargetRef.current;
+      if (!targetId) return;
+      const target = list.find((s) => s.id === targetId);
+      // Store exactly the clicked yaw/pitch — never recompute from the plan.
+      const exactPitch = Number(pitch);
+      const exactYaw = Number(yaw);
+      // Provisional way back (+180°) only when the target room has none yet; a ring
+      // placed by hand in the target room is never overwritten from here.
+      const needsBack = !(target?.hotSpots || []).some((h) => h.targetSceneId === sceneId);
+      let backYaw = exactYaw + 180;
+      while (backYaw > 180) backYaw -= 360;
+      while (backYaw < -180) backYaw += 360;
+
+      setScenes((prev) =>
+        prev.map((s) => {
+          if (s.id === sceneId) {
+            return {
+              ...s,
+              hotSpots: [
+                ...(s.hotSpots || []).filter((h) => h.targetSceneId !== targetId),
+                { id: newHotspotId(), pitch: exactPitch, yaw: exactYaw, targetSceneId: targetId },
+              ],
+            };
+          }
+          if (s.id === targetId && needsBack) {
+            return {
+              ...s,
+              hotSpots: [
+                ...(s.hotSpots || []),
+                { id: newHotspotId(), pitch: exactPitch, yaw: backYaw, targetSceneId: sceneId },
+              ],
+            };
+          }
+          return s;
+        })
+      );
+      setDirty(true);
+      setPlaceMode(false);
+      setPendingTarget("");
+      setOkMsg(
+        needsBack
+          ? `נקודה: ${labelOf(sceneId)} → ${labelOf(targetId)} (ונקודת חזרה זמנית בחדר היעד — מקם אותה ידנית לדיוק) — שמור כדי לפרסם`
+          : `נקודה: ${labelOf(sceneId)} → ${labelOf(targetId)} — שמור כדי לפרסם`
+      );
+    },
+    []
+  );
+
+  const mountViewer = useCallback(async () => {
+    if (!scenesRef.current.length || !containerRef.current) return;
+
+    const token = ++mountTokenRef.current;
     destroyViewer();
     setViewerReady(false);
 
     try {
-      const pannellum = await loadPannellum();
-      if (!containerRef.current) return;
+      const startId =
+        activeSceneIdRef.current ||
+        scenesRef.current.find((s) => !s.hidden)?.id ||
+        scenesRef.current[0]?.id;
+
+      const config = buildTourConfig({
+        scenes: scenesRef.current,
+        firstSceneId: startId,
+        includeHidden: true,
+        floorPlans: floorPlansRef.current,
+      });
+      if (config.default) {
+        config.default.firstScene = startId;
+      }
 
       containerRef.current.innerHTML = "";
-      const viewer = pannellum.viewer(containerRef.current, {
-        type: "equirectangular",
-        panorama: activeScene.panoramaUrl,
-        autoLoad: true,
-        showControls: true,
-        compass: true,
-        yaw: activeScene.yaw ?? 0,
-        pitch: activeScene.pitch ?? 0,
-        hfov: activeScene.hfov ?? 100,
-        hotSpotDebug: false,
-        crossOrigin: "anonymous",
-        hotSpots: (activeScene.hotSpots || []).map((h) => ({
-          id: h.id,
-          pitch: h.pitch,
-          yaw: h.yaw,
-          type: "info",
-          text: h.text || scenesRef.current.find((s) => s.id === h.targetSceneId)?.title || "חץ",
-          cssClass: "visio-editor-hotspot",
-        })),
+      const api = await createPsvTourViewer(containerRef.current, config, {
+        startNodeId: startId,
+        includeHidden: true,
+        enableMap: true,
+        isCancelled: () => token !== mountTokenRef.current,
+        isPlaceMode: () => placeModeRef.current || Boolean(yawCalibrateTargetRef.current),
+        onPlaceClick: ({ pitch, yaw }) => {
+          placeHotspot(pitch, yaw);
+        },
+        onNodeChange: (node) => {
+          // Scene switches the editor requested itself are already applied; only
+          // follow navigation done inside the panorama (clicking a ring).
+          if (node?.id && requestedNodesRef.current.delete(node.id)) return;
+          if (node?.id && node.id !== activeSceneIdRef.current) {
+            setActiveSceneId(node.id);
+          }
+        },
       });
+      if (!api) return;
+      if (token !== mountTokenRef.current) {
+        api.destroy();
+        return;
+      }
 
-      let pointerDown = null;
-      viewer.on("mousedown", (event) => {
-        pointerDown = { x: event.clientX, y: event.clientY, event };
-      });
-      viewer.on("mouseup", (event) => {
-        if (!placeModeRef.current || !pointerDown) return;
-        const moved = Math.hypot(
-          event.clientX - pointerDown.x,
-          event.clientY - pointerDown.y
-        );
-        const sourceEvent = moved < 6 ? pointerDown.event : null;
-        pointerDown = null;
-        if (!sourceEvent) return;
-
-        const targetId = pendingTargetRef.current;
-        if (!targetId) return;
-
-        const coords = viewer.mouseEventToCoords(sourceEvent);
-        if (!coords) return;
-        const [pitch, yaw] = coords;
-        const sceneId = activeSceneIdRef.current;
-        const target = scenesRef.current.find((s) => s.id === targetId);
-
-        applySceneUpdate(sceneId, (scene) => ({
-          ...scene,
-          hotSpots: [
-            ...(scene.hotSpots || []),
-            {
-              id: newHotspotId(),
-              pitch,
-              yaw,
-              targetSceneId: targetId,
-              text: target?.title || "חדר",
-            },
-          ],
-        }));
-
-        setPlaceMode(false);
-        setOkMsg("חץ נוסף — שמור כדי לפרסם");
-      });
-
-      viewerRef.current = viewer;
+      psvApiRef.current = api;
+      viewerRef.current = api.viewer;
+      if (typeof window !== "undefined") {
+        window.__visioEditorViewer = api.viewer;
+        window.__visioEditorPlaceHotspot = (pitch, yaw, targetId) => {
+          if (targetId) {
+            pendingTargetRef.current = targetId;
+            setPendingTarget(targetId);
+          }
+          placeHotspot(pitch, yaw);
+        };
+      }
       setViewerReady(true);
     } catch (err) {
       setError(err.message || "שגיאה בטעינת הצופה");
     }
-  }, [activeScene, destroyViewer, applySceneUpdate]);
+  }, [destroyViewer, placeHotspot]);
 
-  // Remount viewer when scene identity or hotspot count changes for that scene
-  const hotspotSignature = activeScene
-    ? `${activeScene.id}:${(activeScene.hotSpots || []).map((h) => h.id).join(",")}`
-    : "";
+  const tourSignature = scenes
+    .map(
+      (s) =>
+        `${s.id}:${s.hidden ? 1 : 0}:${s.panoramaUrl}:${(s.hotSpots || [])
+          .map((h) => `${h.id}:${h.targetSceneId}:${Number(h.yaw).toFixed(2)}:${Number(h.pitch).toFixed(2)}`)
+          .join(",")}`
+    )
+    .join("|");
 
   useEffect(() => {
-    if (!activeScene?.panoramaUrl) return undefined;
+    if (!scenes.length) return undefined;
     mountViewer();
-    return () => destroyViewer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- remount on scene/hotspot identity only
-  }, [activeScene?.id, activeScene?.panoramaUrl, hotspotSignature]);
+    return () => {
+      mountTokenRef.current++;
+      destroyViewer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- remount on tour graph identity
+  }, [jobId, tourSignature]);
+
+  const selectScene = (sceneId) => {
+    setActiveSceneId(sceneId);
+    activeSceneIdRef.current = sceneId;
+    const api = psvApiRef.current;
+    if (api?.setCurrentNode) {
+      try {
+        if (api.virtualTour?.getCurrentNode?.()?.id !== sceneId) {
+          requestedNodesRef.current.add(sceneId);
+        }
+        api.setCurrentNode(sceneId);
+        return;
+      } catch {
+        /* fall through to remount */
+      }
+    }
+  };
 
   const captureStartView = () => {
-    const viewer = viewerRef.current;
-    if (!viewer || !activeSceneId) return;
+    const api = psvApiRef.current;
+    if (!api || !activeSceneId) return;
+    const { yaw, pitch } = api.getPositionDegrees();
     applySceneUpdate(activeSceneId, (scene) => ({
       ...scene,
-      yaw: viewer.getYaw(),
-      pitch: viewer.getPitch(),
-      hfov: viewer.getHfov(),
+      yaw,
+      pitch,
     }));
     setOkMsg("מבט התחלתי נשמר לסצנה זו");
   };
@@ -352,18 +524,15 @@ export default function TourEditor() {
     }));
   };
 
+  const toggleHidden = (sceneId) => {
+    applySceneUpdate(sceneId, (scene) => ({
+      ...scene,
+      hidden: !scene.hidden,
+    }));
+  };
+
   const renameScene = (sceneId, title) => {
-    setScenes((prev) =>
-      prev.map((s) => {
-        if (s.id === sceneId) return { ...s, title };
-        return {
-          ...s,
-          hotSpots: (s.hotSpots || []).map((h) =>
-            h.targetSceneId === sceneId ? { ...h, text: title } : h
-          ),
-        };
-      })
-    );
+    setScenes((prev) => prev.map((s) => (s.id === sceneId ? { ...s, title } : s)));
     setDirty(true);
   };
 
@@ -376,13 +545,15 @@ export default function TourEditor() {
       const res = await fetch(`/api/pipeline/jobs/${jobId}/tour`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenes, firstSceneId }),
+        body: JSON.stringify({ scenes, firstSceneId, floorPlans, baseVersion: tourVersion }),
       });
       const data = await res.json();
+      if (data.conflict) setConflict(true);
       if (!data.ok) throw new Error(data.error || "שמירה נכשלה");
       setTourUrl(data.tourUrl);
+      setTourVersion(data.version || null);
       setDirty(false);
-      setOkMsg(`נשמר · ${data.sceneCount} סצנות · ${data.linkCount} קישורים`);
+      setOkMsg(`נשמר · ${data.sceneCount} סצנות גלויות · ${data.linkCount} קישורים`);
     } catch (err) {
       setError(err.message || "שמירה נכשלה");
     } finally {
@@ -391,6 +562,15 @@ export default function TourEditor() {
   };
 
   const otherScenes = scenes.filter((s) => s.id !== activeSceneId);
+  const geoNeighboursForActive = useMemo(() => {
+    const ids = new Set();
+    for (const g of geoLinks) {
+      if (g.a === activeSceneId) ids.add(g.b);
+      if (g.b === activeSceneId) ids.add(g.a);
+    }
+    return otherScenes.filter((s) => ids.has(s.id));
+  }, [geoLinks, activeSceneId, otherScenes]);
+
   const eightKWarning =
     panoMeta &&
     (panoMeta.width >= 7500 || (textureLimit && panoMeta.width > textureLimit));
@@ -398,9 +578,9 @@ export default function TourEditor() {
   return (
     <div>
       <h1 className="visio-admin-page-title">עורך סיור 360°</h1>
-      <p style={{ color: ADMIN.muted, fontSize: 13, marginTop: -16, marginBottom: 24, lineHeight: 1.7, maxWidth: 640 }}>
-        בחר job עם פנורמות X4 → תן שמות לחדרים → לחץ להוספת חצים בין חדרים → שמור.
-        הסיור הציבורי מתעדכן באותם נתיבי Blob (ללא התחברות).
+      <p style={{ color: ADMIN.muted, fontSize: 13, marginTop: -16, marginBottom: 24, lineHeight: 1.7, maxWidth: 720 }}>
+        מקם כל חדר על תוכנית הקומה, ואז בכל חדר בחר חדר יעד ולחץ על הרצפה בפנורמה
+        כדי להוסיף טבעת מעבר. שמור כדי לפרסם.
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20, alignItems: "flex-end" }}>
@@ -408,17 +588,36 @@ export default function TourEditor() {
           <label className="visio-admin-label">Job</label>
           <select
             className="visio-admin-input"
-            value={jobId}
-            onChange={(e) => setJobId(e.target.value)}
+            value={jobs.some((j) => j.id === jobId) ? jobId : jobId ? "__custom__" : ""}
+            onChange={(e) => {
+              if (e.target.value === "__custom__") return;
+              if (dirty && !window.confirm("יש שינויים שלא נשמרו. לעבור job ולאבד אותם?")) return;
+              setJobId(e.target.value);
+            }}
             dir="rtl"
           >
             <option value="">— בחר —</option>
+            {jobId && !jobs.some((j) => j.id === jobId) && (
+              <option value="__custom__">{jobId}</option>
+            )}
             {jobs.map((j) => (
               <option key={j.id} value={j.id}>
                 {jobLabel(j)}
               </option>
             ))}
           </select>
+          <input
+            className="visio-admin-input"
+            style={{ marginTop: 8 }}
+            placeholder="או הדבק job id"
+            value={jobId}
+            onChange={(e) => {
+              if (dirty && !window.confirm("יש שינויים שלא נשמרו. לעבור job ולאבד אותם?")) return;
+              setJobId(e.target.value.trim());
+            }}
+            dir="ltr"
+            data-testid="tour-job-id"
+          />
         </div>
         <button type="button" className="visio-admin-btn-ghost" onClick={() => loadJobs()}>
           <RefreshCw size={14} />
@@ -430,13 +629,16 @@ export default function TourEditor() {
           onClick={save}
           disabled={saving || !scenes.length || !dirty}
           style={{ opacity: saving || !scenes.length || !dirty ? 0.5 : 1 }}
+          data-testid="tour-save"
+          data-version={tourVersion || ""}
+          data-dirty={dirty ? "1" : "0"}
         >
           {saving ? <Loader2 size={14} className="visio-spin" /> : <Save size={14} />}
           {" "}שמור סיור
         </button>
-        {tourUrl && (
+        {jobId && (
           <a
-            href={tourUrl}
+            href={`/tour/${jobId}`}
             target="_blank"
             rel="noreferrer"
             className="visio-admin-btn-ghost"
@@ -448,9 +650,24 @@ export default function TourEditor() {
         )}
       </div>
 
-      {error && <div className="visio-admin-error" style={{ marginBottom: 16 }}>{error}</div>}
+      {error && (
+        <div className="visio-admin-error" style={{ marginBottom: 16 }} data-testid="tour-error">
+          {error}
+          {conflict && (
+            <button
+              type="button"
+              className="visio-admin-btn-ghost"
+              style={{ marginInlineStart: 12 }}
+              data-testid="tour-reload-latest"
+              onClick={() => loadTour(jobId)}
+            >
+              <RefreshCw size={12} /> טען את הגרסה האחרונה
+            </button>
+          )}
+        </div>
+      )}
       {okMsg && (
-        <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--visio-success-bg)", border: "1px solid var(--visio-success-border)", color: ADMIN.success, fontSize: 12 }}>
+        <div data-testid="tour-ok" style={{ marginBottom: 16, padding: "10px 14px", background: "var(--visio-success-bg)", border: "1px solid var(--visio-success-border)", color: ADMIN.success, fontSize: 12 }}>
           {okMsg}
         </div>
       )}
@@ -466,29 +683,73 @@ export default function TourEditor() {
         <div className="visio-tour-editor-grid">
           <aside style={{ ...glassPanel, padding: 16 }}>
             <div className="visio-admin-section-title" style={{ marginBottom: 12 }}>חדרים</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {scenes.map((scene) => (
-                <button
-                  key={scene.id}
-                  type="button"
-                  onClick={() => setActiveSceneId(scene.id)}
-                  style={{
-                    textAlign: "right",
-                    padding: "10px 12px",
-                    background: scene.id === activeSceneId ? "var(--visio-gold-wash)" : "var(--visio-input-bg)",
-                    border: `1px solid ${scene.id === activeSceneId ? "var(--visio-gold-border-strong)" : "var(--visio-border-subtle)"}`,
-                    color: ADMIN.text,
-                    cursor: "pointer",
-                    borderRadius: 2,
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{scene.title || scene.id}</div>
-                  <div style={{ fontSize: 10, color: ADMIN.muted, marginTop: 4 }}>
-                    {(scene.hotSpots || []).length} חצים
-                    {firstSceneId === scene.id ? " · התחלה" : ""}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 520, overflowY: "auto" }}>
+              {scenes.map((scene) => {
+                const g = statsById.get(scene.id);
+                const pointCount = (scene.hotSpots || []).length;
+                return (
+                  <div
+                    key={scene.id}
+                    style={{
+                      padding: "10px 12px",
+                      background: scene.id === activeSceneId ? "var(--visio-gold-wash)" : "var(--visio-input-bg)",
+                      border: `1px solid ${scene.id === activeSceneId ? "var(--visio-gold-border-strong)" : "var(--visio-border-subtle)"}`,
+                      borderRadius: 2,
+                      opacity: scene.hidden ? 0.55 : 1,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      data-testid={`tour-scene-${scene.id}`}
+                      onClick={() => selectScene(scene.id)}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        textAlign: "right",
+                        background: "none",
+                        border: "none",
+                        color: ADMIN.text,
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>
+                        {friendlyRoomLabel(scene)}
+                        {scene.hidden ? " · מוסתר" : ""}
+                      </div>
+                      <div style={{ fontSize: 10, color: ADMIN.muted, marginTop: 4 }}>
+                        {pointCount} נקודות
+                        {firstSceneId === scene.id ? " · התחלה" : ""}
+                        {g?.isDeadEnd && !scene.hidden ? " · ללא יציאה" : ""}
+                        {g?.isUnreachable && !scene.hidden ? " · לא נגיש" : ""}
+                      </div>
+                    </button>
+                    {(g?.isDeadEnd || g?.isUnreachable) && !scene.hidden && (
+                      <div style={{ marginTop: 6, fontSize: 10, color: ADMIN.error, display: "flex", alignItems: "center", gap: 4 }}>
+                        <AlertTriangle size={11} />
+                        {g.isDeadEnd && g.isUnreachable
+                          ? "מבוי סתום ולא נגיש"
+                          : g.isDeadEnd
+                            ? "אין נקודות יציאה"
+                            : "שום סצנה לא מקשרת לכאן"}
+                      </div>
+                    )}
+                    <div style={{ marginTop: 8, display: "flex", gap: 6 }}>
+                      <button
+                        type="button"
+                        className="visio-admin-btn-ghost"
+                        style={{ padding: "4px 8px", fontSize: 11, flex: 1 }}
+                        data-testid={`scene-hide-${scene.id}`}
+                        onClick={() => toggleHidden(scene.id)}
+                        title={scene.hidden ? "הצג בסיור" : "הסתר מהסיור"}
+                      >
+                        {scene.hidden ? <Eye size={12} /> : <EyeOff size={12} />}
+                        {scene.hidden ? " הצג" : " הסתר"}
+                      </button>
+                    </div>
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
 
             {activeScene && (
@@ -496,6 +757,7 @@ export default function TourEditor() {
                 <label className="visio-admin-label">שם החדר</label>
                 <input
                   className="visio-admin-input"
+                  data-testid="scene-title-input"
                   value={activeScene.title}
                   onChange={(e) => renameScene(activeScene.id, e.target.value)}
                   dir="rtl"
@@ -509,7 +771,7 @@ export default function TourEditor() {
                     setDirty(true);
                   }}
                 >
-                  {scenes.map((s) => (
+                  {scenes.filter((s) => !s.hidden).map((s) => (
                     <option key={s.id} value={s.id}>{s.title || s.id}</option>
                   ))}
                 </select>
@@ -517,7 +779,7 @@ export default function TourEditor() {
             )}
           </aside>
 
-          <section style={{ ...glassPanel, padding: 0, overflow: "hidden", minHeight: 420 }}>
+          <section style={{ ...glassPanel, padding: 0, overflow: "hidden", minHeight: 420, position: "relative" }}>
             <div
               ref={containerRef}
               className="visio-tour-editor-viewer"
@@ -532,16 +794,23 @@ export default function TourEditor() {
             <div style={{ padding: 16, borderTop: "1px solid var(--visio-border-subtle)" }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 12 }}>
                 <div style={{ flex: "1 1 180px" }}>
-                  <label className="visio-admin-label">יעד לחץ הבא</label>
+                  <label className="visio-admin-label">יעד לנקודה הבאה</label>
                   <select
                     className="visio-admin-input"
+                    data-testid="hotspot-target-select"
                     value={pendingTarget}
-                    onChange={(e) => setPendingTarget(e.target.value)}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setPendingTarget(id);
+                      setPlaceMode(Boolean(id));
+                    }}
                     disabled={otherScenes.length === 0}
                   >
                     <option value="">— בחר חדר יעד —</option>
                     {otherScenes.map((s) => (
-                      <option key={s.id} value={s.id}>{s.title || s.id}</option>
+                      <option key={s.id} value={s.id}>
+                        {friendlyRoomLabel(s)}{s.hidden ? " (מוסתר)" : ""}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -556,10 +825,11 @@ export default function TourEditor() {
                     opacity: !pendingTarget ? 0.45 : 1,
                   }}
                   disabled={!pendingTarget || !viewerReady}
+                  data-testid="hotspot-place-btn"
                   onClick={() => setPlaceMode((v) => !v)}
                 >
                   <MousePointerClick size={14} />
-                  {placeMode ? "לחץ על התמונה…" : "הוסף חץ"}
+                  {placeMode ? "לחץ על הרצפה…" : "הוסף נקודה"}
                 </button>
                 <button
                   type="button"
@@ -573,16 +843,80 @@ export default function TourEditor() {
                 </button>
               </div>
 
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 10,
+                  alignItems: "center",
+                  marginBottom: 12,
+                  padding: 10,
+                  background: "rgba(96,176,240,0.06)",
+                  border: "1px solid rgba(96,176,240,0.25)",
+                }}
+              >
+                <div style={{ flex: "1 1 180px" }}>
+                  <label className="visio-admin-label">כיול כיוון (לחיצה אחת על הפתח)</label>
+                  <select
+                    className="visio-admin-input"
+                    data-testid="yaw-calibrate-target"
+                    value={yawCalibrateTarget}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setYawCalibrateTarget(id);
+                      if (id) {
+                        setPendingTarget("");
+                        setPlaceMode(false);
+                      }
+                    }}
+                    disabled={geoNeighboursForActive.length === 0 || !viewerReady}
+                  >
+                    <option value="">
+                      {geoNeighboursForActive.length
+                        ? "— בחר שכן מאושר מהתוכנית —"
+                        : "— אין קישורים מאושרים לסצנה זו —"}
+                    </option>
+                    {geoNeighboursForActive.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {friendlyRoomLabel(s)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {yawCalibrateTarget && (
+                  <div
+                    data-testid="yaw-calibrate-hint"
+                    style={{
+                      flex: "1 1 100%",
+                      fontSize: 12,
+                      color: ADMIN.accent,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <MapPin size={14} />
+                    לחצו בפנורמה על הרצפה לכיוון{" "}
+                    {friendlyRoomLabel(
+                      scenes.find((s) => s.id === yawCalibrateTarget) || {
+                        id: yawCalibrateTarget,
+                      }
+                    )}{" "}
+                    — נחשב offset ונציב דיסקיות לכל השכנים המאושרים
+                  </div>
+                )}
+              </div>
+
               {placeMode && (
                 <div style={{ fontSize: 12, color: ADMIN.accent, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                   <MapPin size={14} />
-                  מצב מיקום פעיל — לחץ על הכיוון בדלת / מעבר בחדר
+                  לחץ על הרצפה — הדיסקית תישב בדיוק שם (ללא חישוב מתוכנית)
                 </div>
               )}
 
-              <div className="visio-admin-section-title" style={{ fontSize: 13, marginBottom: 8 }}>חצים בחדר זה</div>
+              <div className="visio-admin-section-title" style={{ fontSize: 13, marginBottom: 8 }}>נקודות בחדר זה</div>
               {(activeScene?.hotSpots || []).length === 0 ? (
-                <div style={{ fontSize: 12, color: ADMIN.muted }}>אין חצים עדיין</div>
+                <div style={{ fontSize: 12, color: ADMIN.muted }}>אין נקודות עדיין</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {(activeScene.hotSpots || []).map((h) => (
@@ -599,9 +933,9 @@ export default function TourEditor() {
                       }}
                     >
                       <div style={{ fontSize: 12, color: ADMIN.text }}>
-                        → {scenes.find((s) => s.id === h.targetSceneId)?.title || h.targetSceneId}
+                        → {friendlyRoomLabel(scenes.find((s) => s.id === h.targetSceneId) || { id: h.targetSceneId })}
                         <span style={{ color: ADMIN.muted, marginInlineStart: 8 }} dir="ltr">
-                          yaw {h.yaw.toFixed(1)}° · pitch {h.pitch.toFixed(1)}°
+                          yaw {Number(h.yaw).toFixed(1)}° · pitch {Number(h.pitch).toFixed(1)}°
                         </span>
                       </div>
                       <select
@@ -610,19 +944,16 @@ export default function TourEditor() {
                         value={h.targetSceneId}
                         onChange={(e) => {
                           const targetId = e.target.value;
-                          const title = scenes.find((s) => s.id === targetId)?.title || "";
                           applySceneUpdate(activeSceneId, (scene) => ({
                             ...scene,
                             hotSpots: scene.hotSpots.map((x) =>
-                              x.id === h.id
-                                ? { ...x, targetSceneId: targetId, text: title }
-                                : x
+                              x.id === h.id ? { ...x, targetSceneId: targetId } : x
                             ),
                           }));
                         }}
                       >
                         {otherScenes.map((s) => (
-                          <option key={s.id} value={s.id}>{s.title || s.id}</option>
+                          <option key={s.id} value={s.id}>{friendlyRoomLabel(s)}</option>
                         ))}
                       </select>
                       <button
@@ -630,7 +961,7 @@ export default function TourEditor() {
                         className="visio-admin-btn-ghost"
                         style={{ color: ADMIN.error, padding: 8 }}
                         onClick={() => removeHotspot(h.id)}
-                        aria-label="מחק חץ"
+                        aria-label="מחק נקודה"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -671,16 +1002,32 @@ export default function TourEditor() {
                 <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
                 <span>
                   פנורמה ~8K — ייתכן עומס על GPU במובייל ישן (מגבלת טקסטורה {textureLimit || "?"}px).
-                  לא משנים גודל אוטומטית. אם הטעינה נכשלת או איטית מאוד בטלפון — ראו המלצת downscale/multires אחרי הבדיקה.
                 </span>
               </div>
             )}
             <p style={{ marginTop: 14, fontSize: 11, color: ADMIN.muted, lineHeight: 1.7 }}>
-              סיווג: קבצים עם יחס ~2:1 או שם Insta360/360 מסווגים כפנורמה equirectangular.
-              X4 ב־8192×4096 עובר את בדיקת היחס.
+              נקודות ניווט = דיסקיות רצפה. קישור דו־כיווני קובע את כיוון ההגעה אחרי מעבר.
             </p>
           </aside>
         </div>
+      )}
+
+      {!loading && scenes.length > 0 && (
+        <FloorPlanPanel
+          jobId={jobId}
+          scenes={scenes}
+          floorPlans={floorPlans}
+          activeSceneId={activeSceneId}
+          onScenesChange={(next) => {
+            setScenes(next);
+            setDirty(true);
+          }}
+          onFloorPlansChange={setFloorPlans}
+          onSelectScene={selectScene}
+          onDirty={() => setDirty(true)}
+          geoLinks={geoLinks}
+          onGeoLinksChange={setGeoLinks}
+        />
       )}
     </div>
   );

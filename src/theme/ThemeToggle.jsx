@@ -6,7 +6,7 @@ import { Moon, Sun } from "lucide-react";
 const STORAGE_KEY = "visio-theme";
 
 function readDomTheme() {
-  if (typeof document === "undefined") return "dark";
+  if (typeof document === "undefined") return "light";
   const attr = document.documentElement.getAttribute("data-theme");
   if (attr === "light" || attr === "dark") return attr;
   try {
@@ -15,10 +15,7 @@ function readDomTheme() {
   } catch {
     /* ignore */
   }
-  if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: light)").matches) {
-    return "light";
-  }
-  return "dark";
+  return "light";
 }
 
 function applyTheme(theme) {
@@ -31,7 +28,7 @@ function applyTheme(theme) {
  * Blocking script in root layout applies theme before first paint.
  */
 export default function ThemeToggle({ className = "" }) {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
