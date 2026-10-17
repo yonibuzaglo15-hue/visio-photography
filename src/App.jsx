@@ -132,15 +132,18 @@ const PARTNERS = [
   { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
 ];
 
-// Current offer (prices before VAT). `id` is what the booking form sends.
-const PHOTOS_12_12 = "12+12 תמונות ממותגות — עם שם הסוכן ובלי שם";
+// Current offer (prices before VAT). `id` is what the booking form sends (kept stable for the backend).
 const PACKAGES = [
-  { id: "PHOTOS", name: "תמונות", price: 365, features: [PHOTOS_12_12] },
-  { id: "PHOTOS_VIDEO", name: "תמונות וסרטון", price: 400, features: [PHOTOS_12_12, "סרטון שיווק לנכס"] },
-  { id: "FULL", name: "מלאה", price: 450, recommended: true, features: [PHOTOS_12_12, "סרטון שיווק לנכס", "צילומי רחפן DJI", "סיור וירטואלי 3D *"],
-    note: "* הסיור הווירטואלי כרוך במנוי חודשי של ₪40 לחודש." },
-  { id: "INSTAGRAM", name: "שיווק תוכן אורגני לאינסטגרם", price: 120, unit: "לשעת עבודה", features: ["שיווק תוכן אורגני לאינסטגרם", "מותאם אישית לכל לקוח"],
-    note: "צילומי רחפן DJI – תוספת בתשלום." },
+  { id: "PHOTOS", tier: "essential", name: "VISIO Essential", price: 365,
+    desc: "כל מה שנכס צריך כדי לבלוט במודעה: 12 תמונות ממותגות עם שם הסוכן ו-12 ללא שם, מצולמות ב-Insta360 X4 ומוכנות לפרסום." },
+  { id: "PHOTOS_VIDEO", tier: "motion", name: "VISIO Motion", price: 400,
+    desc: "תמונות שמוכרות וסרטון שמספר: 12+12 תמונות ממותגות וסרטון שיווק שמציג את הנכס בתנועה, מוכן לרשתות ולמודעות." },
+  { id: "FULL", tier: "signature", name: "VISIO Signature", price: 450, recommended: true,
+    desc: "החבילה המלאה: 12+12 תמונות ממותגות, סרטון שיווק, צילומי רחפן DJI וסיור וירטואלי תלת-מימדי שמאפשר לקונים להתהלך בנכס מהבית.",
+    note: "הסיור כרוך במנוי חודשי של ₪40" },
+  { id: "INSTAGRAM", tier: "social", name: "VISIO Social", price: 120, unit: "לשעת עבודה",
+    desc: "שיווק תוכן אורגני לאינסטגרם, בהתאמה אישית לסוכן או למשרד.",
+    note: "רחפן בתוספת תשלום" },
 ];
 const GEAR_LINE = "הצילומים נעשים במצלמת Insta360 X4 וברחפן DJI";
 
@@ -341,16 +344,14 @@ function PricingSection({ onNav }) {
       {/* Cards */}
       <div className="visio-pricing-grid">
         {PACKAGES.map(pkg => (
-          <div key={pkg.id} className={`visio-price-card${pkg.recommended ? " featured" : ""}`}>
+          <div key={pkg.id} className={`visio-price-card metal-${pkg.tier}${pkg.recommended ? " featured" : ""}`}>
             {pkg.recommended && <div className="visio-badge">מומלץ</div>}
-            <div className="visio-kicker muted">חבילה</div>
-            <div className="visio-price-name visio-price-name-he">{pkg.name}</div>
+            <img className={`visio-pkg-logo metal-${pkg.tier}`} src={`/packages/visio-${pkg.tier}.svg`} alt={pkg.name} width="96" height="96" loading="lazy" />
+            <div className="visio-price-name visio-price-name-en" dir="ltr">{pkg.name}</div>
             <div className="visio-price">₪{p(pkg.price)}</div>
             <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.unit ? `${pkg.unit} · ` : ""}{showVat ? "כולל מע״מ" : "+ מע״מ"}</div>
-            <ul className="visio-price-features visio-checklist">
-              {pkg.features.map(f => <li key={f}><span className="visio-check" aria-hidden="true">✓</span><Bidi>{f}</Bidi></li>)}
-            </ul>
-            {pkg.note && <p className="visio-price-note"><Bidi>{pkg.note}</Bidi></p>}
+            <p className="visio-price-desc"><Bidi>{pkg.desc}</Bidi></p>
+            {pkg.note && <p className="visio-price-note"><Bidi>{`* ${pkg.note}`}</Bidi></p>}
             <button className={`visio-btn block${pkg.recommended ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
               הזמן עכשיו ← תשלום ביום הצילום
             </button>
@@ -541,10 +542,10 @@ function BookingSection() {
               <label className="visio-label">חבילה</label>
               <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
                 <option value="CONSULTATION">ייעוץ טלפוני — חינם</option>
-                <option value="PHOTOS">תמונות — ₪365 + מע״מ</option>
-                <option value="PHOTOS_VIDEO">תמונות וסרטון — ₪400 + מע״מ</option>
-                <option value="FULL">מלאה — ₪450 + מע״מ</option>
-                <option value="INSTAGRAM">שיווק תוכן אורגני לאינסטגרם — ₪120 לשעת עבודה + מע״מ</option>
+                <option value="PHOTOS">VISIO Essential — ₪365 + מע״מ</option>
+                <option value="PHOTOS_VIDEO">VISIO Motion — ₪400 + מע״מ</option>
+                <option value="FULL">VISIO Signature — ₪450 + מע״מ</option>
+                <option value="INSTAGRAM">VISIO Social — ₪120 לשעת עבודה + מע״מ</option>
               </select>
             </div>
             {[["שם מלא *", "name", "שם פרטי + משפחה", "rtl"], ["טלפון *", "phone", "05X-XXXXXXX", "ltr"], ["כתובת הנכס *", "address", "רחוב, מספר, עיר", "rtl"]].map(([lbl, key, ph, dir]) => (
@@ -650,7 +651,7 @@ function CharterSection() {
           </div>
         ))}
         <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: C.muted }}>
-          לשאלות ובירורים: <a href="mailto:visio.photography.il@gmail.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>visio.photography.il@gmail.com</a>
+          לשאלות ובירורים: <a href="mailto:yoni@visioisrael.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>yoni@visioisrael.com</a>
         </p>
       </div>
     </section>

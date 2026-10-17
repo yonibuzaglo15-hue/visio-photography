@@ -546,3 +546,18 @@ button:hover { opacity: 0.85; }
 @media (min-width: 1920px) {
   .visio-booking-wrap { max-width: 800px; }
 }
+
+/* ─── Package tiers: metallic emblems + accent rule (Essential silver · Motion copper · Signature gold · Social black) ─── */
+.visio-price-card { --metal: linear-gradient(90deg, #6d7279, #e9ecef 45%, #8a9097); }
+.visio-price-card.metal-motion { --metal: linear-gradient(90deg, #6a3216, #e8a77c 45%, #8f4724); }
+.visio-price-card.metal-signature { --metal: linear-gradient(90deg, #7a5517, #f6e3a1 45%, #a87b28); }
+.visio-price-card.metal-social { --metal: linear-gradient(90deg, #000, #4a4a4a 45%, #0d0d0d); }
+.visio-price-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--metal); }
+.visio-price-card.featured .visio-badge { top: 2px; }
+.visio-pkg-logo { display: block; width: 96px; height: 96px; margin: 4px 0 18px; }
+.visio-price-name-en { font-family: var(--pub-display); font-size: 22px; letter-spacing: .06em; text-align: right; margin: 0 0 18px; }
+.visio-price-desc { font-size: 14px; line-height: 1.7; color: var(--pub-text); margin: 20px 0 22px; padding-top: 20px; border-top: 1px solid var(--pub-rule); text-align: right; }
+.visio-price-card .visio-price-note { margin: -8px 0 24px; }
+[data-theme="dark"] .visio-pkg-logo.metal-social { filter: drop-shadow(0 0 .6px rgba(255,255,255,.55)); }
+[data-theme="dark"] .visio-price-card.metal-social { --metal: linear-gradient(90deg, #1a1a1a, #6a6a6a 45%, #222); }
+@media (max-width: 768px) { .visio-pkg-logo { width: 84px; height: 84px; } }
