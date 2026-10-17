@@ -72,7 +72,7 @@ function AdminDashboard({ admin, onLogout, activeTab, setActiveTab }) {
   const intakeSectionRef = useRef(null);
 
   const revenue = bookings.filter((b) => b.status === "confirmed").reduce((s, b) => {
-    const prices = { ESSENTIAL: 350, SIGNATURE: 400, PRESTIGE: 750 };
+    const prices = { PHOTOS: 365, PHOTOS_VIDEO: 400, FULL: 450, INSTAGRAM: 0 /* billed per hour (₪120) */, ESSENTIAL: 350, SIGNATURE: 400, PRESTIGE: 750 }; // legacy keys kept for old bookings
     return s + (prices[b.pkg] || 0);
   }, 0);
 

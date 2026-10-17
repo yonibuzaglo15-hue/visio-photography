@@ -132,12 +132,17 @@ const PARTNERS = [
   { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
 ];
 
+// Current offer (prices before VAT). `id` is what the booking form sends.
+const PHOTOS_12_12 = "12+12 תמונות ממותגות — עם שם הסוכן ובלי שם";
 const PACKAGES = [
-  { id: "consultation", name: "CONSULTATION", hebrew: "ייעוץ טלפוני", price: 0, popular: false, free: true, features: ["שיחת ייעוץ 15 דקות","הצעת מחיר מותאמת אישית","ללא התחייבות","קביעה מיידית"] },
-  { id: "essential", name: "ESSENTIAL", price: 350, popular: false, features: ["15 תמונות מעובדות AI","עיבוד תאורה מקצועי","הספקה ב-24 שעות ל-Drive","פורמט עבור יד2 / מדלן"] },
-  { id: "signature", name: "SIGNATURE", price: 400, popular: true, features: ["25 תמונות AI","סרטון 60 שניות","3 פנורמות 360°","הספקה ב-24 שעות","+ סיור וירטואלי ₪80/חודש"] },
-  { id: "prestige", name: "PRESTIGE", price: 750, popular: false, features: ["תמונות ללא הגבלה","סרטון 90 שניות + מוזיקה","פנורמות ללא הגבלה","צילום רחפן","סיור וירטואלי — חודש ראשון","RAW files","גיבוי 90 יום"] },
+  { id: "PHOTOS", name: "תמונות", price: 365, features: [PHOTOS_12_12] },
+  { id: "PHOTOS_VIDEO", name: "תמונות וסרטון", price: 400, features: [PHOTOS_12_12, "סרטון שיווק לנכס"] },
+  { id: "FULL", name: "מלאה", price: 450, recommended: true, features: [PHOTOS_12_12, "סרטון שיווק לנכס", "צילומי רחפן DJI", "סיור וירטואלי 3D *"],
+    note: "* הסיור הווירטואלי כרוך במנוי חודשי של ₪40 לחודש." },
+  { id: "INSTAGRAM", name: "שיווק תוכן אורגני לאינסטגרם", price: 120, unit: "לשעת עבודה", features: ["שיווק תוכן אורגני לאינסטגרם", "מותאם אישית לכל לקוח"],
+    note: "צילומי רחפן DJI – תוספת בתשלום." },
 ];
+const GEAR_LINE = "הצילומים נעשים במצלמת Insta360 X4 וברחפן DJI";
 
 
 /* ═══════════════════════════════════
@@ -196,7 +201,7 @@ function HomeSection({ onNav }) {
       {/* Stats */}
       <div style={{ padding: "0 20px" }}>
         <div className="visio-stats">
-          {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["5","חבילות + ייעוץ חינם"]].map(([n,l]) => (
+          {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["12+12","תמונות ממותגות בחבילה"]].map(([n,l]) => (
             <div key={l} className="visio-stat">
               <div className="visio-stat-num"><Bidi>{n}</Bidi></div>
               <div className="visio-kicker muted">{l}</div>
@@ -336,33 +341,23 @@ function PricingSection({ onNav }) {
       {/* Cards */}
       <div className="visio-pricing-grid">
         {PACKAGES.map(pkg => (
-          <div key={pkg.id} className={`visio-price-card${pkg.popular ? " featured" : ""}`}>
-            {(pkg.free || pkg.popular) && <div className="visio-badge">{pkg.free ? "חינם" : "הנפוץ ביותר"}</div>}
-            <div className="visio-kicker muted">{pkg.hebrew || "חבילת צילום"}</div>
-            <div className="visio-price-name"><Bidi>{pkg.name}</Bidi></div>
-            <div className="visio-price">{pkg.free ? "₪0" : `₪${p(pkg.price)}`}</div>
-            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.free ? "ייעוץ חינם · ללא התחייבות" : `לצילום · ${showVat ? "כולל" : "ללא"} מע״מ`}</div>
-            <ul className="visio-price-features">
-              {pkg.features.map(f => <li key={f}>— <Bidi>{f}</Bidi></li>)}
+          <div key={pkg.id} className={`visio-price-card${pkg.recommended ? " featured" : ""}`}>
+            {pkg.recommended && <div className="visio-badge">מומלץ</div>}
+            <div className="visio-kicker muted">חבילה</div>
+            <div className="visio-price-name visio-price-name-he">{pkg.name}</div>
+            <div className="visio-price">₪{p(pkg.price)}</div>
+            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.unit ? `${pkg.unit} · ` : ""}{showVat ? "כולל מע״מ" : "+ מע״מ"}</div>
+            <ul className="visio-price-features visio-checklist">
+              {pkg.features.map(f => <li key={f}><span className="visio-check" aria-hidden="true">✓</span><Bidi>{f}</Bidi></li>)}
             </ul>
-            <button className={`visio-btn block${pkg.popular ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
+            {pkg.note && <p className="visio-price-note"><Bidi>{pkg.note}</Bidi></p>}
+            <button className={`visio-btn block${pkg.recommended ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
               הזמן עכשיו ← תשלום ביום הצילום
             </button>
           </div>
         ))}
       </div>
-
-      {/* Addons */}
-      <div className="visio-addons">
-        {[["סיור וירטואלי","אירוח חודשי",80,"/ חודש"],["תמונות נוספות","מעבר להיקף החבילה",25,"/ תמונה"],["אקספרס 6 שעות","אספקה מזורזת",150,"לחבילה"],["Reels לרשתות","Instagram / TikTok 9:16",200,"לסרטון"]].map(([name,desc,price,unit]) => (
-          <div key={name} className="visio-addon">
-            <div className="visio-story-title" style={{ margin: "0 0 4px" }}><Bidi>{name}</Bidi></div>
-            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}><Bidi>{desc}</Bidi></div>
-            <div className="visio-price" style={{ fontSize: 30 }}>₪{p(price)}</div>
-            <div className="visio-credit" style={{ marginTop: 6 }}>{unit}</div>
-          </div>
-        ))}
-      </div>
+      <p className="visio-gear-line"><Bidi>{GEAR_LINE}</Bidi></p>
     </section>
   );
 }
@@ -380,7 +375,7 @@ function BookingSection() {
   const [selDate, setSelDate] = useState(null);
   const [selSlot, setSelSlot] = useState(null);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "SIGNATURE", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "FULL", notes: "" });
   const [done, setDone] = useState(false);
   const [wm, setWm] = useState({ agentPhone: "", logoFile: null, logoUrl: null, agentPhotoFile: null, agentPhotoUrl: null, wantAgentPhoto: false });
   const logoRef = useRef(null);
@@ -446,7 +441,7 @@ function BookingSection() {
         התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
       </p>
       <div className="visio-done-grid">
-        {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", `VISIO ${form.pkg}`], ["כתובת", form.address]].map(([l, v]) => (
+        {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", PACKAGES.find(x => x.id === form.pkg)?.name || form.pkg], ["כתובת", form.address]].map(([l, v]) => (
           <div key={l}>
             <div className="visio-kicker muted" style={{ marginBottom: 6 }}>{l}</div>
             <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}><Bidi>{v}</Bidi></div>
@@ -546,9 +541,10 @@ function BookingSection() {
               <label className="visio-label">חבילה</label>
               <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
                 <option value="CONSULTATION">ייעוץ טלפוני — חינם</option>
-                <option value="ESSENTIAL">ESSENTIAL — ₪350</option>
-                <option value="SIGNATURE">SIGNATURE — ₪400</option>
-                <option value="PRESTIGE">PRESTIGE — ₪750</option>
+                <option value="PHOTOS">תמונות — ₪365 + מע״מ</option>
+                <option value="PHOTOS_VIDEO">תמונות וסרטון — ₪400 + מע״מ</option>
+                <option value="FULL">מלאה — ₪450 + מע״מ</option>
+                <option value="INSTAGRAM">שיווק תוכן אורגני לאינסטגרם — ₪120 לשעת עבודה + מע״מ</option>
               </select>
             </div>
             {[["שם מלא *", "name", "שם פרטי + משפחה", "rtl"], ["טלפון *", "phone", "05X-XXXXXXX", "ltr"], ["כתובת הנכס *", "address", "רחוב, מספר, עיר", "rtl"]].map(([lbl, key, ph, dir]) => (
@@ -638,7 +634,7 @@ function CharterSection() {
     { title: "אספקה", body: "כל הצילומים יסופקו ב-Google Drive תוך 24-48 שעות מהצילום." },
     { title: "שימוש", body: "הלקוח רשאי להשתמש בתמונות לצרכי שיווק הנכס בלבד." },
     { title: "פרטיות", body: "VISIO שומרת את הזכות לפרסם עבודות לצרכי תיק עבודות, אלא אם התבקשה אחרת." },
-    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי. ניתן לבטל בכל עת עם הודעה מוקדמת." },
+    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪40 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
     { title: "אחריות", body: "VISIO אחראית לאיכות הצילום ולעמידה בלוחות הזמנים שסוכמו. שינויים לאחר הגשה ייגבו תוספת." },
     { title: "קניין רוחני", body: "כל זכויות היוצרים על התמונות והסרטונים שייכות ל-VISIO. הלקוח מקבל רישיון שימוש בלתי בלעדי." },
   ];
@@ -676,7 +672,7 @@ function AboutSection({ onNav }) {
         <blockquote className="visio-pullquote">נדל״ן. בצילום שמוכר.</blockquote>
 
         <div className="visio-about-grid">
-          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמות 4K · רחפן · Matterport 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
+          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
