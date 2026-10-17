@@ -28,10 +28,12 @@ const VAT = 0.18;
 // are isolated so neighbouring Hebrew punctuation and word order don't flip.
 const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
 
-function Bidi({ children: text }) {
+// Pricing copy also isolates number runs (12+12, ₪40) so they never reorder neighbouring Hebrew.
+const LATIN_OR_NUM_RUN = /₪?\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*|₪?\d+(?:\+\d+)?/g;
+function Bidi({ children: text, numbers = false }) {
   const parts = [];
   let last = 0;
-  for (const m of text.matchAll(LATIN_RUN)) {
+  for (const m of text.matchAll(numbers ? LATIN_OR_NUM_RUN : LATIN_RUN)) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     parts.push(<bdi key={m.index} lang="en" dir="ltr">{m[0]}</bdi>);
     last = m.index + m[0].length;
@@ -350,15 +352,15 @@ function PricingSection({ onNav }) {
             <div className="visio-price-name visio-price-name-en" dir="ltr">{pkg.name}</div>
             <div className="visio-price">₪{p(pkg.price)}</div>
             <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.unit ? `${pkg.unit} · ` : ""}{showVat ? "כולל מע״מ" : "+ מע״מ"}</div>
-            <p className="visio-price-desc"><Bidi>{pkg.desc}</Bidi></p>
-            {pkg.note && <p className="visio-price-note"><Bidi>{`* ${pkg.note}`}</Bidi></p>}
+            <p className="visio-price-desc" dir="rtl"><Bidi numbers>{pkg.desc}</Bidi></p>
+            {pkg.note && <p className="visio-price-note" dir="rtl"><Bidi numbers>{`* ${pkg.note}`}</Bidi></p>}
             <button className={`visio-btn block${pkg.recommended ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
               הזמן עכשיו ← תשלום ביום הצילום
             </button>
           </div>
         ))}
       </div>
-      <p className="visio-gear-line"><Bidi>{GEAR_LINE}</Bidi></p>
+      <p className="visio-gear-line" dir="rtl"><Bidi>{GEAR_LINE}</Bidi></p>
     </section>
   );
 }

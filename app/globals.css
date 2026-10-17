@@ -310,7 +310,7 @@ button:hover { opacity: 0.85; }
 .visio-addon { background: var(--pub-bg); padding: 24px 20px; }
 .visio-price-name-he { font-family: var(--pub-serif); letter-spacing: 0; font-size: 26px; line-height: var(--pub-lh-heading); min-height: 2.5em; display: flex; align-items: flex-end; }
 .visio-price-from { font-family: var(--pub-sans); font-size: 15px; letter-spacing: .02em; margin-inline-end: 6px; vertical-align: middle; color: var(--pub-muted); }
-.visio-gear-line { text-align: center; font-size: 13px; letter-spacing: .04em; color: var(--pub-muted); margin: 28px auto 0; max-width: 640px; }
+.visio-gear-line { text-align: center; font-size: 13px; letter-spacing: 0; direction: rtl; unicode-bidi: isolate; color: var(--pub-muted); margin: 28px auto 0; max-width: 640px; }
 @media (max-width: 1100px) and (min-width: 769px) { .visio-pricing-grid { grid-template-columns: repeat(2, 1fr); } }
 .visio-checklist { text-align: right; gap: 14px; }
 .visio-checklist li { display: flex; gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.5; }
