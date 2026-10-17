@@ -68,9 +68,13 @@ describe("portfolio tour wiring", () => {
     expect(card?.sub.startsWith("שבט לוי 11")).toBe(true);
     expect(card?.tour).toBe("ashdod-apartment");
     const order = ["16", "17", "18", "19", "20", "21", "13", "14", "15", "09", "10", "11", "12", "01", "02", "03", "04", "05", "06", "07", "08"];
+    expect(card?.fit).toBe("contain");
     expect(card?.hero).toBe("/portfolio/shevet-levi-11/16.jpg");
     expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-levi-11/${n}.jpg`));
     expect(card?.gallery.join(" ")).not.toMatch(/card\.jpg|stills\//);
+    const css = fs.readFileSync("app/globals.css", "utf8");
+    expect(css).toMatch(/\.visio-portfolio-img-wrap\.contain img \{ object-fit: contain/);
+    expect(portfolio.filter((item) => item.fit === "contain").map((item) => item.id)).toEqual([10]);
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
