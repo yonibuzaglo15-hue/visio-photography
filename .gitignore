@@ -5,6 +5,5 @@ dist
 .env.local
 .DS_Store
 .data/
-public/tours/
 .vercel/
 .vercel
