@@ -30,8 +30,19 @@ describe("hosted tours", () => {
     expect(tour.scenes).toHaveLength(44);
     expect(tour.firstScene).toBe("p27");
     expect(tour.assetBase).toBe("/tours/ashdod-apartment");
+    expect(tour.title).toBe("דירה · אשדוד");
+    expect(tour.location).toBe("שבט לוי 11");
     expect(tour.scenes[0].hotspots.length).toBeGreaterThan(0);
     expect(tour.scenes.every((scene) => typeof scene.map.x === "number")).toBe(true);
+  });
+
+  it("serves /tours/shevet-levi-11 as an alias of the same apartment", () => {
+    expect(listTourSlugs()).toContain("shevet-levi-11");
+    const tour = loadTour("shevet-levi-11");
+    expect(tour.slug).toBe("ashdod-apartment");
+    expect(tour.location).toBe("שבט לוי 11");
+    expect(tour.scenes).toHaveLength(44);
+    expect(tour.assetBase).toBe("/tours/ashdod-apartment");
   });
 
   it("rejects unsafe slugs", () => {
@@ -54,6 +65,7 @@ describe("portfolio tour wiring", () => {
   it("points the Ashdod apartment card at the hosted tour", () => {
     const card = portfolio.find((item) => item.matterport === "Hkg7xrnXgoM");
     expect(card?.title).toBe("דירה · אשדוד");
+    expect(card?.sub.startsWith("שבט לוי 11")).toBe(true);
     expect(card?.tour).toBe("ashdod-apartment");
     expect(card?.hero).toBe("/tours/ashdod-apartment/card.jpg");
   });
