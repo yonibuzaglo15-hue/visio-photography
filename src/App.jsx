@@ -72,7 +72,7 @@ const PORTFOLIO = [
   { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
   { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
   { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
-  { id: 10, title: "דירה · אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", hero: "/tours/ashdod-apartment/card.jpg", gallery: ["/tours/ashdod-apartment/card.jpg", "/tours/ashdod-apartment/stills/living.jpg", "/tours/ashdod-apartment/stills/entrance.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
+  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", hero: "/tours/ashdod-apartment/card.jpg", gallery: ["/tours/ashdod-apartment/card.jpg", "/tours/ashdod-apartment/stills/living.jpg", "/tours/ashdod-apartment/stills/entrance.jpg"], tags: ["שבט לוי 11","מרפסת","סלון","מטבח","סיור וירטואלי"] },
 ];
 
 const COVER_ID = 8;
