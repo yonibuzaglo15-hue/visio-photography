@@ -275,6 +275,19 @@ button:hover { opacity: 0.85; }
 .visio-portfolio-hover { position: absolute; inset: 0; background: var(--pub-scrim); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
 .visio-portfolio-meta { padding-top: 16px; }
 
+/* ── Portfolio filter (segmented pill) ── */
+.visio-filter-wrap { display: flex; justify-content: center; margin: calc(-1 * clamp(12px, 2.5vw, 28px)) 0 clamp(32px, 5vw, 52px); padding: 0 16px; }
+.visio-filter { position: relative; display: inline-flex; align-items: stretch; direction: rtl; background: transparent; border: 1px solid color-mix(in srgb, var(--pub-ink) 22%, transparent); border-radius: 999px; padding: 3px; max-width: 100%; }
+.visio-filter-indicator { position: absolute; top: 3px; bottom: 3px; left: 0; border-radius: 999px; background: color-mix(in srgb, var(--pub-ink) 7%, transparent); border: 1px solid color-mix(in srgb, var(--pub-ink) 55%, transparent); transition: transform .38s cubic-bezier(.2,.7,.2,1), width .38s cubic-bezier(.2,.7,.2,1), opacity .2s; pointer-events: none; }
+.visio-filter-btn { position: relative; z-index: 1; background: none; border: none; cursor: pointer; font-family: var(--pub-sans); font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--pub-muted); padding: 10px 22px; min-height: 40px; border-radius: 999px; white-space: nowrap; transition: color .25s ease; -webkit-tap-highlight-color: transparent; }
+.visio-filter-btn:hover { color: var(--pub-ink); }
+.visio-filter-btn.active { color: var(--pub-ink); }
+.visio-filter-btn:focus-visible { outline: 1px solid var(--pub-ink); outline-offset: 2px; }
+.visio-portfolio-card { animation: visioCardIn .5s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes visioCardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .visio-filter-btn { padding: 9px 16px; letter-spacing: .16em; } }
+@media (prefers-reduced-motion: reduce) { .visio-portfolio-card { animation: none; } .visio-filter-indicator { transition: none; } }
+
 /* ── Lightbox ── */
 .visio-lightbox { position: fixed; inset: 0; background: var(--pub-lightbox); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; padding: 16px; }
 .visio-lightbox img { max-height: 80vh; max-width: 90vw; object-fit: contain; }
@@ -295,6 +308,14 @@ button:hover { opacity: 0.85; }
 .visio-price-card .visio-btn { margin-top: auto; }
 .visio-addons { max-width: 1280px; margin: 56px auto 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-rule); }
 .visio-addon { background: var(--pub-bg); padding: 24px 20px; }
+.visio-price-name-he { font-family: var(--pub-serif); letter-spacing: 0; font-size: 26px; line-height: var(--pub-lh-heading); min-height: 2.5em; display: flex; align-items: flex-end; }
+.visio-price-from { font-family: var(--pub-sans); font-size: 15px; letter-spacing: .02em; margin-inline-end: 6px; vertical-align: middle; color: var(--pub-muted); }
+.visio-gear-line { text-align: center; font-size: 13px; letter-spacing: 0; direction: rtl; unicode-bidi: isolate; color: var(--pub-muted); margin: 28px auto 0; max-width: 640px; }
+@media (max-width: 1100px) and (min-width: 769px) { .visio-pricing-grid { grid-template-columns: repeat(2, 1fr); } }
+.visio-checklist { text-align: right; gap: 14px; }
+.visio-checklist li { display: flex; gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.5; }
+.visio-check { flex: none; font-size: 13px; color: var(--pub-ink); }
+.visio-price-note { font-size: 12px; line-height: 1.6; color: var(--pub-muted); margin: -12px 0 24px; text-align: right; }
 
 /* ── Booking ── */
 .visio-booking-wrap { padding: clamp(48px, 7vw, 80px) 20px; max-width: 720px; margin: 0 auto; width: 100%; }
@@ -525,3 +546,18 @@ button:hover { opacity: 0.85; }
 @media (min-width: 1920px) {
   .visio-booking-wrap { max-width: 800px; }
 }
+
+/* ─── Package tiers: metallic emblems + accent rule (Essential silver · Motion copper · Signature gold · Social black) ─── */
+.visio-price-card { --metal: linear-gradient(90deg, #6d7279, #e9ecef 45%, #8a9097); }
+.visio-price-card.metal-motion { --metal: linear-gradient(90deg, #6a3216, #e8a77c 45%, #8f4724); }
+.visio-price-card.metal-signature { --metal: linear-gradient(90deg, #7a5517, #f6e3a1 45%, #a87b28); }
+.visio-price-card.metal-social { --metal: linear-gradient(90deg, #000, #4a4a4a 45%, #0d0d0d); }
+.visio-price-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--metal); }
+.visio-price-card.featured .visio-badge { top: 2px; }
+.visio-pkg-logo { display: block; width: 96px; height: 96px; margin: 4px 0 18px; }
+.visio-price-name-en { font-family: var(--pub-display); font-size: 22px; letter-spacing: .06em; text-align: right; margin: 0 0 18px; }
+.visio-price-desc { font-size: 14px; line-height: 1.7; color: var(--pub-text); margin: 20px 0 22px; padding-top: 20px; border-top: 1px solid var(--pub-rule); text-align: right; }
+.visio-price-card .visio-price-note { margin: -8px 0 24px; }
+[data-theme="dark"] .visio-pkg-logo.metal-social { filter: drop-shadow(0 0 .6px rgba(255,255,255,.55)); }
+[data-theme="dark"] .visio-price-card.metal-social { --metal: linear-gradient(90deg, #1a1a1a, #6a6a6a 45%, #222); }
+@media (max-width: 768px) { .visio-pkg-logo { width: 84px; height: 84px; } }

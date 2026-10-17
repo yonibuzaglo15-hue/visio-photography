@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 
 import { C } from "./theme/colors.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
@@ -28,10 +28,12 @@ const VAT = 0.18;
 // are isolated so neighbouring Hebrew punctuation and word order don't flip.
 const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
 
-function Bidi({ children: text }) {
+// Pricing copy also isolates number runs (12+12, ₪40) so they never reorder neighbouring Hebrew.
+const LATIN_OR_NUM_RUN = /₪?\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*|₪?\d+(?:\+\d+)?/g;
+function Bidi({ children: text, numbers = false }) {
   const parts = [];
   let last = 0;
-  for (const m of text.matchAll(LATIN_RUN)) {
+  for (const m of text.matchAll(numbers ? LATIN_OR_NUM_RUN : LATIN_RUN)) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     parts.push(<bdi key={m.index} lang="en" dir="ltr">{m[0]}</bdi>);
     last = m.index + m[0].length;
@@ -65,17 +67,65 @@ function StoryImage({ id, title }) {
 const PORTFOLIO = [
   { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
   { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
-  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", tag: "בוטיק", partner: "ReHouse", matterport: "cEtmuBEsSNq", tags: ["קיר שיש","פרקט","בוטיק"] },
-  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", tag: "לובי יוקרה", partner: "ReHouse", matterport: "9YJGFmX8KbJ", tags: ["לובי יוקרה","שיש"] },
+  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", tag: "בוטיק", partner: "ReHouse", company: "rehouse", matterport: "cEtmuBEsSNq", hero: "/portfolio/nahal-snir-21/01.jpg", gallery: ["/portfolio/nahal-snir-21/01.jpg", "/portfolio/nahal-snir-21/02.jpg", "/portfolio/nahal-snir-21/03.jpg", "/portfolio/nahal-snir-21/04.jpg", "/portfolio/nahal-snir-21/05.jpg", "/portfolio/nahal-snir-21/06.jpg", "/portfolio/nahal-snir-21/07.jpg", "/portfolio/nahal-snir-21/08.jpg", "/portfolio/nahal-snir-21/09.jpg", "/portfolio/nahal-snir-21/10.jpg"], tags: ["קיר שיש","פרקט","בוטיק"] },
+  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", tag: "לובי יוקרה", partner: "ReHouse", company: "rehouse", matterport: "9YJGFmX8KbJ", hero: "/portfolio/balfour-7/01.jpg", gallery: ["/portfolio/balfour-7/01.jpg", "/portfolio/balfour-7/02.jpg", "/portfolio/balfour-7/03.jpg", "/portfolio/balfour-7/04.jpg", "/portfolio/balfour-7/05.jpg", "/portfolio/balfour-7/06.jpg", "/portfolio/balfour-7/07.jpg", "/portfolio/balfour-7/08.jpg", "/portfolio/balfour-7/09.jpg", "/portfolio/balfour-7/10.jpg"], tags: ["לובי יוקרה","שיש"] },
   { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
-  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", tag: "דירת גן", partner: "ReHouse", matterport: "C6Uvbihrqvm", tags: ["גינה","שיש","סלון"] },
+  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", tag: "דירת גן", partner: "ReHouse", company: "rehouse", matterport: "C6Uvbihrqvm", hero: "/portfolio/hamashot-8/01.jpg", gallery: ["/portfolio/hamashot-8/01.jpg", "/portfolio/hamashot-8/02.jpg", "/portfolio/hamashot-8/03.jpg", "/portfolio/hamashot-8/04.jpg", "/portfolio/hamashot-8/05.jpg", "/portfolio/hamashot-8/06.jpg", "/portfolio/hamashot-8/07.jpg", "/portfolio/hamashot-8/08.jpg", "/portfolio/hamashot-8/09.jpg"], tags: ["גינה","שיש","סלון"] },
   { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
   { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
   { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
-  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", tag: "סיור וירטואלי", partner: "ReHouse", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
+  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
+  { id: 11, title: "רוטשילד 23 · אשדוד", sub: "רובע ט״ו", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/rothschild-23/01.jpg", gallery: ["/portfolio/rothschild-23/01.jpg", "/portfolio/rothschild-23/02.jpg", "/portfolio/rothschild-23/03.jpg", "/portfolio/rothschild-23/04.jpg", "/portfolio/rothschild-23/05.jpg", "/portfolio/rothschild-23/06.jpg", "/portfolio/rothschild-23/07.jpg", "/portfolio/rothschild-23/08.jpg", "/portfolio/rothschild-23/09.jpg"], tags: ["סלון","מרפסת","מטבח"] },
+  { id: 12, title: "נחל לכיש 45 · אשדוד", sub: "רובע י״א", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/nahal-lachish-45/01.jpg", gallery: ["/portfolio/nahal-lachish-45/01.jpg", "/portfolio/nahal-lachish-45/02.jpg", "/portfolio/nahal-lachish-45/03.jpg", "/portfolio/nahal-lachish-45/04.jpg", "/portfolio/nahal-lachish-45/05.jpg", "/portfolio/nahal-lachish-45/06.jpg", "/portfolio/nahal-lachish-45/07.jpg", "/portfolio/nahal-lachish-45/08.jpg", "/portfolio/nahal-lachish-45/09.jpg", "/portfolio/nahal-lachish-45/10.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
+  { id: 13, title: "יהויכין 11 · אשדוד", sub: "רובע י״ג", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/yehoyachin-11/01.jpg", gallery: ["/portfolio/yehoyachin-11/01.jpg", "/portfolio/yehoyachin-11/02.jpg", "/portfolio/yehoyachin-11/03.jpg", "/portfolio/yehoyachin-11/04.jpg", "/portfolio/yehoyachin-11/05.jpg", "/portfolio/yehoyachin-11/06.jpg", "/portfolio/yehoyachin-11/07.jpg", "/portfolio/yehoyachin-11/08.jpg", "/portfolio/yehoyachin-11/09.jpg"], tags: ["סלון","מרפסת"] },
+  { id: 14, title: "ביאליק 46 · אשדוד", sub: "רובע ה׳", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/bialik-46/01.jpg", gallery: ["/portfolio/bialik-46/01.jpg", "/portfolio/bialik-46/02.jpg", "/portfolio/bialik-46/03.jpg", "/portfolio/bialik-46/04.jpg", "/portfolio/bialik-46/05.jpg", "/portfolio/bialik-46/06.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
+  { id: 15, title: "חסידא 17 · אשדוד", sub: "רובע ז׳", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/chasida-17/01.jpg", gallery: ["/portfolio/chasida-17/01.jpg", "/portfolio/chasida-17/02.jpg", "/portfolio/chasida-17/03.jpg", "/portfolio/chasida-17/04.jpg", "/portfolio/chasida-17/05.jpg", "/portfolio/chasida-17/06.jpg", "/portfolio/chasida-17/07.jpg", "/portfolio/chasida-17/08.jpg", "/portfolio/chasida-17/09.jpg", "/portfolio/chasida-17/10.jpg"], tags: ["מטבח","פינת אוכל"] },
 ];
 
 const COVER_ID = 8;
+
+// Company of a card: explicit `company`, otherwise derived from `partner`.
+const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
+const PORTFOLIO_FILTERS = [
+  { id: "all", label: "הכל" },
+  { id: "rehouse", label: "REHOUSE" },
+  { id: "remax", label: "RE/MAX" },
+];
+
+/* ─── PORTFOLIO FILTER (segmented pill with sliding indicator) ─── */
+function PortfolioFilter({ value, onChange }) {
+  const barRef = useRef(null);
+  const btnRefs = useRef({});
+  const [ind, setInd] = useState({ left: 0, width: 0, ready: false });
+  useLayoutEffect(() => {
+    const place = () => {
+      const b = btnRefs.current[value];
+      if (b) setInd({ left: b.offsetLeft, width: b.offsetWidth, ready: true });
+    };
+    place();
+    window.addEventListener("resize", place);
+    const ro = typeof ResizeObserver !== "undefined" && barRef.current ? new ResizeObserver(place) : null;
+    if (ro) ro.observe(barRef.current);
+    if (document.fonts?.ready) document.fonts.ready.then(place);
+    return () => { window.removeEventListener("resize", place); ro?.disconnect(); };
+  }, [value]);
+  return (
+    <div className="visio-filter-wrap">
+      <div className="visio-filter" role="tablist" aria-label="סינון עבודות לפי חברה" ref={barRef}>
+        <span className="visio-filter-indicator" aria-hidden="true"
+          style={{ transform: `translateX(${ind.left}px)`, width: ind.width, opacity: ind.ready ? 1 : 0 }} />
+        {PORTFOLIO_FILTERS.map(f => (
+          <button key={f.id} type="button" role="tab" aria-selected={value === f.id}
+            ref={el => { btnRefs.current[f.id] = el; }}
+            className={`visio-filter-btn${value === f.id ? " active" : ""}`}
+            onClick={() => onChange(f.id)}>
+            <Bidi>{f.label}</Bidi>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const PARTNERS = [
   { id: "remax", name: "RE/MAX", sub: "ישראל", desc: "רשת התיווך הגדולה בעולם" },
@@ -84,12 +134,20 @@ const PARTNERS = [
   { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
 ];
 
+// Current offer (prices before VAT). `id` is what the booking form sends (kept stable for the backend).
 const PACKAGES = [
-  { id: "consultation", name: "CONSULTATION", hebrew: "ייעוץ טלפוני", price: 0, popular: false, free: true, features: ["שיחת ייעוץ 15 דקות","הצעת מחיר מותאמת אישית","ללא התחייבות","קביעה מיידית"] },
-  { id: "essential", name: "ESSENTIAL", price: 350, popular: false, features: ["15 תמונות מעובדות AI","עיבוד תאורה מקצועי","הספקה ב-24 שעות ל-Drive","פורמט עבור יד2 / מדלן"] },
-  { id: "signature", name: "SIGNATURE", price: 400, popular: true, features: ["25 תמונות AI","סרטון 60 שניות","3 פנורמות 360°","הספקה ב-24 שעות","+ סיור וירטואלי ₪80/חודש"] },
-  { id: "prestige", name: "PRESTIGE", price: 750, popular: false, features: ["תמונות ללא הגבלה","סרטון 90 שניות + מוזיקה","פנורמות ללא הגבלה","צילום רחפן","סיור וירטואלי — חודש ראשון","RAW files","גיבוי 90 יום"] },
+  { id: "PHOTOS", tier: "essential", name: "VISIO Essential", price: 365,
+    desc: "כל מה שנכס צריך כדי לבלוט במודעה: 12 תמונות ממותגות עם שם הסוכן ו-12 ללא שם, מצולמות ב-Insta360 X4 ומוכנות לפרסום." },
+  { id: "PHOTOS_VIDEO", tier: "motion", name: "VISIO Motion", price: 400,
+    desc: "תמונות שמוכרות וסרטון שמספר: 12+12 תמונות ממותגות וסרטון שיווק שמציג את הנכס בתנועה, מוכן לרשתות ולמודעות." },
+  { id: "FULL", tier: "signature", name: "VISIO Signature", price: 450, recommended: true,
+    desc: "החבילה המלאה: 12+12 תמונות ממותגות, סרטון שיווק, צילומי רחפן DJI וסיור וירטואלי תלת-מימדי שמאפשר לקונים להתהלך בנכס מהבית.",
+    note: "הסיור כרוך במנוי חודשי של ₪40" },
+  { id: "INSTAGRAM", tier: "social", name: "VISIO Social", price: 120, unit: "לשעת עבודה",
+    desc: "שיווק תוכן אורגני לאינסטגרם, בהתאמה אישית לסוכן או למשרד.",
+    note: "רחפן בתוספת תשלום" },
 ];
+const GEAR_LINE = "הצילומים נעשים במצלמת Insta360 X4 וברחפן DJI";
 
 
 /* ═══════════════════════════════════
@@ -148,7 +206,7 @@ function HomeSection({ onNav }) {
       {/* Stats */}
       <div style={{ padding: "0 20px" }}>
         <div className="visio-stats">
-          {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["5","חבילות + ייעוץ חינם"]].map(([n,l]) => (
+          {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["12+12","תמונות ממותגות בחבילה"]].map(([n,l]) => (
             <div key={l} className="visio-stat">
               <div className="visio-stat-num"><Bidi>{n}</Bidi></div>
               <div className="visio-kicker muted">{l}</div>
@@ -185,6 +243,8 @@ function PortfolioSection() {
   const [active, setActive] = useState(null);
   const [lightboxImgs, setLightboxImgs] = useState([]);
   const [lightboxIdx, setLightboxIdx] = useState(0);
+  const [company, setCompany] = useState("all");
+  const shown = company === "all" ? PORTFOLIO : PORTFOLIO.filter(p => companyOf(p) === company);
 
   const openGallery = (gallery) => { setLightboxImgs(gallery); setLightboxIdx(0); };
   const stepGallery = (d) => setLightboxIdx(i => (i + d + lightboxImgs.length) % lightboxImgs.length);
@@ -192,6 +252,7 @@ function PortfolioSection() {
   return (
     <section className="visio-section">
       <SectionTitle sup="PORTFOLIO" title="עבודות נבחרות" sub="נכסי יוקרה · אשדוד ויבנה" />
+      <PortfolioFilter value={company} onChange={setCompany} />
 
       {/* Lightbox */}
       {lightboxImgs.length > 0 && (
@@ -210,8 +271,8 @@ function PortfolioSection() {
         </div>
       )}
 
-      <div className="visio-portfolio-grid">
-        {PORTFOLIO.map(p => {
+      <div className="visio-portfolio-grid" key={company}>
+        {shown.map((p, i) => {
           const imgs = PROPERTY_IMAGES[p.id];
           const hero = p.hero || imgs?.hero;
           const gallery = p.gallery || imgs?.gallery || [];
@@ -219,7 +280,7 @@ function PortfolioSection() {
             ? `/tours/${p.tour}`
             : (p.matterport ? `https://my.matterport.com/show/?m=${p.matterport}` : null);
           return (
-            <article key={p.id} className="visio-portfolio-card"
+            <article key={p.id} className="visio-portfolio-card" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}
               onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
 
               <div className={`visio-portfolio-img-wrap${p.fit === "contain" ? " contain" : ""}`} style={{ cursor: gallery.length ? "zoom-in" : "default" }}
@@ -285,33 +346,21 @@ function PricingSection({ onNav }) {
       {/* Cards */}
       <div className="visio-pricing-grid">
         {PACKAGES.map(pkg => (
-          <div key={pkg.id} className={`visio-price-card${pkg.popular ? " featured" : ""}`}>
-            {(pkg.free || pkg.popular) && <div className="visio-badge">{pkg.free ? "חינם" : "הנפוץ ביותר"}</div>}
-            <div className="visio-kicker muted">{pkg.hebrew || "חבילת צילום"}</div>
-            <div className="visio-price-name"><Bidi>{pkg.name}</Bidi></div>
-            <div className="visio-price">{pkg.free ? "₪0" : `₪${p(pkg.price)}`}</div>
-            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.free ? "ייעוץ חינם · ללא התחייבות" : `לצילום · ${showVat ? "כולל" : "ללא"} מע״מ`}</div>
-            <ul className="visio-price-features">
-              {pkg.features.map(f => <li key={f}>— <Bidi>{f}</Bidi></li>)}
-            </ul>
-            <button className={`visio-btn block${pkg.popular ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
+          <div key={pkg.id} className={`visio-price-card metal-${pkg.tier}${pkg.recommended ? " featured" : ""}`}>
+            {pkg.recommended && <div className="visio-badge">מומלץ</div>}
+            <img className={`visio-pkg-logo metal-${pkg.tier}`} src={`/packages/visio-${pkg.tier}.svg`} alt={pkg.name} width="96" height="96" loading="lazy" />
+            <div className="visio-price-name visio-price-name-en" dir="ltr">{pkg.name}</div>
+            <div className="visio-price">₪{p(pkg.price)}</div>
+            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.unit ? `${pkg.unit} · ` : ""}{showVat ? "כולל מע״מ" : "+ מע״מ"}</div>
+            <p className="visio-price-desc" dir="rtl"><Bidi numbers>{pkg.desc}</Bidi></p>
+            {pkg.note && <p className="visio-price-note" dir="rtl"><Bidi numbers>{`* ${pkg.note}`}</Bidi></p>}
+            <button className={`visio-btn block${pkg.recommended ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
               הזמן עכשיו ← תשלום ביום הצילום
             </button>
           </div>
         ))}
       </div>
-
-      {/* Addons */}
-      <div className="visio-addons">
-        {[["סיור וירטואלי","אירוח חודשי",80,"/ חודש"],["תמונות נוספות","מעבר להיקף החבילה",25,"/ תמונה"],["אקספרס 6 שעות","אספקה מזורזת",150,"לחבילה"],["Reels לרשתות","Instagram / TikTok 9:16",200,"לסרטון"]].map(([name,desc,price,unit]) => (
-          <div key={name} className="visio-addon">
-            <div className="visio-story-title" style={{ margin: "0 0 4px" }}><Bidi>{name}</Bidi></div>
-            <div style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}><Bidi>{desc}</Bidi></div>
-            <div className="visio-price" style={{ fontSize: 30 }}>₪{p(price)}</div>
-            <div className="visio-credit" style={{ marginTop: 6 }}>{unit}</div>
-          </div>
-        ))}
-      </div>
+      <p className="visio-gear-line" dir="rtl"><Bidi>{GEAR_LINE}</Bidi></p>
     </section>
   );
 }
@@ -329,7 +378,7 @@ function BookingSection() {
   const [selDate, setSelDate] = useState(null);
   const [selSlot, setSelSlot] = useState(null);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "SIGNATURE", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "FULL", notes: "" });
   const [done, setDone] = useState(false);
   const [wm, setWm] = useState({ agentPhone: "", logoFile: null, logoUrl: null, agentPhotoFile: null, agentPhotoUrl: null, wantAgentPhoto: false });
   const logoRef = useRef(null);
@@ -395,7 +444,7 @@ function BookingSection() {
         התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
       </p>
       <div className="visio-done-grid">
-        {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", `VISIO ${form.pkg}`], ["כתובת", form.address]].map(([l, v]) => (
+        {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", PACKAGES.find(x => x.id === form.pkg)?.name || form.pkg], ["כתובת", form.address]].map(([l, v]) => (
           <div key={l}>
             <div className="visio-kicker muted" style={{ marginBottom: 6 }}>{l}</div>
             <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}><Bidi>{v}</Bidi></div>
@@ -495,9 +544,10 @@ function BookingSection() {
               <label className="visio-label">חבילה</label>
               <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
                 <option value="CONSULTATION">ייעוץ טלפוני — חינם</option>
-                <option value="ESSENTIAL">ESSENTIAL — ₪350</option>
-                <option value="SIGNATURE">SIGNATURE — ₪400</option>
-                <option value="PRESTIGE">PRESTIGE — ₪750</option>
+                <option value="PHOTOS">VISIO Essential — ₪365 + מע״מ</option>
+                <option value="PHOTOS_VIDEO">VISIO Motion — ₪400 + מע״מ</option>
+                <option value="FULL">VISIO Signature — ₪450 + מע״מ</option>
+                <option value="INSTAGRAM">VISIO Social — ₪120 לשעת עבודה + מע״מ</option>
               </select>
             </div>
             {[["שם מלא *", "name", "שם פרטי + משפחה", "rtl"], ["טלפון *", "phone", "05X-XXXXXXX", "ltr"], ["כתובת הנכס *", "address", "רחוב, מספר, עיר", "rtl"]].map(([lbl, key, ph, dir]) => (
@@ -587,7 +637,7 @@ function CharterSection() {
     { title: "אספקה", body: "כל הצילומים יסופקו ב-Google Drive תוך 24-48 שעות מהצילום." },
     { title: "שימוש", body: "הלקוח רשאי להשתמש בתמונות לצרכי שיווק הנכס בלבד." },
     { title: "פרטיות", body: "VISIO שומרת את הזכות לפרסם עבודות לצרכי תיק עבודות, אלא אם התבקשה אחרת." },
-    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי. ניתן לבטל בכל עת עם הודעה מוקדמת." },
+    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪40 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
     { title: "אחריות", body: "VISIO אחראית לאיכות הצילום ולעמידה בלוחות הזמנים שסוכמו. שינויים לאחר הגשה ייגבו תוספת." },
     { title: "קניין רוחני", body: "כל זכויות היוצרים על התמונות והסרטונים שייכות ל-VISIO. הלקוח מקבל רישיון שימוש בלתי בלעדי." },
   ];
@@ -603,7 +653,7 @@ function CharterSection() {
           </div>
         ))}
         <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: C.muted }}>
-          לשאלות ובירורים: <a href="mailto:visio.photography.il@gmail.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>visio.photography.il@gmail.com</a>
+          לשאלות ובירורים: <a href="mailto:yoni@visioisrael.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>yoni@visioisrael.com</a>
         </p>
       </div>
     </section>
@@ -625,7 +675,7 @@ function AboutSection({ onNav }) {
         <blockquote className="visio-pullquote">נדל״ן. בצילום שמוכר.</blockquote>
 
         <div className="visio-about-grid">
-          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמות 4K · רחפן · Matterport 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
+          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
