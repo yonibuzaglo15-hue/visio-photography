@@ -275,6 +275,19 @@ button:hover { opacity: 0.85; }
 .visio-portfolio-hover { position: absolute; inset: 0; background: var(--pub-scrim); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
 .visio-portfolio-meta { padding-top: 16px; }
 
+/* ── Portfolio filter (segmented pill) ── */
+.visio-filter-wrap { display: flex; justify-content: center; margin: calc(-1 * clamp(12px, 2.5vw, 28px)) 0 clamp(32px, 5vw, 52px); padding: 0 16px; }
+.visio-filter { position: relative; display: inline-flex; align-items: stretch; direction: rtl; background: transparent; border: 1px solid color-mix(in srgb, var(--pub-ink) 22%, transparent); border-radius: 999px; padding: 3px; max-width: 100%; }
+.visio-filter-indicator { position: absolute; top: 3px; bottom: 3px; left: 0; border-radius: 999px; background: color-mix(in srgb, var(--pub-ink) 7%, transparent); border: 1px solid color-mix(in srgb, var(--pub-ink) 55%, transparent); transition: transform .38s cubic-bezier(.2,.7,.2,1), width .38s cubic-bezier(.2,.7,.2,1), opacity .2s; pointer-events: none; }
+.visio-filter-btn { position: relative; z-index: 1; background: none; border: none; cursor: pointer; font-family: var(--pub-sans); font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--pub-muted); padding: 10px 22px; min-height: 40px; border-radius: 999px; white-space: nowrap; transition: color .25s ease; -webkit-tap-highlight-color: transparent; }
+.visio-filter-btn:hover { color: var(--pub-ink); }
+.visio-filter-btn.active { color: var(--pub-ink); }
+.visio-filter-btn:focus-visible { outline: 1px solid var(--pub-ink); outline-offset: 2px; }
+.visio-portfolio-card { animation: visioCardIn .5s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes visioCardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .visio-filter-btn { padding: 9px 16px; letter-spacing: .16em; } }
+@media (prefers-reduced-motion: reduce) { .visio-portfolio-card { animation: none; } .visio-filter-indicator { transition: none; } }
+
 /* ── Lightbox ── */
 .visio-lightbox { position: fixed; inset: 0; background: var(--pub-lightbox); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; padding: 16px; }
 .visio-lightbox img { max-height: 80vh; max-width: 90vw; object-fit: contain; }
