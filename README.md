@@ -50,7 +50,7 @@ public/tours/<slug>/
 Then, in the `PORTFOLIO` array in `src/App.jsx`, set `tour` on the property. The card button opens `/tours/<slug>` on this site. Leave `matterport` in place if you still want the original model id recorded. Cards without `tour` keep opening Matterport. A card can also set `hero` and `gallery` to stills in this folder when it has no entry in `PROPERTY_IMAGES`.
 
 ```js
-{ title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }
+{ title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }
 ```
 
 `title` and `location` are joined in the tour header and the browser tab (`דירה · אשדוד · שבט לוי 11`). Optional `aliases` are extra slugs for the same folder. `/tours/shevet-levi-11` opens this apartment; the panoramas still load from `/tours/ashdod-apartment`.
