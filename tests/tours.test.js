@@ -115,12 +115,12 @@ describe("portfolio tour wiring", () => {
     expect(card?.title).toBe("שבט זבולון 5 · אשדוד");
     expect(card?.company).toBe("remax");
     expect(card?.tour).toBe("shevet-zevulun");
-    const order = Array.from({ length: 14 }, (_, i) => String(i + 1).padStart(2, "0"));
+    const order = Array.from({ length: 19 }, (_, i) => String(i + 1).padStart(2, "0"));
     expect(card?.hero).toBe("/portfolio/shevet-zevulun/01.jpg");
     expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-zevulun/${n}.jpg`));
     expect(card?.gallery.join(" ")).not.toMatch(/cover\.jpg|stills\//);
     for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
-    // sequential 01..14 only, no leftovers from the previous set; every still is 2560x1440
+    // sequential 01..19 only, no leftovers from the previous set; every still is 2560x1440
     const files = fs.readdirSync("public/portfolio/shevet-zevulun").sort();
     expect(files).toEqual(order.map((n) => `${n}.jpg`));
     for (const f of files) expect(jpegSize(`public/portfolio/shevet-zevulun/${f}`)).toEqual({ width: 2560, height: 1440 });
