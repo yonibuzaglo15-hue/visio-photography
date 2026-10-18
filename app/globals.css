@@ -263,6 +263,10 @@ button:hover { opacity: 0.85; }
 .visio-section-sub { font-family: var(--pub-serif); font-size: 18px; line-height: var(--pub-lh-heading); color: var(--pub-muted); margin: 0; }
 
 /* ── Portfolio ── */
+.visio-region-list { display: flex; flex-direction: column; gap: clamp(56px, 8vw, 96px); }
+.visio-region-head { max-width: 1280px; margin: 0 auto clamp(24px, 4vw, 40px); }
+.visio-region-head .visio-kicker { font-family: var(--pub-serif, inherit); font-size: clamp(18px, 2.4vw, 24px); letter-spacing: .08em; }
+.visio-region-count { font-size: 11px; font-weight: 600; letter-spacing: .22em; color: var(--pub-muted); }
 .visio-portfolio-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px 32px; }
 .visio-portfolio-img-wrap { aspect-ratio: 4 / 3; background: var(--pub-bg-2); position: relative; overflow: hidden; }
 .visio-portfolio-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }

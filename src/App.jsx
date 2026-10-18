@@ -65,28 +65,51 @@ function StoryImage({ id, title }) {
 
 /* ─── DATA ─── */
 const PORTFOLIO = [
-  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
-  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
-  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", tag: "בוטיק", partner: "ReHouse", company: "rehouse", matterport: "cEtmuBEsSNq", hero: "/portfolio/nahal-snir-21/01.jpg", gallery: ["/portfolio/nahal-snir-21/01.jpg", "/portfolio/nahal-snir-21/02.jpg", "/portfolio/nahal-snir-21/03.jpg", "/portfolio/nahal-snir-21/04.jpg", "/portfolio/nahal-snir-21/05.jpg", "/portfolio/nahal-snir-21/06.jpg", "/portfolio/nahal-snir-21/07.jpg", "/portfolio/nahal-snir-21/08.jpg", "/portfolio/nahal-snir-21/09.jpg", "/portfolio/nahal-snir-21/10.jpg"], tags: ["קיר שיש","פרקט","בוטיק"] },
-  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", tag: "לובי יוקרה", partner: "ReHouse", company: "rehouse", matterport: "9YJGFmX8KbJ", hero: "/portfolio/balfour-7/01.jpg", gallery: ["/portfolio/balfour-7/01.jpg", "/portfolio/balfour-7/02.jpg", "/portfolio/balfour-7/03.jpg", "/portfolio/balfour-7/04.jpg", "/portfolio/balfour-7/05.jpg", "/portfolio/balfour-7/06.jpg", "/portfolio/balfour-7/07.jpg", "/portfolio/balfour-7/08.jpg", "/portfolio/balfour-7/09.jpg", "/portfolio/balfour-7/10.jpg"], tags: ["לובי יוקרה","שיש"] },
-  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
-  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", tag: "דירת גן", partner: "ReHouse", company: "rehouse", matterport: "C6Uvbihrqvm", hero: "/portfolio/hamashot-8/01.jpg", gallery: ["/portfolio/hamashot-8/01.jpg", "/portfolio/hamashot-8/02.jpg", "/portfolio/hamashot-8/03.jpg", "/portfolio/hamashot-8/04.jpg", "/portfolio/hamashot-8/05.jpg", "/portfolio/hamashot-8/06.jpg", "/portfolio/hamashot-8/07.jpg", "/portfolio/hamashot-8/08.jpg", "/portfolio/hamashot-8/09.jpg"], tags: ["גינה","שיש","סלון"] },
-  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
-  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
-  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
-  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
-  { id: 11, title: "רוטשילד 23 · אשדוד", sub: "רובע ט״ו", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/rothschild-23/01.jpg", gallery: ["/portfolio/rothschild-23/01.jpg", "/portfolio/rothschild-23/02.jpg", "/portfolio/rothschild-23/03.jpg", "/portfolio/rothschild-23/04.jpg", "/portfolio/rothschild-23/05.jpg", "/portfolio/rothschild-23/06.jpg", "/portfolio/rothschild-23/07.jpg", "/portfolio/rothschild-23/08.jpg", "/portfolio/rothschild-23/09.jpg"], tags: ["סלון","מרפסת","מטבח"] },
-  { id: 12, title: "נחל לכיש 45 · אשדוד", sub: "רובע י״א", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/nahal-lachish-45/01.jpg", gallery: ["/portfolio/nahal-lachish-45/01.jpg", "/portfolio/nahal-lachish-45/02.jpg", "/portfolio/nahal-lachish-45/03.jpg", "/portfolio/nahal-lachish-45/04.jpg", "/portfolio/nahal-lachish-45/05.jpg", "/portfolio/nahal-lachish-45/06.jpg", "/portfolio/nahal-lachish-45/07.jpg", "/portfolio/nahal-lachish-45/08.jpg", "/portfolio/nahal-lachish-45/09.jpg", "/portfolio/nahal-lachish-45/10.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
-  { id: 13, title: "יהויכין 11 · אשדוד", sub: "רובע י״ג", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/yehoyachin-11/01.jpg", gallery: ["/portfolio/yehoyachin-11/01.jpg", "/portfolio/yehoyachin-11/02.jpg", "/portfolio/yehoyachin-11/03.jpg", "/portfolio/yehoyachin-11/04.jpg", "/portfolio/yehoyachin-11/05.jpg", "/portfolio/yehoyachin-11/06.jpg", "/portfolio/yehoyachin-11/07.jpg", "/portfolio/yehoyachin-11/08.jpg", "/portfolio/yehoyachin-11/09.jpg"], tags: ["סלון","מרפסת"] },
-  { id: 14, title: "ביאליק 46 · אשדוד", sub: "רובע ה׳", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/bialik-46/01.jpg", gallery: ["/portfolio/bialik-46/01.jpg", "/portfolio/bialik-46/02.jpg", "/portfolio/bialik-46/03.jpg", "/portfolio/bialik-46/04.jpg", "/portfolio/bialik-46/05.jpg", "/portfolio/bialik-46/06.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
-  { id: 15, title: "חסידא 17 · אשדוד", sub: "רובע ז׳", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/chasida-17/01.jpg", gallery: ["/portfolio/chasida-17/01.jpg", "/portfolio/chasida-17/02.jpg", "/portfolio/chasida-17/03.jpg", "/portfolio/chasida-17/04.jpg", "/portfolio/chasida-17/05.jpg", "/portfolio/chasida-17/06.jpg", "/portfolio/chasida-17/07.jpg", "/portfolio/chasida-17/08.jpg", "/portfolio/chasida-17/09.jpg", "/portfolio/chasida-17/10.jpg"], tags: ["מטבח","פינת אוכל"] },
-  { id: 16, title: "שבט זבולון 5 - גיא רוזן", sub: "רובע י״ב · מרפסת · סלון · מטבח · 32 נקודות", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "shevet-zevulun", hero: "/portfolio/shevet-zevulun/cover.jpg", gallery: ["/portfolio/shevet-zevulun/01.jpg", "/portfolio/shevet-zevulun/02.jpg", "/portfolio/shevet-zevulun/03.jpg", "/portfolio/shevet-zevulun/04.jpg", "/portfolio/shevet-zevulun/05.jpg", "/portfolio/shevet-zevulun/06.jpg", "/portfolio/shevet-zevulun/07.jpg", "/portfolio/shevet-zevulun/08.jpg", "/portfolio/shevet-zevulun/09.jpg", "/portfolio/shevet-zevulun/10.jpg", "/portfolio/shevet-zevulun/11.jpg", "/portfolio/shevet-zevulun/12.jpg", "/portfolio/shevet-zevulun/13.jpg", "/portfolio/shevet-zevulun/14.jpg", "/portfolio/shevet-zevulun/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", city: "אשדוד", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
+  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", city: "אשדוד", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
+  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", city: "אשדוד", tag: "בוטיק", partner: "ReHouse", company: "rehouse", matterport: "Z76pbSkPMXX", hero: "/portfolio/nahal-snir-21/01.jpg", gallery: ["/portfolio/nahal-snir-21/01.jpg", "/portfolio/nahal-snir-21/02.jpg", "/portfolio/nahal-snir-21/03.jpg", "/portfolio/nahal-snir-21/04.jpg", "/portfolio/nahal-snir-21/05.jpg", "/portfolio/nahal-snir-21/06.jpg", "/portfolio/nahal-snir-21/07.jpg", "/portfolio/nahal-snir-21/08.jpg", "/portfolio/nahal-snir-21/09.jpg", "/portfolio/nahal-snir-21/10.jpg"], tags: ["קיר שיש","פרקט","בוטיק"] },
+  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", city: "אשדוד", tag: "לובי יוקרה", partner: "ReHouse", company: "rehouse", matterport: "9YJGFmX8KbJ", hero: "/portfolio/balfour-7/01.jpg", gallery: ["/portfolio/balfour-7/01.jpg", "/portfolio/balfour-7/02.jpg", "/portfolio/balfour-7/03.jpg", "/portfolio/balfour-7/04.jpg", "/portfolio/balfour-7/05.jpg", "/portfolio/balfour-7/06.jpg", "/portfolio/balfour-7/07.jpg", "/portfolio/balfour-7/08.jpg", "/portfolio/balfour-7/09.jpg", "/portfolio/balfour-7/10.jpg"], tags: ["לובי יוקרה","שיש"] },
+  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", city: "יבנה", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
+  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", city: "אשדוד", tag: "דירת גן", partner: "ReHouse", company: "rehouse", matterport: "C6Uvbihrqvm", hero: "/portfolio/hamashot-8/01.jpg", gallery: ["/portfolio/hamashot-8/01.jpg", "/portfolio/hamashot-8/02.jpg", "/portfolio/hamashot-8/03.jpg", "/portfolio/hamashot-8/04.jpg", "/portfolio/hamashot-8/05.jpg", "/portfolio/hamashot-8/06.jpg", "/portfolio/hamashot-8/07.jpg", "/portfolio/hamashot-8/08.jpg", "/portfolio/hamashot-8/09.jpg"], tags: ["גינה","שיש","סלון"] },
+  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", city: "אשדוד", tag: "דירת גן + פרגולה", partner: "ReHouse", matterport: "Xh34KkeoLb5", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
+  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", city: "אשדוד", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
+  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", city: "אשדוד", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
+  { id: 11, title: "רוטשילד 23 · אשדוד", sub: "רובע ט״ו", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/rothschild-23/01.jpg", gallery: ["/portfolio/rothschild-23/01.jpg", "/portfolio/rothschild-23/02.jpg", "/portfolio/rothschild-23/03.jpg", "/portfolio/rothschild-23/04.jpg", "/portfolio/rothschild-23/05.jpg", "/portfolio/rothschild-23/06.jpg", "/portfolio/rothschild-23/07.jpg", "/portfolio/rothschild-23/08.jpg", "/portfolio/rothschild-23/09.jpg"], tags: ["סלון","מרפסת","מטבח"] },
+  { id: 12, title: "נחל לכיש 45 · אשדוד", sub: "רובע י״א", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/nahal-lachish-45/01.jpg", gallery: ["/portfolio/nahal-lachish-45/01.jpg", "/portfolio/nahal-lachish-45/02.jpg", "/portfolio/nahal-lachish-45/03.jpg", "/portfolio/nahal-lachish-45/04.jpg", "/portfolio/nahal-lachish-45/05.jpg", "/portfolio/nahal-lachish-45/06.jpg", "/portfolio/nahal-lachish-45/07.jpg", "/portfolio/nahal-lachish-45/08.jpg", "/portfolio/nahal-lachish-45/09.jpg", "/portfolio/nahal-lachish-45/10.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
+  { id: 13, title: "יהויכין 11 · אשדוד", sub: "רובע י״ג", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/yehoyachin-11/01.jpg", gallery: ["/portfolio/yehoyachin-11/01.jpg", "/portfolio/yehoyachin-11/02.jpg", "/portfolio/yehoyachin-11/03.jpg", "/portfolio/yehoyachin-11/04.jpg", "/portfolio/yehoyachin-11/05.jpg", "/portfolio/yehoyachin-11/06.jpg", "/portfolio/yehoyachin-11/07.jpg", "/portfolio/yehoyachin-11/08.jpg", "/portfolio/yehoyachin-11/09.jpg"], tags: ["סלון","מרפסת"] },
+  { id: 14, title: "ביאליק 46 · אשדוד", sub: "רובע ה׳", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/bialik-46/01.jpg", gallery: ["/portfolio/bialik-46/01.jpg", "/portfolio/bialik-46/02.jpg", "/portfolio/bialik-46/03.jpg", "/portfolio/bialik-46/04.jpg", "/portfolio/bialik-46/05.jpg", "/portfolio/bialik-46/06.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
+  { id: 15, title: "חסידא 17 · אשדוד", sub: "רובע ז׳", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/chasida-17/01.jpg", gallery: ["/portfolio/chasida-17/01.jpg", "/portfolio/chasida-17/02.jpg", "/portfolio/chasida-17/03.jpg", "/portfolio/chasida-17/04.jpg", "/portfolio/chasida-17/05.jpg", "/portfolio/chasida-17/06.jpg", "/portfolio/chasida-17/07.jpg", "/portfolio/chasida-17/08.jpg", "/portfolio/chasida-17/09.jpg", "/portfolio/chasida-17/10.jpg"], tags: ["מטבח","פינת אוכל"] },
+  { id: 16, title: "שבט זבולון 5 - גיא רוזן", sub: "רובע י״ב · מרפסת · סלון · מטבח · 32 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "shevet-zevulun", hero: "/portfolio/shevet-zevulun/cover.jpg", gallery: ["/portfolio/shevet-zevulun/01.jpg", "/portfolio/shevet-zevulun/02.jpg", "/portfolio/shevet-zevulun/03.jpg", "/portfolio/shevet-zevulun/04.jpg", "/portfolio/shevet-zevulun/05.jpg", "/portfolio/shevet-zevulun/06.jpg", "/portfolio/shevet-zevulun/07.jpg", "/portfolio/shevet-zevulun/08.jpg", "/portfolio/shevet-zevulun/09.jpg", "/portfolio/shevet-zevulun/10.jpg", "/portfolio/shevet-zevulun/11.jpg", "/portfolio/shevet-zevulun/12.jpg", "/portfolio/shevet-zevulun/13.jpg", "/portfolio/shevet-zevulun/14.jpg", "/portfolio/shevet-zevulun/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 17, title: "שבט לוי 4 - יאן שינדלמן", sub: "רובע י״ב · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "xZ4M9pKzoBr", hero: "/portfolio/shevet-levi-4/cover.jpg", gallery: ["/portfolio/shevet-levi-4/01.jpg", "/portfolio/shevet-levi-4/02.jpg", "/portfolio/shevet-levi-4/03.jpg", "/portfolio/shevet-levi-4/04.jpg", "/portfolio/shevet-levi-4/05.jpg", "/portfolio/shevet-levi-4/06.jpg", "/portfolio/shevet-levi-4/07.jpg", "/portfolio/shevet-levi-4/08.jpg", "/portfolio/shevet-levi-4/09.jpg", "/portfolio/shevet-levi-4/10.jpg", "/portfolio/shevet-levi-4/11.jpg", "/portfolio/shevet-levi-4/12.jpg", "/portfolio/shevet-levi-4/13.jpg", "/portfolio/shevet-levi-4/14.jpg"], tags: ["מרפסת","נוף","מטבח","סיור וירטואלי 3D"] },
+  { id: 18, title: "העצמאות 21 - יאן שינדלמן", sub: "סיטי · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "eqKC1zuQDfa", hero: "/portfolio/atzmaut-21/cover.jpg", gallery: ["/portfolio/atzmaut-21/01.jpg", "/portfolio/atzmaut-21/02.jpg", "/portfolio/atzmaut-21/03.jpg", "/portfolio/atzmaut-21/04.jpg", "/portfolio/atzmaut-21/05.jpg", "/portfolio/atzmaut-21/06.jpg", "/portfolio/atzmaut-21/07.jpg", "/portfolio/atzmaut-21/08.jpg", "/portfolio/atzmaut-21/09.jpg", "/portfolio/atzmaut-21/10.jpg", "/portfolio/atzmaut-21/11.jpg", "/portfolio/atzmaut-21/12.jpg", "/portfolio/atzmaut-21/13.jpg", "/portfolio/atzmaut-21/14.jpg", "/portfolio/atzmaut-21/15.jpg", "/portfolio/atzmaut-21/16.jpg", "/portfolio/atzmaut-21/17.jpg", "/portfolio/atzmaut-21/18.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 19, title: "הציונות 55 - יאן שינדלמן", sub: "סיטי · אשדוד", city: "אשדוד", tag: "פנטהאוז + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "m1ArnEzVJCY", hero: "/portfolio/tzionut-55/cover.jpg", gallery: ["/portfolio/tzionut-55/01.jpg", "/portfolio/tzionut-55/02.jpg", "/portfolio/tzionut-55/03.jpg", "/portfolio/tzionut-55/04.jpg", "/portfolio/tzionut-55/05.jpg", "/portfolio/tzionut-55/06.jpg", "/portfolio/tzionut-55/07.jpg", "/portfolio/tzionut-55/08.jpg", "/portfolio/tzionut-55/09.jpg", "/portfolio/tzionut-55/10.jpg", "/portfolio/tzionut-55/11.jpg", "/portfolio/tzionut-55/12.jpg", "/portfolio/tzionut-55/13.jpg", "/portfolio/tzionut-55/14.jpg"], tags: ["פנטהאוז","בריכה","מרפסת גג","נוף","סיור וירטואלי 3D"] },
+  { id: 20, title: "הכלנית 7א - יאן שינדלמן", sub: "רובע ח׳ · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "YcGsq9ppCTT", hero: "/portfolio/kalanit-7a/cover.jpg", gallery: ["/portfolio/kalanit-7a/01.jpg", "/portfolio/kalanit-7a/02.jpg", "/portfolio/kalanit-7a/03.jpg", "/portfolio/kalanit-7a/04.jpg", "/portfolio/kalanit-7a/05.jpg", "/portfolio/kalanit-7a/06.jpg", "/portfolio/kalanit-7a/07.jpg", "/portfolio/kalanit-7a/08.jpg", "/portfolio/kalanit-7a/09.jpg", "/portfolio/kalanit-7a/10.jpg", "/portfolio/kalanit-7a/11.jpg", "/portfolio/kalanit-7a/12.jpg", "/portfolio/kalanit-7a/13.jpg", "/portfolio/kalanit-7a/14.jpg", "/portfolio/kalanit-7a/15.jpg", "/portfolio/kalanit-7a/16.jpg", "/portfolio/kalanit-7a/17.jpg", "/portfolio/kalanit-7a/18.jpg", "/portfolio/kalanit-7a/19.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 21, title: "אוסישקין 21 - יאן שינדלמן", sub: "רובע ט״ו · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "x8CmoHwwyA1", hero: "/portfolio/ussishkin-21/cover.jpg", gallery: ["/portfolio/ussishkin-21/01.jpg", "/portfolio/ussishkin-21/02.jpg", "/portfolio/ussishkin-21/03.jpg", "/portfolio/ussishkin-21/04.jpg", "/portfolio/ussishkin-21/05.jpg", "/portfolio/ussishkin-21/06.jpg", "/portfolio/ussishkin-21/07.jpg", "/portfolio/ussishkin-21/08.jpg", "/portfolio/ussishkin-21/09.jpg", "/portfolio/ussishkin-21/10.jpg", "/portfolio/ussishkin-21/11.jpg", "/portfolio/ussishkin-21/12.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 22, title: "פתח תקווה 9 - יאן שינדלמן", sub: "רובע ט׳ · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "FkkW9mVhJC4", hero: "/portfolio/petah-tikva-9/cover.jpg", gallery: ["/portfolio/petah-tikva-9/01.jpg", "/portfolio/petah-tikva-9/02.jpg", "/portfolio/petah-tikva-9/03.jpg", "/portfolio/petah-tikva-9/04.jpg", "/portfolio/petah-tikva-9/05.jpg", "/portfolio/petah-tikva-9/06.jpg", "/portfolio/petah-tikva-9/07.jpg", "/portfolio/petah-tikva-9/08.jpg", "/portfolio/petah-tikva-9/09.jpg", "/portfolio/petah-tikva-9/10.jpg", "/portfolio/petah-tikva-9/11.jpg", "/portfolio/petah-tikva-9/12.jpg", "/portfolio/petah-tikva-9/13.jpg", "/portfolio/petah-tikva-9/14.jpg", "/portfolio/petah-tikva-9/15.jpg", "/portfolio/petah-tikva-9/16.jpg", "/portfolio/petah-tikva-9/17.jpg"], tags: ["מרפסת גג","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 23, title: "שי עגנון 21 - יאן שינדלמן", sub: "עתיקות · אשקלון", city: "אשקלון", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "JN6a8HHqRpX", hero: "/portfolio/agnon-21/cover.jpg", gallery: ["/portfolio/agnon-21/01.jpg", "/portfolio/agnon-21/02.jpg", "/portfolio/agnon-21/03.jpg", "/portfolio/agnon-21/04.jpg", "/portfolio/agnon-21/05.jpg", "/portfolio/agnon-21/06.jpg", "/portfolio/agnon-21/07.jpg", "/portfolio/agnon-21/08.jpg", "/portfolio/agnon-21/09.jpg", "/portfolio/agnon-21/10.jpg", "/portfolio/agnon-21/11.jpg"], tags: ["סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 24, title: "נחל שניר 9 - יאן שינדלמן", sub: "רובע י״א · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "mDADwNnNKtD", hero: "/portfolio/nahal-snir-9/cover.jpg", gallery: ["/portfolio/nahal-snir-9/01.jpg", "/portfolio/nahal-snir-9/02.jpg", "/portfolio/nahal-snir-9/03.jpg", "/portfolio/nahal-snir-9/04.jpg", "/portfolio/nahal-snir-9/05.jpg", "/portfolio/nahal-snir-9/06.jpg", "/portfolio/nahal-snir-9/07.jpg", "/portfolio/nahal-snir-9/08.jpg", "/portfolio/nahal-snir-9/09.jpg", "/portfolio/nahal-snir-9/10.jpg", "/portfolio/nahal-snir-9/11.jpg", "/portfolio/nahal-snir-9/12.jpg", "/portfolio/nahal-snir-9/13.jpg"], tags: ["סלון","מטבח","מרפסת","סיור וירטואלי 3D"] },
+  { id: 25, title: "מיכה הנביא 13 - יאן שינדלמן", sub: "רובע י׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/micha-hanavi-13/cover.jpg", gallery: ["/portfolio/micha-hanavi-13/01.jpg", "/portfolio/micha-hanavi-13/02.jpg", "/portfolio/micha-hanavi-13/03.jpg", "/portfolio/micha-hanavi-13/04.jpg", "/portfolio/micha-hanavi-13/05.jpg", "/portfolio/micha-hanavi-13/06.jpg", "/portfolio/micha-hanavi-13/07.jpg", "/portfolio/micha-hanavi-13/08.jpg", "/portfolio/micha-hanavi-13/09.jpg", "/portfolio/micha-hanavi-13/10.jpg", "/portfolio/micha-hanavi-13/11.jpg", "/portfolio/micha-hanavi-13/12.jpg", "/portfolio/micha-hanavi-13/13.jpg", "/portfolio/micha-hanavi-13/14.jpg"], tags: ["סלון","מטבח"] },
+  { id: 26, title: "הרב קוק 19 - יאן שינדלמן", sub: "רובע ב׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/harav-kook-19/cover.jpg", gallery: ["/portfolio/harav-kook-19/01.jpg", "/portfolio/harav-kook-19/02.jpg", "/portfolio/harav-kook-19/03.jpg", "/portfolio/harav-kook-19/04.jpg", "/portfolio/harav-kook-19/05.jpg", "/portfolio/harav-kook-19/06.jpg", "/portfolio/harav-kook-19/07.jpg", "/portfolio/harav-kook-19/08.jpg", "/portfolio/harav-kook-19/09.jpg", "/portfolio/harav-kook-19/10.jpg", "/portfolio/harav-kook-19/11.jpg", "/portfolio/harav-kook-19/12.jpg", "/portfolio/harav-kook-19/13.jpg", "/portfolio/harav-kook-19/14.jpg", "/portfolio/harav-kook-19/15.jpg", "/portfolio/harav-kook-19/16.jpg"], tags: ["סלון","מטבח"] },
+  { id: 27, title: "האשכול 8 - יאן שינדלמן", sub: "רובע א׳ · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "mWxuq2zaKdZ", hero: "/portfolio/haeshkol-8/cover.jpg", gallery: ["/portfolio/haeshkol-8/01.jpg", "/portfolio/haeshkol-8/02.jpg", "/portfolio/haeshkol-8/03.jpg", "/portfolio/haeshkol-8/04.jpg", "/portfolio/haeshkol-8/05.jpg", "/portfolio/haeshkol-8/06.jpg", "/portfolio/haeshkol-8/07.jpg", "/portfolio/haeshkol-8/08.jpg", "/portfolio/haeshkol-8/09.jpg", "/portfolio/haeshkol-8/10.jpg", "/portfolio/haeshkol-8/11.jpg", "/portfolio/haeshkol-8/12.jpg", "/portfolio/haeshkol-8/13.jpg", "/portfolio/haeshkol-8/14.jpg", "/portfolio/haeshkol-8/15.jpg", "/portfolio/haeshkol-8/16.jpg"], tags: ["נוף","מטבח","סלון","סיור וירטואלי 3D"] },
+  { id: 28, title: "מילמן 2 - יאן שינדלמן", sub: "רובע ו׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/milman-2/cover.jpg", gallery: ["/portfolio/milman-2/01.jpg", "/portfolio/milman-2/02.jpg", "/portfolio/milman-2/03.jpg", "/portfolio/milman-2/04.jpg", "/portfolio/milman-2/05.jpg", "/portfolio/milman-2/06.jpg", "/portfolio/milman-2/07.jpg", "/portfolio/milman-2/08.jpg", "/portfolio/milman-2/09.jpg", "/portfolio/milman-2/10.jpg", "/portfolio/milman-2/11.jpg", "/portfolio/milman-2/12.jpg", "/portfolio/milman-2/13.jpg", "/portfolio/milman-2/14.jpg", "/portfolio/milman-2/15.jpg", "/portfolio/milman-2/16.jpg", "/portfolio/milman-2/17.jpg", "/portfolio/milman-2/18.jpg", "/portfolio/milman-2/19.jpg"], tags: ["סלון","מטבח","מרפסת"] },
 ];
 
 const COVER_ID = 8;
 
 // Company of a card: explicit `company`, otherwise derived from `partner`.
 const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
+// City of a card: explicit `city`, otherwise the last "·" segment of sub/title that names a known city.
+const KNOWN_CITIES = ["אשדוד", "אשקלון", "יבנה"];
+export const cityOf = (p) => p.city || [p.sub, p.title].map(t => (t || "").split("·").map(x => x.trim()).reverse().find(x => KNOWN_CITIES.includes(x))).find(Boolean) || "אחר";
+// Region sections for a list of cards: אשדוד first, then אשקלון, יבנה, then any other city (A-Z); card order kept inside each section.
+export const groupByCity = (cards) => {
+  const order = ["אשדוד", "אשקלון", "יבנה"];
+  const map = new Map();
+  for (const p of cards) { const c = cityOf(p); if (!map.has(c)) map.set(c, []); map.get(c).push(p); }
+  const rank = (c) => (order.includes(c) ? order.indexOf(c) : order.length);
+  return [...map.entries()].sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b, "he")).map(([city, items]) => ({ city, items }));
+};
 // Card tag line: the card's tags plus "3D TOUR" when it has a tour (unless a tag already says 3D).
 // The partner/agency is never shown on a card: VISIO is presented purely as the photographer.
 export const cardTagLine = (p) => {
@@ -310,9 +333,58 @@ function PortfolioSection() {
   const stepGallery = useCallback((d) => setLightboxIdx(i => (i + d + nImgs) % nImgs), [nImgs]);
   const closeGallery = useCallback(() => setLightboxImgs([]), []);
 
+  const renderCard = (p, i) => {
+    const imgs = PROPERTY_IMAGES[p.id];
+    const hero = p.hero || imgs?.hero;
+    const gallery = p.gallery || imgs?.gallery || [];
+    const tourHref = p.tour
+      ? `/tours/${p.tour}`
+      : (p.matterport ? `https://my.matterport.com/show/?m=${p.matterport}` : null);
+    return (
+      <article key={p.id} className="visio-portfolio-card" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}
+        onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
+
+        <div className={`visio-portfolio-img-wrap${p.fit === "contain" ? " contain" : ""}`} style={{ cursor: gallery.length ? "zoom-in" : "default" }}
+          onClick={() => { if (gallery.length) openGallery(gallery); }}>
+          {hero ? <img src={hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
+          {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
+
+          {active === p.id && (tourHref || gallery.length > 0) && (
+            <div className="visio-portfolio-hover" onClick={e => e.stopPropagation()}>
+              {tourHref && (
+                <a
+                  className="visio-btn on-image"
+                  href={tourHref}
+                  style={{ textDecoration: "none" }}
+                  {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                >
+                  ▶ סיור וירטואלי 3D
+                </a>
+              )}
+              {gallery.length > 0 && (
+                <button className="visio-btn on-image outline" onClick={() => openGallery(gallery)}>
+                  ⊞ גלריית תמונות ({gallery.length})
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="visio-portfolio-meta">
+          {p.tag && <div className="visio-kicker">{p.tag}</div>}
+          <h3 className="visio-story-title">{p.title}</h3>
+          <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
+          <div className="visio-credit">
+            <Bidi>{cardTagLine(p)}</Bidi>
+          </div>
+        </div>
+      </article>
+    );
+  };
+
   return (
     <section className="visio-section">
-      <SectionTitle sup="PORTFOLIO" title="עבודות נבחרות" sub="נכסי יוקרה · אשדוד ויבנה" />
+      <SectionTitle sup="PORTFOLIO" title="עבודות נבחרות" sub="נכסי יוקרה · אשדוד · אשקלון · יבנה" />
       <PortfolioFilter value={company} onChange={setCompany} />
 
       {/* Lightbox */}
@@ -320,56 +392,25 @@ function PortfolioSection() {
         <Lightbox imgs={lightboxImgs} idx={lightboxIdx} onStep={stepGallery} onClose={closeGallery} />
       )}
 
-      <div className="visio-portfolio-grid" key={company}>
-        {shown.map((p, i) => {
-          const imgs = PROPERTY_IMAGES[p.id];
-          const hero = p.hero || imgs?.hero;
-          const gallery = p.gallery || imgs?.gallery || [];
-          const tourHref = p.tour
-            ? `/tours/${p.tour}`
-            : (p.matterport ? `https://my.matterport.com/show/?m=${p.matterport}` : null);
-          return (
-            <article key={p.id} className="visio-portfolio-card" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}
-              onMouseEnter={() => setActive(p.id)} onMouseLeave={() => setActive(null)}>
-
-              <div className={`visio-portfolio-img-wrap${p.fit === "contain" ? " contain" : ""}`} style={{ cursor: gallery.length ? "zoom-in" : "default" }}
-                onClick={() => { if (gallery.length) openGallery(gallery); }}>
-                {hero ? <img src={hero} alt={p.title} /> : <div className="visio-placeholder"><Bidi>VISIO</Bidi></div>}
-                {gallery.length > 1 && <div className="visio-img-label left">⊞ {gallery.length}</div>}
-
-                {active === p.id && (tourHref || gallery.length > 0) && (
-                  <div className="visio-portfolio-hover" onClick={e => e.stopPropagation()}>
-                    {tourHref && (
-                      <a
-                        className="visio-btn on-image"
-                        href={tourHref}
-                        style={{ textDecoration: "none" }}
-                        {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
-                      >
-                        ▶ סיור וירטואלי 3D
-                      </a>
-                    )}
-                    {gallery.length > 0 && (
-                      <button className="visio-btn on-image outline" onClick={() => openGallery(gallery)}>
-                        ⊞ גלריית תמונות ({gallery.length})
-                      </button>
-                    )}
-                  </div>
-                )}
+      {company === "rehouse" ? (
+        <div className="visio-region-list">
+          {groupByCity(shown).map(({ city, items }) => (
+            <section key={city} className="visio-region" aria-label={city} data-city={city}>
+              <div className="visio-rule-head visio-region-head">
+                <span className="visio-kicker">{city}</span>
+                <span className="visio-region-count" dir="ltr">{items.length}</span>
               </div>
-
-              <div className="visio-portfolio-meta">
-                {p.tag && <div className="visio-kicker">{p.tag}</div>}
-                <h3 className="visio-story-title">{p.title}</h3>
-                <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
-                <div className="visio-credit">
-                  <Bidi>{cardTagLine(p)}</Bidi>
-                </div>
+              <div className="visio-portfolio-grid" key={`${company}-${city}`}>
+                {items.map(renderCard)}
               </div>
-            </article>
-          );
-        })}
-      </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div className="visio-portfolio-grid" key={company}>
+          {shown.map(renderCard)}
+        </div>
+      )}
     </section>
   );
 }
