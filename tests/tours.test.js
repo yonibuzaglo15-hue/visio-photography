@@ -45,6 +45,25 @@ describe("hosted tours", () => {
     expect(tour.assetBase).toBe("/tours/ashdod-apartment");
   });
 
+  it("loads the self-hosted שבט זבולון tour", () => {
+    expect(listTourSlugs()).toContain("shevet-zevulun");
+    const tour = loadTour("shevet-zevulun");
+    expect(tour).toBeTruthy();
+    expect(tour.scenes).toHaveLength(32);
+    expect(tour.firstScene).toBe("z21");
+    expect(tour.assetBase).toBe("/tours/shevet-zevulun");
+    expect(tour.location.startsWith("שבט זבולון")).toBe(true);
+    const ids = new Set(tour.scenes.map((scene) => scene.id));
+    for (const scene of tour.scenes) {
+      expect(scene.hotspots.length).toBeGreaterThan(0);
+      for (const h of scene.hotspots) {
+        expect(ids.has(h.scene)).toBe(true);
+        expect(h.pitch).toBeLessThanOrEqual(-12);
+        expect(h.pitch).toBeGreaterThanOrEqual(-60);
+      }
+    }
+  });
+
   it("rejects unsafe slugs", () => {
     expect(loadTour("../etc")).toBeNull();
     expect(loadTour("nope")).toBeNull();
@@ -75,6 +94,15 @@ describe("portfolio tour wiring", () => {
     const css = fs.readFileSync("app/globals.css", "utf8");
     expect(css).toMatch(/\.visio-portfolio-img-wrap\.contain img \{ object-fit: contain/);
     expect(portfolio.filter((item) => item.fit === "contain").map((item) => item.id)).toEqual([10]);
+  });
+
+  it("points the שבט זבולון card at its hosted tour without 360 crops in the gallery", () => {
+    const card = portfolio.find((item) => item.tour === "shevet-zevulun");
+    expect(card?.title).toBe("שבט זבולון · אשדוד");
+    expect(card?.company).toBe("remax");
+    expect(card?.hero).toBe("/portfolio/shevet-zevulun/cover.jpg");
+    expect(card?.gallery).toEqual([]);
+    expect(fs.existsSync("public/portfolio/shevet-zevulun/cover.jpg")).toBe(true);
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
