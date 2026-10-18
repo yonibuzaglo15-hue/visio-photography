@@ -59,6 +59,7 @@ function tip(hotSpotDiv, text) {
 export default function TourViewer({ tour }) {
   const panoRef = useRef(null);
   const viewerRef = useRef(null);
+  const coneRef = useRef(null);
   const [room, setRoom] = useState("");
   const [sceneId, setSceneId] = useState(tour.firstScene || tour.scenes[0]?.id || "");
   const [roomsOpen, setRoomsOpen] = useState(false);
@@ -154,6 +155,29 @@ export default function TourViewer({ tour }) {
     };
   }, [tour]);
 
+  // Optional view cone on the minimap: scenes whose map entry carries a `heading`
+  // (map bearing of pano yaw 0, degrees clockwise from plan-up) get a wedge that
+  // follows the current yaw / field of view. Tours without headings are unaffected.
+  const activeScene = tour.scenes.find((scene) => scene.id === sceneId);
+  const coneHeading = Number.isFinite(activeScene?.map?.heading) ? activeScene.map.heading : null;
+  useEffect(() => {
+    if (!mapOpen || !ready || coneHeading === null) return undefined;
+    let frame = 0;
+    const tick = () => {
+      const viewer = viewerRef.current;
+      const cone = coneRef.current;
+      if (viewer && cone) {
+        const yaw = viewer.getYaw();
+        const hfov = viewer.getHfov();
+        cone.style.transform = `rotate(${coneHeading + yaw}deg)`;
+        cone.style.setProperty("--fov", `${Math.max(20, Math.min(160, hfov))}deg`);
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [mapOpen, ready, coneHeading, sceneId]);
+
   function loadScene(id) {
     viewerRef.current?.loadScene(id);
   }
@@ -247,6 +271,14 @@ export default function TourViewer({ tour }) {
         <div id="map" className={`visio-tour-map${mapOpen ? " open" : ""}`}>
           <div className="visio-tour-map-in" dir="ltr">
             <img src={planSrc} alt="תוכנית הדירה" />
+            {coneHeading !== null && activeScene && (
+              <div
+                ref={coneRef}
+                className="visio-tour-cone"
+                aria-hidden="true"
+                style={{ left: `${activeScene.map.x}%`, top: `${activeScene.map.y}%` }}
+              />
+            )}
             {tour.scenes.map((scene) => (
               <button
                 key={scene.id}

@@ -89,7 +89,7 @@
   --pub-rule: #e5e5e5;
   --pub-on-ink: #ffffff;
   --pub-overlay: rgba(255, 255, 255, 0.94);
-  --pub-lightbox: rgba(255, 255, 255, 0.97);
+  --pub-lightbox: rgba(0, 0, 0, 0.96);
   --pub-scrim: rgba(0, 0, 0, 0.4);
   --pub-display: 'Bodoni Moda', 'Bodoni 72', Didot, 'Frank Ruhl Libre', 'Times New Roman', serif;
   --pub-serif: 'Frank Ruhl Libre', 'David Libre', David, 'Times New Roman', serif;
@@ -108,7 +108,7 @@
   --pub-rule: #262626;
   --pub-on-ink: #0a0a0a;
   --pub-overlay: rgba(10, 10, 10, 0.92);
-  --pub-lightbox: rgba(10, 10, 10, 0.97);
+  --pub-lightbox: rgba(0, 0, 0, 0.96);
   --pub-scrim: rgba(0, 0, 0, 0.55);
 }
 
@@ -289,8 +289,12 @@ button:hover { opacity: 0.85; }
 @media (prefers-reduced-motion: reduce) { .visio-portfolio-card { animation: none; } .visio-filter-indicator { transition: none; } }
 
 /* ── Lightbox ── */
-.visio-lightbox { position: fixed; inset: 0; background: var(--pub-lightbox); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; padding: 16px; }
-.visio-lightbox img { max-height: 80vh; max-width: 90vw; object-fit: contain; }
+.visio-lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.96); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; padding: 16px; touch-action: pan-y; overscroll-behavior: contain; }
+.visio-lightbox img { display: block; max-height: 80vh; max-width: 100%; width: auto; height: auto; object-fit: contain; border: 0; padding: 0; margin: 0; background: none; box-shadow: none; user-select: none; -webkit-user-drag: none; }
+.visio-lightbox-controls { display: flex; gap: 12px; align-items: center; }
+.visio-lightbox .visio-icon-btn { color: #f2f2f2; border-color: rgba(255, 255, 255, 0.6); background: rgba(0, 0, 0, 0.25); }
+.visio-lightbox .visio-icon-btn:hover, .visio-lightbox .visio-icon-btn:focus-visible { border-color: #fff; color: #fff; }
+.visio-lightbox .visio-credit { color: #e6e6e6; }
 .visio-icon-btn { min-width: 44px; height: 44px; padding: 0 16px; background: none; border: 1px solid var(--pub-ink); color: var(--pub-ink); font-size: 18px; cursor: pointer; }
 
 /* ── Pricing ── */
@@ -529,7 +533,8 @@ button:hover { opacity: 0.85; }
   .visio-admin-sidebar-toggle { display: flex; align-items: center; justify-content: center; }
   .visio-admin-main { padding: 20px 16px; }
 
-  .visio-lightbox img { max-height: 70vh; max-width: 100%; }
+  .visio-lightbox { padding: 12px 0; }
+  .visio-lightbox img { max-height: 80vh; max-width: 100%; }
 }
 
 /* ── Mobile ── */

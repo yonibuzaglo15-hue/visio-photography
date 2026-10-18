@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 
 import { C } from "./theme/colors.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
@@ -80,12 +80,20 @@ const PORTFOLIO = [
   { id: 13, title: "יהויכין 11 · אשדוד", sub: "רובע י״ג", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/yehoyachin-11/01.jpg", gallery: ["/portfolio/yehoyachin-11/01.jpg", "/portfolio/yehoyachin-11/02.jpg", "/portfolio/yehoyachin-11/03.jpg", "/portfolio/yehoyachin-11/04.jpg", "/portfolio/yehoyachin-11/05.jpg", "/portfolio/yehoyachin-11/06.jpg", "/portfolio/yehoyachin-11/07.jpg", "/portfolio/yehoyachin-11/08.jpg", "/portfolio/yehoyachin-11/09.jpg"], tags: ["סלון","מרפסת"] },
   { id: 14, title: "ביאליק 46 · אשדוד", sub: "רובע ה׳", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/bialik-46/01.jpg", gallery: ["/portfolio/bialik-46/01.jpg", "/portfolio/bialik-46/02.jpg", "/portfolio/bialik-46/03.jpg", "/portfolio/bialik-46/04.jpg", "/portfolio/bialik-46/05.jpg", "/portfolio/bialik-46/06.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
   { id: 15, title: "חסידא 17 · אשדוד", sub: "רובע ז׳", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/chasida-17/01.jpg", gallery: ["/portfolio/chasida-17/01.jpg", "/portfolio/chasida-17/02.jpg", "/portfolio/chasida-17/03.jpg", "/portfolio/chasida-17/04.jpg", "/portfolio/chasida-17/05.jpg", "/portfolio/chasida-17/06.jpg", "/portfolio/chasida-17/07.jpg", "/portfolio/chasida-17/08.jpg", "/portfolio/chasida-17/09.jpg", "/portfolio/chasida-17/10.jpg"], tags: ["מטבח","פינת אוכל"] },
+  { id: 16, title: "שבט זבולון 5 - גיא רוזן", sub: "רובע י״ב · מרפסת · סלון · מטבח · 32 נקודות", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "shevet-zevulun", hero: "/portfolio/shevet-zevulun/cover.jpg", gallery: ["/portfolio/shevet-zevulun/01.jpg", "/portfolio/shevet-zevulun/02.jpg", "/portfolio/shevet-zevulun/03.jpg", "/portfolio/shevet-zevulun/04.jpg", "/portfolio/shevet-zevulun/05.jpg", "/portfolio/shevet-zevulun/06.jpg", "/portfolio/shevet-zevulun/07.jpg", "/portfolio/shevet-zevulun/08.jpg", "/portfolio/shevet-zevulun/09.jpg", "/portfolio/shevet-zevulun/10.jpg", "/portfolio/shevet-zevulun/11.jpg", "/portfolio/shevet-zevulun/12.jpg", "/portfolio/shevet-zevulun/13.jpg", "/portfolio/shevet-zevulun/14.jpg", "/portfolio/shevet-zevulun/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
 ];
 
 const COVER_ID = 8;
 
 // Company of a card: explicit `company`, otherwise derived from `partner`.
 const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
+// Card tag line: the card's tags plus "3D TOUR" when it has a tour (unless a tag already says 3D).
+// The partner/agency is never shown on a card: VISIO is presented purely as the photographer.
+export const cardTagLine = (p) => {
+  const tags = p.tags || [];
+  const has3d = tags.some(t => /3D/i.test(t));
+  return [...tags, !has3d && (p.tour || p.matterport) && "3D TOUR"].filter(Boolean).join(" · ");
+};
 const PORTFOLIO_FILTERS = [
   { id: "all", label: "הכל" },
   { id: "rehouse", label: "REHOUSE" },
@@ -186,7 +194,7 @@ function HomeSection({ onNav }) {
             {lead.tag && <div className="visio-kicker" style={{ marginTop: 18 }}>{lead.tag}</div>}
             <h3 className="visio-story-title lead">{lead.title}</h3>
             <p className="visio-story-dek">{lead.sub}</p>
-            <div className="visio-credit"><Bidi>{`צילום: VISIO · ${lead.partner}`}</Bidi></div>
+            <div className="visio-credit"><Bidi>צילום: VISIO</Bidi></div>
           </button>
           <div className="visio-story-list">
             {side.slice(0, 4).map(p => (
@@ -194,7 +202,7 @@ function HomeSection({ onNav }) {
                 <div>
                   {p.tag && <div className="visio-kicker">{p.tag}</div>}
                   <h3 className="visio-story-title">{p.title}</h3>
-                  <div className="visio-credit"><Bidi>{`צילום: VISIO · ${p.partner}`}</Bidi></div>
+                  <div className="visio-credit"><Bidi>צילום: VISIO</Bidi></div>
                 </div>
                 <StoryImage id={p.id} title={p.title} />
               </button>
@@ -238,6 +246,57 @@ function HomeSection({ onNav }) {
   );
 }
 
+/* ─── LIGHTBOX ─── */
+// RTL: "next" sits on the left (flex row reverses), so ArrowLeft / swipe right → next,
+// ArrowRight / swipe left → previous. Esc closes. Body scroll is locked while open.
+export const SWIPE_MIN_PX = 40;
+export function swipeStep(dx, dy) {
+  if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) <= Math.abs(dy)) return 0;
+  return dx > 0 ? 1 : -1;
+}
+export function keyStep(key) {
+  if (key === "ArrowLeft") return 1;
+  if (key === "ArrowRight") return -1;
+  return 0;
+}
+function Lightbox({ imgs, idx, onStep, onClose }) {
+  const touch = useRef(null);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") { onClose(); return; }
+      const d = imgs.length > 1 ? keyStep(e.key) : 0;
+      if (d) { e.preventDefault(); onStep(d); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [imgs.length, onStep, onClose]);
+  const onTouchStart = (e) => { const t = e.touches[0]; touch.current = { x: t.clientX, y: t.clientY }; };
+  const onTouchEnd = (e) => {
+    const s = touch.current; touch.current = null;
+    if (!s || imgs.length < 2) return;
+    const t = e.changedTouches[0];
+    const d = swipeStep(t.clientX - s.x, t.clientY - s.y);
+    if (d) onStep(d);
+  };
+  return (
+    <div className="visio-lightbox" role="dialog" aria-modal="true" onClick={onClose} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <img src={imgs[idx]} alt="" onClick={e => e.stopPropagation()} draggable={false} />
+      <div className="visio-lightbox-controls" onClick={e => e.stopPropagation()}>
+        {imgs.length > 1 && (
+          <>
+            <button className="visio-icon-btn" onClick={() => onStep(-1)} aria-label="הקודם">‹</button>
+            <span className="visio-credit" dir="ltr">{idx + 1} / {imgs.length}</span>
+            <button className="visio-icon-btn" onClick={() => onStep(1)} aria-label="הבא">›</button>
+          </>
+        )}
+        <button className="visio-icon-btn" onClick={onClose} style={{ fontSize: 12, letterSpacing: ".2em" }}>✕ סגור</button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── PORTFOLIO ─── */
 function PortfolioSection() {
   const [active, setActive] = useState(null);
@@ -247,7 +306,9 @@ function PortfolioSection() {
   const shown = company === "all" ? PORTFOLIO : PORTFOLIO.filter(p => companyOf(p) === company);
 
   const openGallery = (gallery) => { setLightboxImgs(gallery); setLightboxIdx(0); };
-  const stepGallery = (d) => setLightboxIdx(i => (i + d + lightboxImgs.length) % lightboxImgs.length);
+  const nImgs = lightboxImgs.length;
+  const stepGallery = useCallback((d) => setLightboxIdx(i => (i + d + nImgs) % nImgs), [nImgs]);
+  const closeGallery = useCallback(() => setLightboxImgs([]), []);
 
   return (
     <section className="visio-section">
@@ -256,19 +317,7 @@ function PortfolioSection() {
 
       {/* Lightbox */}
       {lightboxImgs.length > 0 && (
-        <div className="visio-lightbox" onClick={() => setLightboxImgs([])}>
-          <img src={lightboxImgs[lightboxIdx]} alt="" onClick={e => e.stopPropagation()} />
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }} onClick={e => e.stopPropagation()}>
-            {lightboxImgs.length > 1 && (
-              <>
-                <button className="visio-icon-btn" onClick={() => stepGallery(-1)} aria-label="הקודם">‹</button>
-                <span className="visio-credit">{lightboxIdx + 1} / {lightboxImgs.length}</span>
-                <button className="visio-icon-btn" onClick={() => stepGallery(1)} aria-label="הבא">›</button>
-              </>
-            )}
-            <button className="visio-icon-btn" onClick={() => setLightboxImgs([])} style={{ fontSize: 12, letterSpacing: ".2em" }}>✕ סגור</button>
-          </div>
-        </div>
+        <Lightbox imgs={lightboxImgs} idx={lightboxIdx} onStep={stepGallery} onClose={closeGallery} />
       )}
 
       <div className="visio-portfolio-grid" key={company}>
@@ -314,7 +363,7 @@ function PortfolioSection() {
                 <h3 className="visio-story-title">{p.title}</h3>
                 <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
                 <div className="visio-credit">
-                  <Bidi>{[...p.tags, (p.tour || p.matterport) && "3D TOUR", p.partner].filter(Boolean).join(" · ")}</Bidi>
+                  <Bidi>{cardTagLine(p)}</Bidi>
                 </div>
               </div>
             </article>
