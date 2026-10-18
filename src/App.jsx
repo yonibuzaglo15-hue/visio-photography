@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 
 import { C } from "./theme/colors.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
@@ -239,6 +239,57 @@ function HomeSection({ onNav }) {
   );
 }
 
+/* ─── LIGHTBOX ─── */
+// RTL: "next" sits on the left (flex row reverses), so ArrowLeft / swipe right → next,
+// ArrowRight / swipe left → previous. Esc closes. Body scroll is locked while open.
+export const SWIPE_MIN_PX = 40;
+export function swipeStep(dx, dy) {
+  if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) <= Math.abs(dy)) return 0;
+  return dx > 0 ? 1 : -1;
+}
+export function keyStep(key) {
+  if (key === "ArrowLeft") return 1;
+  if (key === "ArrowRight") return -1;
+  return 0;
+}
+function Lightbox({ imgs, idx, onStep, onClose }) {
+  const touch = useRef(null);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") { onClose(); return; }
+      const d = imgs.length > 1 ? keyStep(e.key) : 0;
+      if (d) { e.preventDefault(); onStep(d); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [imgs.length, onStep, onClose]);
+  const onTouchStart = (e) => { const t = e.touches[0]; touch.current = { x: t.clientX, y: t.clientY }; };
+  const onTouchEnd = (e) => {
+    const s = touch.current; touch.current = null;
+    if (!s || imgs.length < 2) return;
+    const t = e.changedTouches[0];
+    const d = swipeStep(t.clientX - s.x, t.clientY - s.y);
+    if (d) onStep(d);
+  };
+  return (
+    <div className="visio-lightbox" role="dialog" aria-modal="true" onClick={onClose} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <img src={imgs[idx]} alt="" onClick={e => e.stopPropagation()} draggable={false} />
+      <div className="visio-lightbox-controls" onClick={e => e.stopPropagation()}>
+        {imgs.length > 1 && (
+          <>
+            <button className="visio-icon-btn" onClick={() => onStep(-1)} aria-label="הקודם">‹</button>
+            <span className="visio-credit" dir="ltr">{idx + 1} / {imgs.length}</span>
+            <button className="visio-icon-btn" onClick={() => onStep(1)} aria-label="הבא">›</button>
+          </>
+        )}
+        <button className="visio-icon-btn" onClick={onClose} style={{ fontSize: 12, letterSpacing: ".2em" }}>✕ סגור</button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── PORTFOLIO ─── */
 function PortfolioSection() {
   const [active, setActive] = useState(null);
@@ -248,7 +299,9 @@ function PortfolioSection() {
   const shown = company === "all" ? PORTFOLIO : PORTFOLIO.filter(p => companyOf(p) === company);
 
   const openGallery = (gallery) => { setLightboxImgs(gallery); setLightboxIdx(0); };
-  const stepGallery = (d) => setLightboxIdx(i => (i + d + lightboxImgs.length) % lightboxImgs.length);
+  const nImgs = lightboxImgs.length;
+  const stepGallery = useCallback((d) => setLightboxIdx(i => (i + d + nImgs) % nImgs), [nImgs]);
+  const closeGallery = useCallback(() => setLightboxImgs([]), []);
 
   return (
     <section className="visio-section">
@@ -257,19 +310,7 @@ function PortfolioSection() {
 
       {/* Lightbox */}
       {lightboxImgs.length > 0 && (
-        <div className="visio-lightbox" onClick={() => setLightboxImgs([])}>
-          <img src={lightboxImgs[lightboxIdx]} alt="" onClick={e => e.stopPropagation()} />
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }} onClick={e => e.stopPropagation()}>
-            {lightboxImgs.length > 1 && (
-              <>
-                <button className="visio-icon-btn" onClick={() => stepGallery(-1)} aria-label="הקודם">‹</button>
-                <span className="visio-credit">{lightboxIdx + 1} / {lightboxImgs.length}</span>
-                <button className="visio-icon-btn" onClick={() => stepGallery(1)} aria-label="הבא">›</button>
-              </>
-            )}
-            <button className="visio-icon-btn" onClick={() => setLightboxImgs([])} style={{ fontSize: 12, letterSpacing: ".2em" }}>✕ סגור</button>
-          </div>
-        </div>
+        <Lightbox imgs={lightboxImgs} idx={lightboxIdx} onStep={stepGallery} onClose={closeGallery} />
       )}
 
       <div className="visio-portfolio-grid" key={company}>

@@ -12,6 +12,20 @@ const KEPT_MATTERPORT = {
   8: "so6PszZrxgx",
 };
 
+function jpegSize(file) {
+  const b = fs.readFileSync(file);
+  let i = 2;
+  while (i < b.length) {
+    if (b[i] !== 0xff) { i++; continue; }
+    const m = b[i + 1];
+    if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
+      return { height: b.readUInt16BE(i + 5), width: b.readUInt16BE(i + 7) };
+    }
+    i += 2 + b.readUInt16BE(i + 2);
+  }
+  return null;
+}
+
 function portfolioFromApp() {
   const src = fs.readFileSync("src/App.jsx", "utf8");
   const start = src.indexOf("const PORTFOLIO = [");
@@ -106,6 +120,10 @@ describe("portfolio tour wiring", () => {
     expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-zevulun/${n}.jpg`));
     expect(card?.gallery.join(" ")).not.toMatch(/cover\.jpg|stills\//);
     for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
+    // sequential 01..14 only, no leftovers from the previous set; every still is 2560x1440
+    const files = fs.readdirSync("public/portfolio/shevet-zevulun").sort();
+    expect(files).toEqual(order.map((n) => `${n}.jpg`));
+    for (const f of files) expect(jpegSize(`public/portfolio/shevet-zevulun/${f}`)).toEqual({ width: 2560, height: 1440 });
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
@@ -125,5 +143,46 @@ describe("viewer stage stays ltr", () => {
     expect(css).toMatch(/\.ring \.rg\s*\{[^}]*left:\s*-38px/);
     expect(css).toMatch(/width:\s*76px/);
     expect(css).toMatch(/height:\s*38px/);
+  });
+});
+
+describe("gallery lightbox (all cards)", () => {
+  const src = fs.readFileSync("src/App.jsx", "utf8");
+  const css = fs.readFileSync("app/globals.css", "utf8");
+  const helpers = (() => {
+    const start = src.indexOf("export const SWIPE_MIN_PX");
+    const end = src.indexOf("function Lightbox(");
+    const code = src.slice(start, end).replace(/export /g, "");
+    return Function(`"use strict"; ${code}; return { swipeStep, keyStep, SWIPE_MIN_PX };`)();
+  })();
+
+  it("uses a dark opaque backdrop and an unframed, contained image", () => {
+    expect(css).toMatch(/\.visio-lightbox \{[^}]*background: rgba\(0, 0, 0, 0\.92\)/);
+    const img = css.match(/\.visio-lightbox img \{([^}]*)\}/)[1];
+    expect(img).toMatch(/max-height: 80vh/);
+    expect(img).toMatch(/max-width: 100%/);
+    expect(img).toMatch(/object-fit: contain/);
+    expect(img).toMatch(/border: 0/);
+    expect(img).toMatch(/padding: 0/);
+    expect(css).not.toMatch(/\.visio-lightbox img \{ max-height: 70vh/);
+    expect(css).toMatch(/\.visio-lightbox \.visio-icon-btn \{[^}]*color: #f2f2f2/);
+    expect(css).toMatch(/\.visio-lightbox \.visio-credit \{[^}]*color: #e6e6e6/);
+  });
+
+  it("locks page scroll while open and restores it on close", () => {
+    expect(src).toContain('document.body.style.overflow = "hidden"');
+    expect(src).toContain("document.body.style.overflow = prev");
+  });
+
+  it("keeps Esc + arrow keys and adds RTL-aware swipe", () => {
+    expect(src).toContain('e.key === "Escape"');
+    expect(helpers.keyStep("ArrowLeft")).toBe(1);
+    expect(helpers.keyStep("ArrowRight")).toBe(-1);
+    expect(helpers.keyStep("Enter")).toBe(0);
+    expect(helpers.swipeStep(120, 10)).toBe(1);
+    expect(helpers.swipeStep(-120, 10)).toBe(-1);
+    expect(helpers.swipeStep(helpers.SWIPE_MIN_PX - 1, 0)).toBe(0);
+    expect(helpers.swipeStep(60, 200)).toBe(0); // vertical drag is not a swipe
+    expect(src).toContain("onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}");
   });
 });
