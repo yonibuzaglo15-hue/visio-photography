@@ -146,6 +146,38 @@ describe("viewer stage stays ltr", () => {
   });
 });
 
+describe("card text never mentions RE/MAX", () => {
+  const src = fs.readFileSync("src/App.jsx", "utf8");
+  const portfolio = portfolioFromApp();
+  const cardTagLine = (() => {
+    const start = src.indexOf("export const cardTagLine");
+    const end = src.indexOf("\n};", start);
+    const code = src.slice(start, end + 3).replace(/export /g, "");
+    return Function(`"use strict"; ${code}; return cardTagLine;`)();
+  })();
+  const REMAX = /re\s*\/?\s*max|רימקס|רי\/מקס/i;
+
+  it("no card title, kicker, subtitle or tag line contains RE/MAX", () => {
+    for (const p of portfolio) {
+      for (const text of [p.title, p.tag, p.sub, cardTagLine(p), ...(p.tags || [])]) {
+        expect(text || "", `card ${p.id}`).not.toMatch(REMAX);
+      }
+    }
+  });
+
+  it("never renders the partner on a card", () => {
+    const jsx = src.split("\n").filter((l) => /<Bidi>|className=/.test(l));
+    expect(jsx.filter((l) => /\b(p|lead)\.partner\b/.test(l))).toEqual([]);
+  });
+
+  it("uses the exact tag line for שבט זבולון 5 and drops RE/MAX from חסידא 17", () => {
+    const zev = portfolio.find((p) => p.id === 16);
+    expect(cardTagLine(zev)).toBe("מרפסת · סלון · מטבח · סיור וירטואלי 3D");
+    const hasida = portfolio.find((p) => p.id === 15);
+    expect(cardTagLine(hasida)).toBe("מטבח · פינת אוכל");
+  });
+});
+
 describe("gallery lightbox (all cards)", () => {
   const src = fs.readFileSync("src/App.jsx", "utf8");
   const css = fs.readFileSync("app/globals.css", "utf8");
@@ -157,7 +189,7 @@ describe("gallery lightbox (all cards)", () => {
   })();
 
   it("uses a dark opaque backdrop and an unframed, contained image", () => {
-    expect(css).toMatch(/\.visio-lightbox \{[^}]*background: rgba\(0, 0, 0, 0\.92\)/);
+    expect(css).toMatch(/\.visio-lightbox \{[^}]*background: rgba\(0, 0, 0, 0\.96\)/);
     const img = css.match(/\.visio-lightbox img \{([^}]*)\}/)[1];
     expect(img).toMatch(/max-height: 80vh/);
     expect(img).toMatch(/max-width: 100%/);
