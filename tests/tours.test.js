@@ -96,13 +96,16 @@ describe("portfolio tour wiring", () => {
     expect(portfolio.filter((item) => item.fit === "contain").map((item) => item.id)).toEqual([10]);
   });
 
-  it("points the שבט זבולון card at its hosted tour without 360 crops in the gallery", () => {
+  it("points the שבט זבולון card at its hosted tour with the edited stills gallery", () => {
     const card = portfolio.find((item) => item.tour === "shevet-zevulun");
     expect(card?.title).toBe("שבט זבולון 5 · אשדוד");
     expect(card?.company).toBe("remax");
-    expect(card?.hero).toBe("/portfolio/shevet-zevulun/cover.jpg");
-    expect(card?.gallery).toEqual([]);
-    expect(fs.existsSync("public/portfolio/shevet-zevulun/cover.jpg")).toBe(true);
+    expect(card?.tour).toBe("shevet-zevulun");
+    const order = Array.from({ length: 14 }, (_, i) => String(i + 1).padStart(2, "0"));
+    expect(card?.hero).toBe("/portfolio/shevet-zevulun/01.jpg");
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-zevulun/${n}.jpg`));
+    expect(card?.gallery.join(" ")).not.toMatch(/cover\.jpg|stills\//);
+    for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
