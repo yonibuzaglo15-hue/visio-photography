@@ -66,7 +66,8 @@ describe("hosted tours", () => {
     expect(tour.scenes).toHaveLength(32);
     expect(tour.firstScene).toBe("z21");
     expect(tour.assetBase).toBe("/tours/shevet-zevulun");
-    expect(tour.location.startsWith("שבט זבולון")).toBe(true);
+    expect(tour.title).toBe("שבט זבולון 5 - גיא רוזן");
+    expect(tour.location).toBe("רובע י״ב · אשדוד");
     const ids = new Set(tour.scenes.map((scene) => scene.id));
     for (const scene of tour.scenes) {
       expect(scene.hotspots.length).toBeGreaterThan(0);
@@ -76,6 +77,26 @@ describe("hosted tours", () => {
         expect(h.pitch).toBeGreaterThanOrEqual(-60);
       }
     }
+  });
+
+  it("places every שבט זבולון point on the Matterport-derived plan with a heading", () => {
+    const tour = loadTour("shevet-zevulun");
+    expect(tour.plan).toBe("plan.jpg");
+    expect(jpegSize("public/tours/shevet-zevulun/plan.jpg")).toEqual({ width: 1442, height: 1380 });
+    const seen = new Set();
+    for (const scene of tour.scenes) {
+      const { x, y, heading } = scene.map;
+      expect(x).toBeGreaterThan(2);
+      expect(x).toBeLessThan(98);
+      expect(y).toBeGreaterThan(2);
+      expect(y).toBeLessThan(98);
+      expect(Number.isFinite(heading)).toBe(true);
+      const key = `${x},${y}`;
+      expect(seen.has(key)).toBe(false);
+      seen.add(key);
+    }
+    // the other tour keeps its plain dots (no view cone)
+    expect(loadTour("ashdod-apartment").scenes.some((scene) => "heading" in scene.map)).toBe(false);
   });
 
   it("rejects unsafe slugs", () => {
@@ -112,17 +133,21 @@ describe("portfolio tour wiring", () => {
 
   it("points the שבט זבולון card at its hosted tour with the edited stills gallery", () => {
     const card = portfolio.find((item) => item.tour === "shevet-zevulun");
-    expect(card?.title).toBe("שבט זבולון 5 · אשדוד");
+    expect(card?.title).toBe("שבט זבולון 5 - גיא רוזן");
     expect(card?.company).toBe("remax");
     expect(card?.tour).toBe("shevet-zevulun");
-    const order = Array.from({ length: 19 }, (_, i) => String(i + 1).padStart(2, "0"));
-    expect(card?.hero).toBe("/portfolio/shevet-zevulun/01.jpg");
+    const order = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, "0"));
+    // card cover is a separate logo-free still; the gallery keeps the branded 01..15
+    expect(card?.hero).toBe("/portfolio/shevet-zevulun/cover.jpg");
+    expect(card?.gallery).not.toContain(card?.hero);
+    expect(jpegSize("public/portfolio/shevet-zevulun/cover.jpg")).toEqual({ width: 2560, height: 1440 });
+    expect(card?.gallery).toHaveLength(15);
     expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-zevulun/${n}.jpg`));
     expect(card?.gallery.join(" ")).not.toMatch(/cover\.jpg|stills\//);
     for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
-    // sequential 01..19 only, no leftovers from the previous set; every still is 2560x1440
+    // sequential 01..15 only, no leftovers from the previous set; every still is 2560x1440
     const files = fs.readdirSync("public/portfolio/shevet-zevulun").sort();
-    expect(files).toEqual(order.map((n) => `${n}.jpg`));
+    expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
     for (const f of files) expect(jpegSize(`public/portfolio/shevet-zevulun/${f}`)).toEqual({ width: 2560, height: 1440 });
   });
 

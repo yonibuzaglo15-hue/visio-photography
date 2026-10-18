@@ -254,6 +254,23 @@ body:has(.visio-tour) {
   opacity: 0.92;
 }
 
+.visio-tour-cone {
+  --fov: 100deg;
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from calc(var(--fov) / -2),
+    rgba(255, 255, 255, 0.8) 0deg,
+    rgba(255, 255, 255, 0.8) var(--fov),
+    transparent var(--fov)
+  );
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.95));
+}
+
 .visio-tour-dot {
   position: absolute;
   width: 10px;
