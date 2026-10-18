@@ -5,10 +5,11 @@ import { listTourSlugs, loadTour } from "../lib/tours/loadTour.js";
 const KEPT_MATTERPORT = {
   1: "ooDYEMx6TCr",
   2: "g1C8Upb3G6q",
-  3: "cEtmuBEsSNq",
+  3: "Z76pbSkPMXX",
   4: "9YJGFmX8KbJ",
   5: "AF18oBWVfrm",
   6: "C6Uvbihrqvm",
+  7: "Xh34KkeoLb5",
   8: "so6PszZrxgx",
 };
 
@@ -241,5 +242,67 @@ describe("gallery lightbox (all cards)", () => {
     expect(helpers.swipeStep(helpers.SWIPE_MIN_PX - 1, 0)).toBe(0);
     expect(helpers.swipeStep(60, 200)).toBe(0); // vertical drag is not a swipe
     expect(src).toContain("onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}");
+  });
+});
+
+describe("Yan Shindelman (REHOUSE) works", () => {
+  const portfolio = portfolioFromApp();
+  const YAN = [
+    [17, "shevet-levi-4", "שבט לוי 4", "רובע י״ב · אשדוד", "xZ4M9pKzoBr", 14],
+    [18, "atzmaut-21", "העצמאות 21", "סיטי · אשדוד", "eqKC1zuQDfa", 18],
+    [19, "tzionut-55", "הציונות 55", "סיטי · אשדוד", "m1ArnEzVJCY", 14],
+    [20, "kalanit-7a", "הכלנית 7א", "רובע ח׳ · אשדוד", "YcGsq9ppCTT", 19],
+    [21, "ussishkin-21", "אוסישקין 21", "רובע ט״ו · אשדוד", "x8CmoHwwyA1", 12],
+    [22, "petah-tikva-9", "פתח תקווה 9", "רובע ט׳ · אשדוד", "FkkW9mVhJC4", 17],
+    [23, "agnon-21", "שי עגנון 21", "עתיקות · אשקלון", "JN6a8HHqRpX", 11],
+    [24, "nahal-snir-9", "נחל שניר 9", "רובע י״א · אשדוד", "mDADwNnNKtD", 13],
+    [25, "micha-hanavi-13", "מיכה הנביא 13", "רובע י׳ · אשדוד", null, 14],
+    [26, "harav-kook-19", "הרב קוק 19", "רובע ב׳ · אשדוד", null, 16],
+    [27, "haeshkol-8", "האשכול 8", "רובע א׳ · אשדוד", "mWxuq2zaKdZ", 16],
+    [28, "milman-2", "מילמן 2", "רובע ו׳ · אשדוד", null, 19],
+  ];
+
+  it.each(YAN)("card %i (%s) has title, location, tour and a full local gallery", (id, slug, street, sub, model, count) => {
+    const card = portfolio.find((p) => p.id === id);
+    expect(card.title).toBe(`${street} - יאן שינדלמן`);
+    expect(card.sub).toBe(sub);
+    expect(card.company).toBe("rehouse");
+    expect(card.tour).toBeUndefined();
+    if (model) {
+      expect(card.matterport).toBe(model);
+      expect(card.tag).toMatch(/\+ סיור וירטואלי$/);
+      expect(card.tags).toContain("סיור וירטואלי 3D");
+    } else {
+      expect(card.matterport).toBeUndefined();
+      expect(card.tag).toBe("דירה");
+    }
+    expect(card.hero).toBe(`/portfolio/${slug}/cover.jpg`);
+    expect(card.gallery).not.toContain(card.hero);
+    const order = Array.from({ length: count }, (_, i) => String(i + 1).padStart(2, "0"));
+    expect(card.gallery).toEqual(order.map((n) => `/portfolio/${slug}/${n}.jpg`));
+    const files = fs.readdirSync(`public/portfolio/${slug}`).sort();
+    expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
+    const size = jpegSize(`public/portfolio/${slug}/cover.jpg`);
+    expect(size.width * 9).toBe(size.height * 16);
+    for (const f of files) expect(jpegSize(`public/portfolio/${slug}/${f}`)).toEqual(size);
+  });
+
+  it("marks הציונות 55 as a penthouse", () => {
+    expect(portfolio.find((p) => p.id === 19).tag).toBe("פנטהאוז + סיור וירטואלי");
+  });
+
+  it("never names the brokerage in Yan card text", () => {
+    for (const p of portfolio.filter((c) => c.id >= 17)) {
+      for (const text of [p.title, p.tag, p.sub, ...(p.tags || [])]) {
+        expect(text).not.toMatch(/re\s*\/?\s*max|re\s*house|רימקס|ריהאוס/i);
+      }
+    }
+  });
+
+  it("uses unique ids and never reuses an image path across cards", () => {
+    const ids = portfolio.map((p) => p.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const all = portfolio.flatMap((p) => p.gallery || []);
+    expect(new Set(all).size).toBe(all.length);
   });
 });
