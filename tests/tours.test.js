@@ -154,7 +154,7 @@ describe("portfolio tour wiring", () => {
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
     const src = fs.readFileSync("src/App.jsx", "utf8");
-    expect(src).toContain("p.tour\n            ? `/tours/${p.tour}`");
+    expect(src).toMatch(/p\.tour\n\s+\? `\/tours\/\$\{p\.tour\}`/);
     expect(src).toContain("https://my.matterport.com/show/?m=${p.matterport}");
   });
 });
@@ -304,5 +304,54 @@ describe("Yan Shindelman (REHOUSE) works", () => {
     expect(new Set(ids).size).toBe(ids.length);
     const all = portfolio.flatMap((p) => p.gallery || []);
     expect(new Set(all).size).toBe(all.length);
+  });
+});
+
+describe("REHOUSE works grouped by region", () => {
+  const src = fs.readFileSync("src/App.jsx", "utf8");
+  const portfolio = portfolioFromApp();
+  const helpers = (() => {
+    const start = src.indexOf("const KNOWN_CITIES");
+    const end = src.indexOf("// Card tag line:", start);
+    const code = src.slice(start, end).replace(/export /g, "");
+    return Function(`"use strict"; ${code}; return { cityOf, groupByCity };`)();
+  })();
+  const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
+  const rehouse = portfolio.filter((p) => companyOf(p) === "rehouse");
+
+  it("gives every card an explicit city that matches its title/location", () => {
+    for (const p of portfolio) {
+      expect(["אשדוד", "אשקלון", "יבנה"], `card ${p.id}`).toContain(p.city);
+      if (/אשקלון|יבנה|אשדוד/.test(`${p.title} ${p.sub}`)) expect(`${p.title} ${p.sub}`).toContain(p.city);
+    }
+    expect(portfolio.find((p) => p.id === 23).city).toBe("אשקלון");
+    expect(portfolio.find((p) => p.id === 5).city).toBe("יבנה");
+  });
+
+  it("derives a city from the location line when the field is missing", () => {
+    expect(helpers.cityOf({ sub: "עתיקות · אשקלון" })).toBe("אשקלון");
+    expect(helpers.cityOf({ title: "הפטל 17 · יבנה", sub: "גינה" })).toBe("יבנה");
+    expect(helpers.cityOf({ title: "x", sub: "y" })).toBe("אחר");
+  });
+
+  it("orders REHOUSE regions אשדוד first, then אשקלון, then יבנה, keeping card order", () => {
+    const groups = helpers.groupByCity(rehouse);
+    expect(groups.map((g) => g.city)).toEqual(["אשדוד", "אשקלון", "יבנה"]);
+    expect(groups.reduce((n, g) => n + g.items.length, 0)).toBe(rehouse.length);
+    expect(groups[1].items.map((p) => p.id)).toEqual([23]);
+    expect(groups[2].items.map((p) => p.id)).toEqual([5]);
+    const ashdod = groups[0].items.map((p) => p.id);
+    expect(ashdod).toEqual([...ashdod].sort((a, b) => a - b));
+    expect(helpers.groupByCity([{ id: 1, city: "באר שבע" }, { id: 2, city: "יבנה" }, { id: 3, city: "אשדוד" }]).map((g) => g.city)).toEqual(["אשדוד", "יבנה", "באר שבע"]);
+  });
+
+  it("renders region sections only on the REHOUSE filter and updates the subtitle", () => {
+    expect(src).toContain('company === "rehouse" ? (');
+    expect(src).toContain("groupByCity(shown).map(");
+    expect(src).toContain('<span className="visio-kicker">{city}</span>');
+    expect(src).toContain('sub="נכסי יוקרה · אשדוד · אשקלון · יבנה"');
+    expect(src).not.toContain("אשדוד ויבנה");
+    const css = fs.readFileSync("app/globals.css", "utf8");
+    expect(css).toMatch(/\.visio-region-head \{/);
   });
 });
