@@ -98,7 +98,7 @@ describe("portfolio tour wiring", () => {
 
   it("points the שבט זבולון card at its hosted tour without 360 crops in the gallery", () => {
     const card = portfolio.find((item) => item.tour === "shevet-zevulun");
-    expect(card?.title).toBe("שבט זבולון · אשדוד");
+    expect(card?.title).toBe("שבט זבולון 5 · אשדוד");
     expect(card?.company).toBe("remax");
     expect(card?.hero).toBe("/portfolio/shevet-zevulun/cover.jpg");
     expect(card?.gallery).toEqual([]);
