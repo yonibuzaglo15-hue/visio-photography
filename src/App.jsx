@@ -24,6 +24,12 @@ const PROPERTY_IMAGES = {
 
 const fmt = (n) => Math.round(n).toLocaleString("he-IL");
 const VAT = 0.18;
+// Money with VAT can be fractional (e.g. ₪40 × 1.18 = ₪47.20) — never round it away.
+const fmtMoney = (n) => {
+  const r = Math.round(n * 100) / 100;
+  return r.toLocaleString("he-IL", Number.isInteger(r) ? {} : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+const Money = ({ n }) => <bdi dir="ltr">₪{fmtMoney(n)}</bdi>;
 
 /* ─── BIDI ─── */
 // Latin runs (incl. leading digits like "4K" and inner separators like "RE/MAX", "9:16")
@@ -437,7 +443,7 @@ function PortfolioSection() {
 /* ─── PRICING ─── */
 function PricingSection({ onNav }) {
   const [showVat, setShowVat] = useState(false);
-  const p = (base) => fmt(showVat ? base * (1 + VAT) : base);
+  const p = (base) => fmtMoney(showVat ? base * (1 + VAT) : base);
 
   return (
     <section className="visio-section">
@@ -469,7 +475,7 @@ function PricingSection({ onNav }) {
           </div>
         ))}
       </div>
-      <p className="visio-gear-line" dir="rtl">כל המחירים אינם כוללים מע״מ — 18% מע״מ יתווספו לחשבון (לדוגמה: ₪450 + 18% = ₪{fmt(450 * (1 + VAT))}). גם מנוי הסיור הווירטואלי (₪40 לחודש) הוא בתוספת מע״מ. התשלום מתבצע בעת ההזמנה.</p>
+      <p className="visio-gear-line" dir="rtl">כל המחירים אינם כוללים מע״מ — <bdi dir="ltr">18%</bdi> מע״מ יתווספו לחשבון (לדוגמה: <bdi dir="ltr">₪450 + 18% = ₪{fmtMoney(450 * (1 + VAT))}</bdi>). גם מנוי הסיור הווירטואלי (<Money n={40} /> לחודש) הוא בתוספת מע״מ. התשלום מתבצע בעת ההזמנה.</p>
       <p className="visio-gear-line" dir="rtl"><Bidi>{GEAR_LINE}</Bidi></p>
     </section>
   );
@@ -796,10 +802,10 @@ function BookingSection() {
             <div className="visio-order-summary" aria-labelledby="bk-sum-title">
               <h3 id="bk-sum-title" className="visio-term-title" style={{ fontSize: 18, marginBottom: 8 }}>לפני אישור ההזמנה</h3>
               <ul>
-                <li>{pkgObj ? <><Bidi>{pkgObj.name}</Bidi> — ₪{fmt(pkgObj.price)}{pkgObj.unit ? ` ${pkgObj.unit}` : ""} + מע״מ 18% (סה״כ ₪{fmt(pkgObj.price * (1 + VAT))}{pkgObj.unit ? ` ${pkgObj.unit}` : ""})</> : "ייעוץ טלפוני — ללא עלות"}</li>
-                {form.pkg === "FULL" && <li><strong>סיור וירטואלי:</strong> מנוי חודשי של ₪40 + מע״מ (₪{fmt(40 * (1 + VAT))} לחודש), מתחדש אוטומטית וניתן לביטול בהתאם לתנאי השירות.</li>}
+                <li>{pkgObj ? <><Bidi>{pkgObj.name}</Bidi>: <Money n={pkgObj.price} />{pkgObj.unit ? ` ${pkgObj.unit}` : ""} + מע״מ (<bdi dir="ltr">18%</bdi>). סה״כ לתשלום: <Money n={pkgObj.price * (1 + VAT)} />{pkgObj.unit ? ` ${pkgObj.unit}` : ""}.</> : "ייעוץ טלפוני — ללא עלות"}</li>
+                {form.pkg === "FULL" && <li><strong>סיור וירטואלי:</strong> מנוי חודשי של <Money n={40} /> + מע״מ (<Money n={40 * (1 + VAT)} /> לחודש), מתחדש אוטומטית וניתן לביטול בהתאם לתנאי השירות.</li>}
                 <li>התשלום מתבצע בעת ההזמנה. ההזמנה נכנסת לתוקף לאחר שנאשר את המועד.</li>
-                <li>ביטול: 48 שעות ומעלה לפני הצילום — החזר מלא · 24–48 שעות — 50% · פחות מ-24 שעות — ללא החזר.</li>
+                <li>ביטול: 48 שעות ומעלה לפני הצילום — החזר מלא · <bdi dir="ltr">24–48</bdi> שעות — <bdi dir="ltr">50%</bdi> · פחות מ-24 שעות — ללא החזר.</li>
                 <li>אספקת הקבצים: עד 48 שעות מהצילום (הערכה).</li>
               </ul>
             </div>
