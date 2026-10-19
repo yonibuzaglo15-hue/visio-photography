@@ -18,7 +18,7 @@ const CSP = [
   "base-uri 'self'",
   "form-action 'self' https://accounts.google.com",
   "frame-ancestors 'self'",
-  "upgrade-insecure-requests",
+  // "upgrade-insecure-requests" — add back when switching from Report-Only to enforced (ignored in report-only mode)
 ].join("; ");
 
 const BASE_SECURITY_HEADERS = [
