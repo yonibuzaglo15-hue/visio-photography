@@ -5,6 +5,7 @@ import { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react
 import Image from "next/image";
 import { C } from "./theme/colors.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
+import { TERMS_VERSION } from "../lib/legal/versions.js";
 const PROPERTY_IMAGES = {
   1: { hero: "/portfolio-featured/1/hero.jpg", gallery: ["/portfolio-featured/1/g01.jpg"] },
   2: { hero: "/portfolio-featured/2/hero.jpg", gallery: ["/portfolio-featured/2/g01.jpg"] },
@@ -48,7 +49,7 @@ function SectionTitle({ sup, title, sub }) {
   return (
     <div className="visio-section-head">
       <div className="visio-kicker"><Bidi>{sup}</Bidi></div>
-      <h2 className="visio-section-title"><Bidi>{title}</Bidi></h2>
+      <h1 className="visio-section-title"><Bidi>{title}</Bidi></h1>
       {sub && <p className="visio-section-sub"><Bidi>{sub}</Bidi></p>}
     </div>
   );
@@ -216,7 +217,7 @@ function HomeSection({ onNav }) {
           <button className="visio-story" onClick={() => onNav("portfolio")}>
             <StoryImage id={lead.id} title={lead.title} />
             {lead.tag && <div className="visio-kicker" style={{ marginTop: 18 }}>{lead.tag}</div>}
-            <h3 className="visio-story-title lead">{lead.title}</h3>
+            <h2 className="visio-story-title lead">{lead.title}</h2>
             <p className="visio-story-dek">{lead.sub}</p>
             <div className="visio-credit"><Bidi>צילום: VISIO</Bidi></div>
           </button>
@@ -225,7 +226,7 @@ function HomeSection({ onNav }) {
               <button key={p.id} className="visio-story" onClick={() => onNav("portfolio")}>
                 <div>
                   {p.tag && <div className="visio-kicker">{p.tag}</div>}
-                  <h3 className="visio-story-title">{p.title}</h3>
+                  <h2 className="visio-story-title">{p.title}</h2>
                   <div className="visio-credit"><Bidi>צילום: VISIO</Bidi></div>
                 </div>
                 <StoryImage id={p.id} title={p.title} />
@@ -373,7 +374,7 @@ function PortfolioSection() {
 
         <div className="visio-portfolio-meta">
           {p.tag && <div className="visio-kicker">{p.tag}</div>}
-          <h3 className="visio-story-title">{p.title}</h3>
+          <h2 className="visio-story-title">{p.title}</h2>
           <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
           <div className="visio-credit">
             <Bidi>{cardTagLine(p)}</Bidi>
@@ -459,8 +460,27 @@ function PricingSection({ onNav }) {
 /* ─── BOOKING ─── */
 const HEB_MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
 const HEB_DAYS = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
-const LAT_DAYS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const HEB_DOW_SHORT = ["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
 const SLOTS = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
+const UPLOAD_MAX_BYTES = 2 * 1024 * 1024;
+const UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const TERMS_URL = "/?page=charter";
+const PRIVACY_URL = "/privacy";
+
+/* Asia/Jerusalem "now" helpers (the business calendar runs on Israel time). */
+const ilToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(new Date());
+const ilNowHHMM = () => new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+
+function Field({ id, label, required, error, hint, children }) {
+  return (
+    <div>
+      <label className="visio-label" htmlFor={id}>{label}{required && <span aria-hidden="true"> *</span>}</label>
+      {children}
+      {hint && <div id={`${id}-hint`} className="visio-field-hint">{hint}</div>}
+      {error && <div id={`${id}-error`} className="visio-field-error" role="alert">{error}</div>}
+    </div>
+  );
+}
 
 function BookingSection() {
   const today = new Date();
@@ -469,16 +489,24 @@ function BookingSection() {
   const [selDate, setSelDate] = useState(null);
   const [selSlot, setSelSlot] = useState(null);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "FULL", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", pkg: "FULL", notes: "", website: "" });
+  const [consent, setConsent] = useState(false);
   const [done, setDone] = useState(false);
   const [wm, setWm] = useState({ agentPhone: "", logoFile: null, logoUrl: null, agentPhotoFile: null, agentPhotoUrl: null, wantAgentPhoto: false });
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
   const logoRef = useRef(null);
   const photoRef = useRef(null);
+  const slotsRef = useRef(null);
+  const formRef = useRef(null);
   const [bookingLoading, setBookingLoading] = useState(false);
 
   const handleFile = (field, urlField, e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (!UPLOAD_TYPES.includes(file.type)) { setErrors(er => ({ ...er, [field]: "ניתן להעלות JPG, PNG או WebP בלבד" })); e.target.value = ""; return; }
+    if (file.size > UPLOAD_MAX_BYTES) { setErrors(er => ({ ...er, [field]: "גודל הקובץ המרבי הוא 2MB" })); e.target.value = ""; return; }
+    setErrors(er => ({ ...er, [field]: undefined }));
     const reader = new FileReader();
     reader.onload = ev => setWm(w => ({ ...w, [field]: file, [urlField]: ev.target.result }));
     reader.readAsDataURL(file);
@@ -488,61 +516,82 @@ function BookingSection() {
   const getFirst = (y, m) => new Date(y, m, 1).getDay();
   const toKey = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   const isWknd = (y, m, d) => { const w = new Date(y, m, d).getDay(); return w === 5 || w === 6; };
-  const isPast = (y, m, d) => { const t = new Date(); t.setHours(0, 0, 0, 0); return new Date(y, m, d) < t; };
+  const isPast = (y, m, d) => toKey(y, m, d) < ilToday();
   const getHebDate = (y, m, d) => { try { return new Intl.DateTimeFormat("he-IL-u-ca-hebrew", { day: "numeric" }).format(new Date(y, m, d)); } catch { return ""; } };
+  const slotPast = (sl) => selDate === ilToday() && sl <= ilNowHHMM();
 
   const dim = getDIM(yr, mo), first = getFirst(yr, mo);
-  const [sd, sm, sy] = selDate ? selDate.split("-").map(Number) : [];
+  const [sy, sm, sd] = selDate ? selDate.split("-").map(Number) : [];
+
+  const clientValidate = () => {
+    const e = {};
+    if (form.name.trim().length < 2) e.name = "יש להזין שם מלא";
+    if (!/^0\d{8,9}$/.test(form.phone.replace(/[\s\-().]/g, "").replace(/^\+?972/, "0"))) e.phone = "יש להזין מספר טלפון תקין";
+    if (!/^[^\s@<>"']+@[^\s@<>"']+\.[A-Za-z]{2,}$/.test(form.email.trim())) e.email = "יש להזין כתובת אימייל תקינה";
+    if (form.address.trim().length < 3) e.address = "יש להזין את כתובת הנכס";
+    if (!consent) e.consentTerms = "יש לאשר את תנאי השירות ומדיניות הפרטיות";
+    return e;
+  };
 
   const completeBooking = async () => {
     setBookingLoading(true);
-    const payload = {
-      name: form.name,
-      phone: form.phone,
-      address: form.address,
-      pkg: form.pkg,
-      date: selDate,
-      time: selSlot,
-      notes: form.notes,
-    };
+    setSubmitError("");
+    const fd = new FormData();
+    Object.entries({ ...form, date: selDate, time: selSlot, agentPhone: wm.agentPhone, wantAgentPhoto: String(wm.wantAgentPhoto), consentTerms: String(consent), termsVersion: TERMS_VERSION }).forEach(([k, v]) => fd.append(k, v ?? ""));
+    if (wm.logoFile) fd.append("logo", wm.logoFile);
+    if (wm.wantAgentPhoto && wm.agentPhotoFile) fd.append("agentPhoto", wm.agentPhotoFile);
     try {
-      await fetch("/api/book-appointment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, bookingRef: `booking-${Date.now()}` }),
-      });
-    } catch (e) {
-      console.error("Booking API error:", e);
+      const res = await fetch("/api/book-appointment", { method: "POST", body: fd });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.ok) {
+        setDone(true);
+      } else {
+        if (json.fields) setErrors(json.fields);
+        setSubmitError(json.error || "לא הצלחנו לקלוט את ההזמנה. נסו שוב או פנו אלינו ב-WhatsApp.");
+      }
+    } catch {
+      setSubmitError("אין חיבור לשרת. נסו שוב או פנו אלינו ב-WhatsApp.");
     }
-    // pipeline job created server-side in /api/book-appointment
-    setDone(true);
     setBookingLoading(false);
   };
 
-  const handleSubmitBooking = () => {
-    if (!form.name || !form.phone || !form.address || !selDate || !selSlot) return;
+  const handleSubmitBooking = (e) => {
+    e?.preventDefault();
+    if (!selDate || !selSlot) { setSubmitError("יש לבחור תאריך ושעה"); return; }
+    const e2 = clientValidate();
+    setErrors(e2);
+    if (Object.keys(e2).length) {
+      setSubmitError("יש לתקן את השדות המסומנים");
+      const firstKey = ["name", "phone", "email", "address", "consentTerms"].find(k => e2[k]);
+      formRef.current?.querySelector(`#bk-${firstKey}`)?.focus();
+      return;
+    }
     completeBooking();
   };
 
-  const formIncomplete = !form.name || !form.phone || !form.address;
+  const pkgObj = PACKAGES.find(x => x.id === form.pkg);
+  const errProps = (k) => errors[k] ? { "aria-invalid": true, "aria-describedby": `bk-${k}-error` } : {};
 
   if (done) return (
-    <section className="visio-section" style={{ textAlign: "center" }}>
-      <div className="visio-kicker"><Bidi>BOOKING CONFIRMED</Bidi></div>
-      <h2 className="visio-section-title">הצילום נקבע ✓</h2>
-      <p style={{ fontSize: 14, color: C.muted, margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
-      <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0", fontSize: 14 }}>
-        התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
+    <section className="visio-section" style={{ textAlign: "center" }} aria-live="polite">
+      <div className="visio-kicker"><Bidi>VISIO</Bidi></div>
+      <h1 className="visio-section-title">בקשת ההזמנה התקבלה ✓</h1>
+      <p style={{ fontSize: 16, color: C.muted, margin: 0 }}>ניצור איתך קשר לאישור המועד. ההזמנה נכנסת לתוקף לאחר אישור המועד. {form.email && <>אישור נשלח גם לכתובת <bdi dir="ltr">{form.email}</bdi>.</>}</p>
+      <p className="visio-notice" style={{ maxWidth: 460, margin: "20px auto 0", fontSize: 15 }}>
+        התשלום מתבצע בעת ההזמנה. המחירים אינם כוללים מע״מ (18% יתווספו לחשבון).
       </p>
+      {/* PAYMENT STEP PLACEHOLDER — online payment is NOT implemented.
+          Planned: redirect to the acquirer's hosted payment page (card / Apple Pay / Google Pay),
+          see docs/payments-architecture.md. No provider keys exist in this codebase. */}
       <div className="visio-done-grid">
-        {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", PACKAGES.find(x => x.id === form.pkg)?.name || form.pkg], ["כתובת", form.address]].map(([l, v]) => (
+        {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", pkgObj?.name || form.pkg], ["כתובת", form.address]].map(([l, v]) => (
           <div key={l}>
             <div className="visio-kicker muted" style={{ marginBottom: 6 }}>{l}</div>
             <div className="visio-serif" style={{ fontSize: 18, color: C.ink }}><Bidi>{v}</Bidi></div>
           </div>
         ))}
       </div>
-      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); }}>
+      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); setConsent(false); }}>
         ← קביעת צילום נוסף
       </button>
     </section>
@@ -550,77 +599,85 @@ function BookingSection() {
 
   return (
     <div className="visio-booking-wrap">
-      <SectionTitle sup="BOOKING" title="תיאום מועד צילום" sub="בחר תאריך ושעה · מסונכרן עם יומן העסק" />
+      <SectionTitle as="h1" sup="BOOKING" title="תיאום מועד צילום" sub="בחרו תאריך ושעה · נאשר את המועד מולכם" />
 
       {/* Steps */}
-      <div className="visio-steps">
+      <ol className="visio-steps" aria-label="שלבי ההזמנה">
         {["תאריך", "שעה", "פרטים"].map((s, i) => (
-          <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? "1" : undefined }}>
+          <li key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? "1" : undefined }} aria-current={step === i + 1 ? "step" : undefined}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <div className={`visio-step-dot${step > i + 1 ? " done" : step === i + 1 ? " current" : ""}`}>
+              <div className={`visio-step-dot${step > i + 1 ? " done" : step === i + 1 ? " current" : ""}`} aria-hidden="true">
                 {step > i + 1 ? "✓" : i + 1}
               </div>
               <div className="visio-credit" style={{ color: step === i + 1 ? C.ink : C.muted }}>{s}</div>
             </div>
-            {i < 2 && <div style={{ flex: 1, height: 1, background: C.rule, margin: "0 8px 22px" }} />}
-          </div>
+            {i < 2 && <div aria-hidden="true" style={{ flex: 1, height: 1, background: C.rule, margin: "0 8px 22px" }} />}
+          </li>
         ))}
-      </div>
+      </ol>
 
       {/* Calendar */}
-      <div className="visio-panel">
+      <div className="visio-panel" role="group" aria-labelledby="bk-cal-title">
         <div className="visio-panel-head">
-          <button className="visio-icon-btn" aria-label="החודש הקודם" onClick={() => { if (mo === 0) { setYr(y => y - 1); setMo(11); } else setMo(m => m - 1); }}>‹</button>
-          <div className="visio-panel-title">{HEB_MONTHS[mo]} {yr}</div>
-          <button className="visio-icon-btn" aria-label="החודש הבא" onClick={() => { if (mo === 11) { setYr(y => y + 1); setMo(0); } else setMo(m => m + 1); }}>›</button>
+          <button type="button" className="visio-icon-btn" aria-label="החודש הקודם" onClick={() => { if (mo === 0) { setYr(y => y - 1); setMo(11); } else setMo(m => m - 1); }}>›</button>
+          <h2 id="bk-cal-title" className="visio-panel-title" aria-live="polite">{HEB_MONTHS[mo]} {yr}</h2>
+          <button type="button" className="visio-icon-btn" aria-label="החודש הבא" onClick={() => { if (mo === 11) { setYr(y => y + 1); setMo(0); } else setMo(m => m + 1); }}>‹</button>
         </div>
-        <div className="visio-cal-dow">
-          {LAT_DAYS.map((d, i) => <div key={d} style={i >= 5 ? { color: C.faint } : undefined}><Bidi>{d}</Bidi></div>)}
+        <div className="visio-cal-dow" aria-hidden="true">
+          {HEB_DOW_SHORT.map((d) => <div key={d}>{d}</div>)}
         </div>
         <div className="visio-cal-grid">
-          {Array(first).fill(null).map((_, i) => <div key={`e${i}`} className="visio-calendar-day" />)}
+          {Array(first).fill(null).map((_, i) => <div key={`e${i}`} className="visio-calendar-day" aria-hidden="true" />)}
           {Array(dim).fill(null).map((_, i) => {
             const day = i + 1, key = toKey(yr, mo, day);
             const avail = !isWknd(yr, mo, day) && !isPast(yr, mo, day), sel = selDate === key;
-            const isT = key === toKey(today.getFullYear(), today.getMonth(), today.getDate());
+            const isT = key === ilToday();
             const cls = ["visio-calendar-day", avail ? "available" : "blocked", isT && "today", sel && "selected"].filter(Boolean).join(" ");
+            const dow = HEB_DAYS[new Date(yr, mo, day).getDay()];
             return (
-              <div key={day} className={cls} onClick={() => { if (!avail) return; setSelDate(key); setStep(2); }}>
+              <button type="button" key={day} className={cls} disabled={!avail} aria-pressed={sel}
+                aria-label={`יום ${dow}, ${day} ב${HEB_MONTHS[mo]} ${yr}${avail ? "" : " — לא זמין"}`}
+                onClick={() => { setSelDate(key); setSelSlot(null); setStep(2); setTimeout(() => slotsRef.current?.querySelector("button:not([disabled])")?.focus(), 0); }}>
                 <span className="num">{day}</span>
-                <span className="heb">{getHebDate(yr, mo, day)}</span>
-              </div>
+                <span className="heb" aria-hidden="true">{getHebDate(yr, mo, day)}</span>
+              </button>
             );
           })}
         </div>
         <div className="visio-panel-foot">
-          <Bidi>● זמינות מסונכרנת עם Google Calendar · שישי-שבת חסומים</Bidi>
+          שישי-שבת אינם זמינים · המועד ייקבע סופית לאחר אישור שלנו
         </div>
       </div>
 
       {/* Time slots */}
       {step >= 2 && (
-        <div className="visio-panel">
+        <div className="visio-panel" role="group" aria-labelledby="bk-slot-title">
           <div className="visio-panel-head">
-            <span className="visio-panel-title">בחר שעה</span>
+            <h2 id="bk-slot-title" className="visio-panel-title">בחרו שעה</h2>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <button className="visio-link" style={{ fontSize: 11 }} onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>← שנה</button>
-              <span style={{ fontSize: 12, color: C.ink }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
+              <button type="button" className="visio-link" style={{ fontSize: 13 }} onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>שינוי תאריך</button>
+              <span style={{ fontSize: 13, color: C.ink }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
             </div>
           </div>
-          <div className="visio-time-slots">
-            {SLOTS.map(sl => (
-              <button key={sl} className={`visio-time-slot${selSlot === sl ? " selected" : ""}`} onClick={() => { setSelSlot(sl); setStep(3); }}>
-                {sl}
-                <small>פנוי</small>
-              </button>
-            ))}
+          <div className="visio-time-slots" ref={slotsRef}>
+            {SLOTS.map(sl => {
+              const past = slotPast(sl);
+              return (
+                <button type="button" key={sl} disabled={past} aria-pressed={selSlot === sl} className={`visio-time-slot${selSlot === sl ? " selected" : ""}`}
+                  onClick={() => { setSelSlot(sl); setStep(3); setTimeout(() => formRef.current?.querySelector("#bk-pkg")?.focus(), 0); }}>
+                  {sl}
+                  <small>{past ? "עבר" : "פנוי"}</small>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Form */}
       {step >= 3 && (
-        <div id="booking-form" className="visio-panel">
+        <form id="booking-form" className="visio-panel" ref={formRef} onSubmit={handleSubmitBooking} noValidate aria-labelledby="bk-form-title">
+          <h2 id="bk-form-title" className="visio-sr-only">פרטי ההזמנה</h2>
           <div className="visio-form-grid-2">
             {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot]].map(([l, v]) => (
               <div key={l}>
@@ -630,92 +687,122 @@ function BookingSection() {
             ))}
           </div>
           <div className="visio-form-body">
-            {/* Package select */}
-            <div>
-              <label className="visio-label">חבילה</label>
-              <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
+            <Field id="bk-pkg" label="חבילה">
+              <select id="bk-pkg" name="pkg" className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
                 <option value="CONSULTATION">ייעוץ טלפוני — חינם</option>
                 <option value="PHOTOS">VISIO Essential — ₪365 + מע״מ</option>
                 <option value="PHOTOS_VIDEO">VISIO Motion — ₪400 + מע״מ</option>
                 <option value="FULL">VISIO Signature — ₪450 + מע״מ</option>
                 <option value="INSTAGRAM">VISIO Social — ₪120 לשעת עבודה + מע״מ</option>
               </select>
-            </div>
-            {[["שם מלא *", "name", "שם פרטי + משפחה", "rtl"], ["טלפון *", "phone", "05X-XXXXXXX", "ltr"], ["כתובת הנכס *", "address", "רחוב, מספר, עיר", "rtl"]].map(([lbl, key, ph, dir]) => (
-              <div key={key}>
-                <label className="visio-label">{lbl}</label>
-                <input className="visio-input" placeholder={ph} dir={dir} value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
-              </div>
+            </Field>
+            {[
+              ["שם מלא", "name", "שם פרטי + משפחה", "rtl", "text", "name"],
+              ["טלפון", "phone", "05X-XXXXXXX", "ltr", "tel", "tel"],
+              ["אימייל", "email", "name@example.com", "ltr", "email", "email"],
+              ["כתובת הנכס", "address", "רחוב, מספר, עיר", "rtl", "text", "street-address"],
+            ].map(([lbl, key, ph, dir, type, ac]) => (
+              <Field key={key} id={`bk-${key}`} label={lbl} required error={errors[key]} hint={key === "email" ? "לאישור ההזמנה, קבלת הקבצים והחשבונית" : undefined}>
+                <input id={`bk-${key}`} name={key} type={type} autoComplete={ac} required aria-required="true" className="visio-input" placeholder={ph} dir={dir}
+                  maxLength={key === "address" ? 160 : key === "email" ? 120 : 80} value={form[key]}
+                  onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} {...errProps(key)} />
+              </Field>
             ))}
-            <div>
-              <label className="visio-label">הערות לצלם</label>
-              <textarea className="visio-input" rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            <Field id="bk-notes" label="הערות לצלם" error={errors.notes}>
+              <textarea id="bk-notes" name="notes" className="visio-input" rows={3} maxLength={1000} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} {...errProps("notes")} />
+            </Field>
+            {/* Honeypot (hidden from people and assistive tech) */}
+            <div className="visio-hp" aria-hidden="true">
+              <label htmlFor="bk-website">Website</label>
+              <input id="bk-website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} />
             </div>
 
             {/* Watermark section */}
-            <div style={{ border: `1px solid ${C.rule}`, background: C.bg2, padding: "20px 18px" }}>
-              <div className="visio-panel-title" style={{ marginBottom: 4 }}>בראנדינג על התמונות</div>
-              <div style={{ fontSize: 12, color: C.muted, marginBottom: 18 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · אופציונלי</div>
+            <fieldset style={{ border: `1px solid ${C.rule}`, background: C.bg2, padding: "20px 18px", margin: 0 }}>
+              <legend className="visio-panel-title" style={{ padding: "0 6px" }}>בראנדינג על התמונות (אופציונלי)</legend>
+              <div style={{ fontSize: 14, color: C.muted, marginBottom: 18 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · JPG / PNG / WebP עד 2MB</div>
 
               <div style={{ marginBottom: 16 }}>
-                <label className="visio-label">מספר טלפון על התמונה</label>
-                <input className="visio-input" placeholder="05X-XXXXXXX" dir="ltr" value={wm.agentPhone} onChange={e => setWm(w => ({ ...w, agentPhone: e.target.value }))} />
+                <Field id="bk-agentPhone" label="מספר טלפון על התמונה" error={errors.agentPhone}>
+                  <input id="bk-agentPhone" name="agentPhone" type="tel" autoComplete="off" className="visio-input" placeholder="05X-XXXXXXX" dir="ltr" maxLength={20} value={wm.agentPhone} onChange={e => setWm(w => ({ ...w, agentPhone: e.target.value }))} {...errProps("agentPhone")} />
+                </Field>
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label className="visio-label">לוגו חברה / סוכנות</label>
-                <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("logoFile", "logoUrl", e)} />
+                <label className="visio-label" htmlFor="bk-logo">לוגו חברה / סוכנות</label>
+                <input id="bk-logo" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp" className="visio-sr-only" onChange={e => handleFile("logoFile", "logoUrl", e)} />
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                  <button type="button" className="visio-btn outline" style={{ minHeight: 40, padding: "9px 18px", fontSize: 11 }} onClick={() => logoRef.current?.click()}>
-                    {wm.logoUrl ? "← החלף לוגו" : "↑ העלה לוגו"}
+                  <button type="button" className="visio-btn outline" style={{ minHeight: 44, padding: "9px 18px", fontSize: 13 }} onClick={() => logoRef.current?.click()} aria-describedby={errors.logoFile ? "bk-logoFile-error" : undefined}>
+                    {wm.logoUrl ? "↺ החלפת לוגו" : "↑ העלאת לוגו"}
                   </button>
                   {wm.logoUrl && <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <img src={wm.logoUrl} alt="logo" style={{ height: 36, maxWidth: 100, objectFit: "contain", background: C.bg, padding: 4, border: `1px solid ${C.rule}` }} />
-                    <span style={{ fontSize: 11, color: C.ink }}>✓ לוגו הועלה</span>
+                    <img src={wm.logoUrl} alt="תצוגה מקדימה של הלוגו" style={{ height: 36, maxWidth: 100, objectFit: "contain", background: C.bg, padding: 4, border: `1px solid ${C.rule}` }} />
+                    <span style={{ fontSize: 13, color: C.ink }}>✓ הלוגו צורף</span>
                   </div>}
                 </div>
+                {errors.logoFile && <div id="bk-logoFile-error" className="visio-field-error" role="alert">{errors.logoFile}</div>}
               </div>
 
               <div>
-                <label className="visio-label" style={{ marginBottom: 10 }}>תמונת גוף של הסוכן</label>
-                <div onClick={() => setWm(w => ({ ...w, wantAgentPhoto: !w.wantAgentPhoto }))} style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginBottom: 14 }}>
-                  <div className={`visio-checkbox${wm.wantAgentPhoto ? " checked" : ""}`}>
-                    {wm.wantAgentPhoto ? "✓" : ""}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, color: C.text }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
-                    <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>הסוכן יוצב בפינה על כל תמונה</div>
-                  </div>
-                </div>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginBottom: 14 }}>
+                  <input type="checkbox" className="visio-check" checked={wm.wantAgentPhoto} onChange={e => setWm(w => ({ ...w, wantAgentPhoto: e.target.checked }))} />
+                  <span>
+                    <span style={{ display: "block", fontSize: 15, color: C.text }}>אני מעוניין/ת שתמונת הסוכן תופיע על התמונות</span>
+                    <span style={{ display: "block", fontSize: 13, color: C.muted, marginTop: 3 }}>הסוכן יוצב בפינה על כל תמונה</span>
+                  </span>
+                </label>
 
                 {wm.wantAgentPhoto && (
                   <div style={{ padding: 16, background: C.bg, border: `1px solid ${C.rule}` }}>
-                    <input ref={photoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("agentPhotoFile", "agentPhotoUrl", e)} />
-                    <button type="button" className="visio-btn outline" style={{ minHeight: 40, padding: "9px 18px", fontSize: 11 }} onClick={() => photoRef.current?.click()}>
-                      {wm.agentPhotoUrl ? "← החלף תמונה" : "↑ העלה תמונת גוף"}
+                    <label className="visio-label" htmlFor="bk-agentPhoto">תמונת גוף של הסוכן</label>
+                    <input id="bk-agentPhoto" ref={photoRef} type="file" accept="image/jpeg,image/png,image/webp" className="visio-sr-only" onChange={e => handleFile("agentPhotoFile", "agentPhotoUrl", e)} />
+                    <button type="button" className="visio-btn outline" style={{ minHeight: 44, padding: "9px 18px", fontSize: 13 }} onClick={() => photoRef.current?.click()}>
+                      {wm.agentPhotoUrl ? "↺ החלפת תמונה" : "↑ העלאת תמונת גוף"}
                     </button>
+                    {errors.agentPhotoFile && <div className="visio-field-error" role="alert">{errors.agentPhotoFile}</div>}
                     {wm.agentPhotoUrl && (
                       <div style={{ marginTop: 12, position: "relative", height: 140, background: "#1a1a1a", overflow: "hidden" }}>
                         {wm.logoUrl && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,.6)", padding: "3px 6px" }}>
-                          <img src={wm.logoUrl} alt="logo" style={{ height: 22, maxWidth: 72, objectFit: "contain", display: "block" }} />
+                          <img src={wm.logoUrl} alt="" style={{ height: 22, maxWidth: 72, objectFit: "contain", display: "block" }} />
                         </div>}
                         {wm.agentPhone && <div style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,.7)", padding: "3px 10px", fontSize: 12, color: "#fff", letterSpacing: 1.5 }}>📞 {wm.agentPhone}</div>}
-                        <img src={wm.agentPhotoUrl} alt="agent" style={{ position: "absolute", bottom: 0, left: 8, height: "85%", objectFit: "contain", objectPosition: "bottom" }} />
+                        <img src={wm.agentPhotoUrl} alt="תצוגה מקדימה של תמונת הסוכן" style={{ position: "absolute", bottom: 0, left: 8, height: "85%", objectFit: "contain", objectPosition: "bottom" }} />
                       </div>
                     )}
                   </div>
                 )}
               </div>
+            </fieldset>
+
+            {/* Order summary shown before confirmation (terms 2.2, 3.1, 5.1, 6.1, 9) */}
+            <div className="visio-order-summary" aria-labelledby="bk-sum-title">
+              <h3 id="bk-sum-title" className="visio-term-title" style={{ fontSize: 18, marginBottom: 8 }}>לפני אישור ההזמנה</h3>
+              <ul>
+                <li>{pkgObj ? <><Bidi>{pkgObj.name}</Bidi> — ₪{fmt(pkgObj.price)}{pkgObj.unit ? ` ${pkgObj.unit}` : ""} + מע״מ 18% (סה״כ ₪{fmt(pkgObj.price * (1 + VAT))}{pkgObj.unit ? ` ${pkgObj.unit}` : ""})</> : "ייעוץ טלפוני — ללא עלות"}</li>
+                {form.pkg === "FULL" && <li><strong>סיור וירטואלי:</strong> מנוי חודשי של ₪40 + מע״מ (₪{fmt(40 * (1 + VAT))} לחודש), מתחדש אוטומטית וניתן לביטול בהתאם לתנאי השירות.</li>}
+                <li>התשלום מתבצע בעת ההזמנה. ההזמנה נכנסת לתוקף לאחר שנאשר את המועד.</li>
+                <li>ביטול: 48 שעות ומעלה לפני הצילום — החזר מלא · 24–48 שעות — 50% · פחות מ-24 שעות — ללא החזר.</li>
+                <li>אספקת הקבצים: עד 48 שעות מהצילום (הערכה).</li>
+              </ul>
             </div>
 
-            {(!selDate || !selSlot) && <div className="visio-notice">← גלול למעלה ובחר תאריך ושעה</div>}
-            {selDate && selSlot && formIncomplete && <div className="visio-notice">מלא שם, טלפון וכתובת הנכס</div>}
-            <button className="visio-btn block" onClick={handleSubmitBooking} disabled={bookingLoading}
-              style={{ cursor: bookingLoading ? "wait" : "pointer", opacity: (formIncomplete || !selDate || !selSlot) ? 0.5 : 1 }}>
-              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : formIncomplete ? "מלא שם + טלפון + כתובת" : "אישור הזמנה →"}
+            {/* Consent (required) */}
+            <div>
+              <label className="visio-consent" htmlFor="bk-consentTerms">
+                <input id="bk-consentTerms" type="checkbox" className="visio-check" checked={consent} onChange={e => { setConsent(e.target.checked); if (e.target.checked) setErrors(er => ({ ...er, consentTerms: undefined })); }} required aria-required="true" {...errProps("consentTerms")} />
+                <span>קראתי ואני מסכים/ה ל<a href={TERMS_URL} target="_blank" rel="noopener">תנאי השירות</a> ול<a href={PRIVACY_URL} target="_blank" rel="noopener">מדיניות הפרטיות</a> <span aria-hidden="true">*</span></span>
+              </label>
+              {errors.consentTerms && <div id="bk-consentTerms-error" className="visio-field-error" role="alert">{errors.consentTerms}</div>}
+            </div>
+
+            <div aria-live="assertive">{submitError && <div className="visio-notice visio-notice-error" role="alert">{submitError} <a href="https://wa.me/972533523379" target="_blank" rel="noopener" style={{ color: "inherit", textDecoration: "underline" }}>WhatsApp: <bdi dir="ltr">053-352-3379</bdi></a></div>}</div>
+            <button type="submit" className="visio-btn block" disabled={bookingLoading || !consent} aria-disabled={bookingLoading || !consent}
+              style={{ cursor: bookingLoading ? "wait" : "pointer" }}>
+              {bookingLoading ? "שולח..." : "שליחת בקשת הזמנה"}
             </button>
+            {!consent && <div className="visio-field-hint" style={{ textAlign: "center" }}>יש לסמן את תיבת ההסכמה לתנאי השירות כדי לשלוח</div>}
           </div>
-        </div>
+        </form>
       )}
     </div>
   );
@@ -811,7 +898,15 @@ const NAV = [
 export default function VisioApp() {
   const [page, setPage] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const nav = (p) => { setPage(p); setMenuOpen(false); window.scrollTo(0, 0); };
+  // Deep links: /?page=charter etc. (used by the booking form's terms link and emails).
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("page");
+    if (q && NAV.some(n => n.id === q)) setPage(q);
+  }, []);
+  const nav = (p) => {
+    setPage(p); setMenuOpen(false); window.scrollTo(0, 0);
+    try { window.history.replaceState(null, "", p === "home" ? "/" : `/?page=${p}`); } catch {}
+  };
 
   return (
     <div className="visio-public">
