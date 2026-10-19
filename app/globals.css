@@ -573,7 +573,7 @@ button:hover { opacity: 0.85; }
 
 /* ── Accessibility fixes (audit 2026-10, IS 5568 / WCAG 2.0 AA) ───────────── */
 .visio-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.visio-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.visio-hp { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 .visio-public :focus-visible { outline: 2px solid var(--pub-ink); outline-offset: 2px; }
 .visio-public .visio-input:focus-visible { outline: 2px solid var(--pub-ink); outline-offset: 0; }
 h2.visio-panel-title, h3.visio-panel-title, h2.visio-term-title, h3.visio-term-title { margin: 0; }
