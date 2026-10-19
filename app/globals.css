@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600&display=swap');
 
 /* ── Theme tokens ── */
 :root,
@@ -91,9 +90,9 @@
   --pub-overlay: rgba(255, 255, 255, 0.94);
   --pub-lightbox: rgba(0, 0, 0, 0.96);
   --pub-scrim: rgba(0, 0, 0, 0.4);
-  --pub-display: 'Bodoni Moda', 'Bodoni 72', Didot, 'Frank Ruhl Libre', 'Times New Roman', serif;
-  --pub-serif: 'Frank Ruhl Libre', 'David Libre', David, 'Times New Roman', serif;
-  --pub-sans: 'Heebo', 'Assistant', 'Arial Hebrew', Arial, sans-serif;
+  --pub-display: var(--font-bodoni), 'Bodoni 72', Didot, var(--font-frank), 'Times New Roman', serif;
+  --pub-serif: var(--font-frank), 'David Libre', David, 'Times New Roman', serif;
+  --pub-sans: var(--font-heebo), 'Assistant', 'Arial Hebrew', Arial, sans-serif;
   --pub-lh-heading: 1.2;
   --pub-lh-body: 1.7;
 }
@@ -143,13 +142,13 @@ body {
   margin: 0;
   background: var(--visio-bg);
   color: var(--visio-text);
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font-heebo), sans-serif;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
 }
 
 input, select, textarea, button {
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font-heebo), sans-serif;
 }
 
 ::-webkit-scrollbar { width: 4px; }
@@ -405,21 +404,21 @@ button:hover { opacity: 0.85; }
 .visio-admin-nav-item:hover { color: var(--visio-text); background: var(--visio-hover-wash); }
 .visio-admin-nav-item.active { color: var(--visio-gold); background: var(--visio-active-wash); border-right: 2px solid var(--visio-gold); }
 .visio-admin-main { flex: 1; padding: 32px 28px; overflow-y: auto; min-width: 0; }
-.visio-admin-page-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--visio-text); margin: 0 0 28px; }
-.visio-admin-section-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: var(--visio-gold); margin: 0 0 16px; }
+.visio-admin-page-title { font-family: var(--font-bebas), sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--visio-text); margin: 0 0 28px; }
+.visio-admin-section-title { font-family: var(--font-bebas), sans-serif; font-size: 16px; letter-spacing: 3px; color: var(--visio-gold); margin: 0 0 16px; }
 .visio-admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
 .visio-admin-stat { background: var(--visio-glass); backdrop-filter: blur(16px); border: 1px solid var(--visio-glass-border); padding: 20px 18px; border-radius: 2px; }
-.visio-admin-stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; color: var(--visio-gold); margin: 10px 0 4px; }
+.visio-admin-stat-value { font-family: var(--font-bebas), sans-serif; font-size: 32px; letter-spacing: 2px; color: var(--visio-gold); margin: 10px 0 4px; }
 .visio-admin-stat-label { font-size: 12px; color: var(--visio-text); }
 .visio-admin-stat-sub { font-size: 10px; color: var(--visio-muted-soft); margin-top: 2px; }
 .visio-admin-table { border: 1px solid var(--visio-border-subtle); border-radius: 2px; overflow: hidden; }
 .visio-admin-table-row { display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 16px; padding: 14px 18px; align-items: center; background: var(--visio-panel); border-bottom: 1px solid var(--visio-border-subtle); }
 .visio-admin-table-row--wide { grid-template-columns: 1fr 1.2fr 0.8fr auto auto; }
-.visio-admin-tag { font-size: 10px; color: var(--visio-gold); border: 1px solid var(--visio-gold-border-mid); padding: 4px 10px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
+.visio-admin-tag { font-size: 10px; color: var(--visio-gold); border: 1px solid var(--visio-gold-border-mid); padding: 4px 10px; font-family: var(--font-bebas), sans-serif; letter-spacing: 2px; }
 .visio-admin-label { font-size: 10px; letter-spacing: 2px; color: var(--visio-gold-dim); display: block; margin-bottom: 6px; }
 .visio-admin-input { width: 100%; background: var(--visio-input-bg); border: 1px solid var(--visio-border-subtle); color: var(--visio-text); padding: 12px 14px; font-size: 14px; outline: none; border-radius: 2px; }
 .visio-admin-input:focus { border-color: var(--visio-gold-border-strong); }
-.visio-admin-btn-primary { padding: 12px 24px; background: var(--visio-primary-grad); border: none; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 3px; color: var(--visio-on-gold); cursor: pointer; border-radius: 2px; font-weight: 600; }
+.visio-admin-btn-primary { padding: 12px 24px; background: var(--visio-primary-grad); border: none; font-family: var(--font-bebas), sans-serif; font-size: 13px; letter-spacing: 3px; color: var(--visio-on-gold); cursor: pointer; border-radius: 2px; font-weight: 600; }
 .visio-admin-btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: none; border: 1px solid var(--visio-border-subtle); color: var(--visio-muted-soft); font-size: 12px; cursor: pointer; border-radius: 2px; }
 .visio-admin-btn-signout { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--visio-gold-wash); border: 1px solid var(--visio-gold-border-strong); color: var(--visio-gold); font-size: 12px; letter-spacing: 0.5px; cursor: pointer; border-radius: 2px; font-family: inherit; }
 .visio-admin-btn-signout:hover { background: var(--visio-active-wash); }
@@ -454,7 +453,7 @@ button:hover { opacity: 0.85; }
 
 .visio-agents-admin { direction: rtl; }
 .visio-agents-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
-.visio-agents-eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 5px; color: var(--visio-gold-dim); margin-bottom: 4px; }
+.visio-agents-eyebrow { font-family: var(--font-bebas), sans-serif; font-size: 10px; letter-spacing: 5px; color: var(--visio-gold-dim); margin-bottom: 4px; }
 .visio-agents-tabs { display: flex; gap: 4px; }
 .visio-agents-tabs button { padding: 10px 18px; background: var(--visio-panel); border: 1px solid var(--visio-border-subtle); color: var(--visio-muted-soft); font-size: 12px; cursor: pointer; border-radius: 2px; }
 .visio-agents-tabs button.active { color: var(--visio-gold); border-color: var(--visio-gold-border-strong); background: var(--visio-active-wash); }
@@ -465,7 +464,7 @@ button:hover { opacity: 0.85; }
 .visio-agent-card:hover { border-color: rgba(201,168,76,0.2); }
 .visio-agent-card.selected { border-color: color-mix(in srgb, var(--agent-color) 50%, transparent); box-shadow: 0 0 24px color-mix(in srgb, var(--agent-color) 15%, transparent); }
 .visio-agent-icon-wrap { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--visio-input-bg); border: 1px solid var(--visio-border-subtle); color: var(--agent-color); border-radius: 2px; }
-.visio-agent-name { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--agent-color); }
+.visio-agent-name { font-family: var(--font-bebas), sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--agent-color); }
 .visio-agent-role { font-size: 10px; color: var(--visio-muted-soft); letter-spacing: 1px; margin-top: 2px; }
 .visio-agent-card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
 .visio-agent-status { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--visio-muted-soft); text-transform: uppercase; letter-spacing: 1px; }
@@ -476,7 +475,7 @@ button:hover { opacity: 0.85; }
 
 .visio-pipeline-flow { display: flex; flex-direction: column; gap: 8px; }
 .visio-pipeline-step { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--visio-dropzone-bg); border: 1px solid var(--visio-border-subtle); border-radius: 2px; flex-wrap: wrap; }
-.visio-pipeline-num { font-family: 'Bebas Neue', sans-serif; font-size: 11px; color: var(--visio-muted); width: 24px; }
+.visio-pipeline-num { font-family: var(--font-bebas), sans-serif; font-size: 11px; color: var(--visio-muted); width: 24px; }
 .visio-pipeline-agent { display: flex; align-items: center; gap: 8px; font-size: 12px; min-width: 120px; }
 .visio-pipeline-arrow { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--visio-muted-soft); justify-content: center; min-width: 100px; }
 
