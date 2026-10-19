@@ -36,5 +36,8 @@
     "eslint-config-next": "^15.5.28",
     "playwright": "^1.63.0",
     "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "postcss": "^8.5.31"
   }
 }
