@@ -35,6 +35,6 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "playwright": "^1.63.0",
-    "vitest": "^2.1.9"
+    "vitest": "^4.1.12"
   }
 }
