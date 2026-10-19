@@ -978,6 +978,11 @@ export default function VisioApp() {
         <p className="visio-footer-legal">
           <Bidi>© 2025 VISIO Photography · כל הזכויות שמורות · </Bidi><a href="/admin/login">כניסת צוות</a>
         </p>
+        <div className="visio-footer-links">
+          <a href="/privacy">מדיניות פרטיות</a>
+          <a href="/accessibility">הצהרת נגישות</a>
+          <button type="button" onClick={() => nav("charter")} style={{ background: "none", border: 0, color: "#cfcfcf", fontSize: 13, textDecoration: "underline", cursor: "pointer", padding: 0 }}>תנאי השירות</button>
+        </div>
       </footer>
     </div>
   );
