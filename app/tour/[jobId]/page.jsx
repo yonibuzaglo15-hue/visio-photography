@@ -6,7 +6,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function generateMetadata({ params }) {
-  const data = await loadPublicTour(params.jobId);
+  const { jobId } = await params;
+  const data = await loadPublicTour(jobId);
   if (!data) {
     return {
       title: "סיור לא נמצא — VISIO",
@@ -34,7 +35,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function PublicTourPage({ params }) {
-  const data = await loadPublicTour(params.jobId);
+  const { jobId } = await params;
+  const data = await loadPublicTour(jobId);
   if (!data) notFound();
 
   return <TourViewerClient config={data.config} />;

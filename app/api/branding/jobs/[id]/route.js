@@ -3,7 +3,8 @@ import { requireAllowedApi } from "@/lib/auth/require.js";
 import { getBrandingJob } from "@/lib/branding/store.js";
 
 /** GET /api/branding/jobs/[id] */
-export async function GET(request, { params }) {
+export async function GET(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 
