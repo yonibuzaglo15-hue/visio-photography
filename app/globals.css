@@ -217,7 +217,8 @@ button:hover { opacity: 0.85; }
 .nav-hamburger { display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--pub-ink); font-size: 22px; cursor: pointer; min-width: 44px; min-height: 44px; padding: 0; line-height: 1; }
 .nav-overlay { display: none; position: fixed; inset: 0; background: var(--pub-scrim); z-index: 150; }
 .nav-drawer { display: none; position: fixed; top: 0; right: 0; width: min(300px, 85vw); height: 100vh; background: var(--pub-bg); border-left: 1px solid var(--pub-rule); z-index: 200; flex-direction: column; padding: 24px 0; transform: translateX(100%); transition: transform .3s ease; overflow-y: auto; }
-.nav-drawer.open { transform: translateX(0); }
+.nav-drawer:not(.open) { visibility: hidden; transition: transform .3s ease, visibility 0s linear .3s; }
+.nav-drawer.open { transform: translateX(0); visibility: visible; }
 .nav-drawer-mark { font-family: var(--pub-display); font-weight: 500; font-size: 40px; letter-spacing: .04em; color: var(--pub-ink); text-align: center; padding: 0 24px 20px; border-bottom: 1px solid var(--pub-ink); margin-bottom: 8px; }
 .nav-drawer-btn { width: 100%; padding: 16px 24px; background: none; border: none; border-bottom: 1px solid var(--pub-rule); font-family: var(--pub-serif); font-size: 20px; color: var(--pub-ink); cursor: pointer; text-align: right; min-height: 52px; }
 .nav-drawer-btn.active { font-weight: 700; }
@@ -605,3 +606,7 @@ button.visio-calendar-day:disabled { cursor: not-allowed; }
 .visio-legal h1 { font-family: var(--pub-serif); font-weight: 500; font-size: clamp(32px, 5vw, 48px); color: var(--pub-ink); margin: 0 0 8px; }
 .visio-legal h2 { font-family: var(--pub-serif); font-weight: 500; font-size: 22px; color: var(--pub-ink); margin: 32px 0 8px; }
 .visio-legal .visio-legal-meta { font-size: 14px; color: var(--pub-muted); }
+
+/* Visually hidden until keyboard-focused (portfolio card actions) */
+.visio-sr-only-focusable:not(:focus):not(:focus-visible) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.visio-sr-only-focusable:focus, .visio-sr-only-focusable:focus-visible { display: inline-block; margin-top: 8px; margin-inline-end: 12px; padding: 6px 10px; background: var(--pub-bg); color: var(--pub-ink); border: 1px solid var(--pub-ink); font-size: 14px; text-decoration: none; cursor: pointer; }

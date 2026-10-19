@@ -286,6 +286,12 @@ export function keyStep(key) {
 }
 function Lightbox({ imgs, idx, onStep, onClose }) {
   const touch = useRef(null);
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const opener = document.activeElement;
+    closeRef.current?.focus();
+    return () => { if (opener && typeof opener.focus === "function") opener.focus(); };
+  }, []);
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -306,7 +312,7 @@ function Lightbox({ imgs, idx, onStep, onClose }) {
     if (d) onStep(d);
   };
   return (
-    <div className="visio-lightbox" role="dialog" aria-modal="true" onClick={onClose} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <div className="visio-lightbox" role="dialog" aria-modal="true" aria-label="גלריית תמונות" onClick={onClose} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <img src={imgs[idx]} alt="" decoding="async" onClick={e => e.stopPropagation()} draggable={false} />
       <div className="visio-lightbox-controls" onClick={e => e.stopPropagation()}>
         {imgs.length > 1 && (
@@ -316,7 +322,7 @@ function Lightbox({ imgs, idx, onStep, onClose }) {
             <button className="visio-icon-btn" onClick={() => onStep(1)} aria-label="הבא">›</button>
           </>
         )}
-        <button className="visio-icon-btn" onClick={onClose} style={{ fontSize: 12, letterSpacing: ".2em" }}>✕ סגור</button>
+        <button ref={closeRef} className="visio-icon-btn" onClick={onClose} aria-label="סגור" style={{ fontSize: 12, letterSpacing: ".2em" }}><span aria-hidden="true">✕</span> סגור</button>
       </div>
     </div>
   );
@@ -379,6 +385,17 @@ function PortfolioSection() {
           <div className="visio-credit">
             <Bidi>{cardTagLine(p)}</Bidi>
           </div>
+          {/* Keyboard / screen-reader access to the hover-only actions (visible only on focus) */}
+          {tourHref && (
+            <a className="visio-sr-only-focusable" href={tourHref} {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}>
+              סיור וירטואלי 3D — {p.title}
+            </a>
+          )}
+          {gallery.length > 0 && (
+            <button type="button" className="visio-sr-only-focusable" onClick={() => openGallery(gallery)}>
+              גלריית תמונות ({gallery.length}) — {p.title}
+            </button>
+          )}
         </div>
       </article>
     );
@@ -899,6 +916,12 @@ const NAV = [
 export default function VisioApp() {
   const [page, setPage] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
   // Deep links: /?page=charter etc. (used by the booking form's terms link and emails).
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("page");
@@ -931,7 +954,7 @@ export default function VisioApp() {
       {/* ── NAVBAR ── */}
       <nav className="visio-nav">
         <div className="visio-nav-inner">
-          <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="תפריט">☰</button>
+          <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="תפריט" aria-expanded={menuOpen} aria-controls="nav-drawer">☰</button>
           <button className="visio-nav-mini" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
           <div className="nav-desktop">
             {NAV.map(n => (
@@ -944,7 +967,7 @@ export default function VisioApp() {
       </nav>
 
       {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
-      <aside className={`nav-drawer ${menuOpen ? "open" : ""}`}>
+      <aside id="nav-drawer" className={`nav-drawer ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen} aria-label="תפריט ניווט">
         <div className="nav-drawer-mark"><Bidi>VISIO</Bidi></div>
         {NAV.map(n => (
           <button key={n.id} className={`nav-drawer-btn ${page === n.id ? "active" : ""}`} onClick={() => nav(n.id)}>
