@@ -976,7 +976,7 @@ export default function VisioApp() {
           ))}
         </div>
         <p className="visio-footer-legal">
-          <Bidi>© 2025 VISIO Photography · כל הזכויות שמורות · </Bidi><a href="/admin/login">כניסת צוות</a>
+          <Bidi>{`© ${new Date().getFullYear()} VISIO Photography · כל הזכויות שמורות · `}</Bidi><a href="/admin/login">כניסת צוות</a>
         </p>
         <div className="visio-footer-links">
           <a href="/privacy">מדיניות פרטיות</a>
