@@ -31,7 +31,7 @@ const VAT = 0.18;
 const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
 
 // Pricing copy also isolates number runs (12+12, ₪40) so they never reorder neighbouring Hebrew.
-const LATIN_OR_NUM_RUN = /₪?\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*|₪?\d+(?:\+\d+)?/g;
+const LATIN_OR_NUM_RUN = /\d+[-–]\d+|₪?\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*|₪?\d+(?:\+\d+)?/g;
 function Bidi({ children: text, numbers = false }) {
   const parts = [];
   let last = 0;
@@ -161,7 +161,7 @@ function PortfolioFilter({ value, onChange }) {
 }
 
 const PARTNERS = [
-  { id: "remax", name: "RE/MAX", sub: "ישראל", desc: "רשת התיווך הגדולה בעולם" },
+  { id: "remax", name: "RE/MAX", sub: "ישראל", desc: "" },
   { id: "rehouse", name: "ReHouse", sub: 'נדל"ן', desc: 'חברת נדל"ן בוטיק' },
   { id: "lbd", name: "L.B.D", sub: "Real Estate", desc: "נדל״ן יוקרה" },
   { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
@@ -175,7 +175,7 @@ const PACKAGES = [
     desc: "תמונות שמוכרות וסרטון שמספר: 12+12 תמונות ממותגות וסרטון שיווק שמציג את הנכס בתנועה, מוכן לרשתות ולמודעות." },
   { id: "FULL", tier: "signature", name: "VISIO Signature", price: 450, recommended: true,
     desc: "החבילה המלאה: 12+12 תמונות ממותגות, סרטון שיווק, צילומי רחפן DJI וסיור וירטואלי תלת-מימדי שמאפשר לקונים להתהלך בנכס מהבית.",
-    note: "הסיור כרוך במנוי חודשי של ₪40" },
+    note: "הסיור כרוך במנוי חודשי של ₪40 + מע״מ" },
   { id: "INSTAGRAM", tier: "social", name: "VISIO Social", price: 120, unit: "לשעת עבודה",
     desc: "שיווק תוכן אורגני לאינסטגרם, בהתאמה אישית לסוכן או למשרד.",
     note: "רחפן בתוספת תשלום" },
@@ -201,7 +201,7 @@ function HomeSection({ onNav }) {
           <div className="visio-cover-text">
             <div className="visio-kicker"><Bidi>VISIO PHOTOGRAPHY</Bidi></div>
             <h1 className="visio-cover-title">נדל״ן. בצילום שמוכר.</h1>
-            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
+            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · אספקה עד 48 שעות</Bidi></p>
             <div className="visio-cover-btns">
               <button className="visio-btn on-image" onClick={() => onNav("booking")}>הזמן צילום עכשיו</button>
               <button className="visio-btn on-image outline" onClick={() => onNav("portfolio")}>צפה בעבודות</button>
@@ -239,7 +239,7 @@ function HomeSection({ onNav }) {
       {/* Stats */}
       <div style={{ padding: "0 20px" }}>
         <div className="visio-stats">
-          {[["500+","נכסים צולמו"],["24H","זמן אספקה"],["100%","לקוחות מרוצים"],["12+12","תמונות ממותגות בחבילה"]].map(([n,l]) => (
+          {[["500+","נכסים צולמו"],["48H","זמן אספקה מרבי"],["100%","לקוחות מרוצים"],["12+12","תמונות ממותגות בחבילה"]].map(([n,l]) => (
             <div key={l} className="visio-stat">
               <div className="visio-stat-num"><Bidi>{n}</Bidi></div>
               <div className="visio-kicker muted">{l}</div>
@@ -443,15 +443,16 @@ function PricingSection({ onNav }) {
             <img className={`visio-pkg-logo metal-${pkg.tier}`} src={`/packages/visio-${pkg.tier}.svg`} alt={pkg.name} width="96" height="96" loading="lazy" />
             <div className="visio-price-name visio-price-name-en" dir="ltr">{pkg.name}</div>
             <div className="visio-price">₪{p(pkg.price)}</div>
-            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.unit ? `${pkg.unit} · ` : ""}{showVat ? "כולל מע״מ" : "+ מע״מ"}</div>
+            <div className="visio-credit" style={{ marginTop: 10 }}>{pkg.unit ? `${pkg.unit} · ` : ""}{showVat ? "כולל מע״מ (18%)" : "+ מע״מ (18%)"}</div>
             <p className="visio-price-desc" dir="rtl"><Bidi numbers>{pkg.desc}</Bidi></p>
             {pkg.note && <p className="visio-price-note" dir="rtl"><Bidi numbers>{`* ${pkg.note}`}</Bidi></p>}
             <button className={`visio-btn block${pkg.recommended ? "" : " outline"}`} onClick={() => onNav("booking")} style={{ letterSpacing: ".1em" }}>
-              הזמן עכשיו ← תשלום ביום הצילום
+              הזמן עכשיו ← תשלום בעת ההזמנה
             </button>
           </div>
         ))}
       </div>
+      <p className="visio-gear-line" dir="rtl">כל המחירים אינם כוללים מע״מ — 18% מע״מ יתווספו לחשבון (לדוגמה: ₪450 + 18% = ₪{fmt(450 * (1 + VAT))}). גם מנוי הסיור הווירטואלי (₪40 לחודש) הוא בתוספת מע״מ. התשלום מתבצע בעת ההזמנה.</p>
       <p className="visio-gear-line" dir="rtl"><Bidi>{GEAR_LINE}</Bidi></p>
     </section>
   );
@@ -827,7 +828,7 @@ function CharterSection() {
         {publicTerms.map(t => (
           <div key={t.title} className="visio-term">
             <div className="visio-term-title">{t.title}</div>
-            <p><Bidi>{t.body}</Bidi></p>
+            <p><Bidi numbers>{t.body}</Bidi></p>
           </div>
         ))}
         <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: C.muted }}>
@@ -847,13 +848,13 @@ function AboutSection({ onNav }) {
       <div className="visio-narrow visio-article">
         <div className="visio-kicker" style={{ marginBottom: 16 }}>החזון שלנו</div>
         <p>
-          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
+          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 48 שעות לכל היותר. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
         </p>
 
         <blockquote className="visio-pullquote">נדל״ן. בצילום שמוכר.</blockquote>
 
         <div className="visio-about-grid">
-          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
+          {[["מהירות", "אספקה עד 48 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
@@ -867,7 +868,7 @@ function AboutSection({ onNav }) {
           {PARTNERS.map(p => (
             <div key={p.id} style={{ textAlign: "center" }}>
               <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
+              {p.desc && <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>}
             </div>
           ))}
         </div>
