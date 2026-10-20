@@ -11,7 +11,8 @@ const ALLOWED = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
  * POST multipart — upload a floor-plan image to tours/{jobId}/floorplan-f{N}.{ext}
  * Form fields: file, floor (number), label (optional string)
  */
-export async function POST(request, { params }) {
+export async function POST(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 

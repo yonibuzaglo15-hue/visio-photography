@@ -17,7 +17,7 @@ export async function POST(request, { params }) {
   if (gate.errorResponse) return gate.errorResponse;
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const job = await getJob(id);
     if (!job) {
       return NextResponse.json({ ok: false, error: "Job not found" }, { status: 404 });

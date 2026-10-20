@@ -13,7 +13,8 @@ import { AGENTS } from "@/lib/agents/types.js";
  * GET — current details for a job (merged with legacy booking).
  * PATCH — update details only; never touches files / agents / outputs / tour.
  */
-export async function GET(request, { params }) {
+export async function GET(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 
@@ -29,7 +30,8 @@ export async function GET(request, { params }) {
   }
 }
 
-export async function PATCH(request, { params }) {
+export async function PATCH(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 

@@ -31,7 +31,8 @@ function panoramasFromJob(job) {
 /**
  * GET — load editor state: the newest saved version (never a stale CDN copy).
  */
-export async function GET(request, { params }) {
+export async function GET(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 
@@ -96,7 +97,8 @@ export async function GET(request, { params }) {
  * PUT — save editor state. Rejected (409) when someone saved after this editor
  * loaded (`baseVersion` ≠ newest), so an old copy can never overwrite newer work.
  */
-export async function PUT(request, { params }) {
+export async function PUT(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 

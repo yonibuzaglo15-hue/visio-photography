@@ -59,7 +59,8 @@ async function loadPlanBuffer(planUrl) {
  * Local OpenCV assist — detect capture dots / suggest wall-aware links.
  * Suggestions only; the editor never writes them as final without confirmation.
  */
-export async function POST(request, { params }) {
+export async function POST(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 
