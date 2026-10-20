@@ -100,6 +100,42 @@ describe("hosted tours", () => {
     expect(loadTour("ashdod-apartment").scenes.some((scene) => "heading" in scene.map)).toBe(false);
   });
 
+  it("loads the self-hosted חסידא 17 tour with every Matterport point on the plan", () => {
+    expect(listTourSlugs()).toContain("chasida-17");
+    const tour = loadTour("chasida-17");
+    expect(tour).toBeTruthy();
+    expect(tour.scenes).toHaveLength(54);
+    expect(tour.firstScene).toBe("c18");
+    expect(tour.assetBase).toBe("/tours/chasida-17");
+    expect(tour.credit).toBe("יונתן בוזגלו | VISIO");
+    expect(tour.plan).toBe("plan.jpg");
+    for (const text of [tour.title, tour.location, tour.note]) {
+      expect(text).not.toMatch(/re\s*\/?\s*max|re\s*house|רימקס|ריהאוס|גיא רוזן/i);
+    }
+    const ids = new Set(tour.scenes.map((scene) => scene.id));
+    const seen = new Set();
+    for (const scene of tour.scenes) {
+      expect(scene.title).toMatch(/[\u0590-\u05FF]/);
+      expect(scene.title).not.toMatch(/re\s*\/?\s*max|re\s*house|רימקס|ריהאוס/i);
+      expect(scene.hotspots.length).toBeGreaterThan(0);
+      for (const h of scene.hotspots) {
+        expect(ids.has(h.scene)).toBe(true);
+        expect(h.scene).not.toBe(scene.id);
+        expect(h.pitch).toBeLessThanOrEqual(-12);
+        expect(h.pitch).toBeGreaterThanOrEqual(-60);
+      }
+      const { x, y, heading } = scene.map;
+      expect(x).toBeGreaterThan(2);
+      expect(x).toBeLessThan(98);
+      expect(y).toBeGreaterThan(2);
+      expect(y).toBeLessThan(98);
+      expect(Number.isFinite(heading)).toBe(true);
+      expect(seen.has(`${x},${y}`)).toBe(false);
+      seen.add(`${x},${y}`);
+      expect(jpegSize(`public/tours/chasida-17/pano/${scene.id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
+    }
+  });
+
   it("rejects unsafe slugs", () => {
     expect(loadTour("../etc")).toBeNull();
     expect(loadTour("nope")).toBeNull();
@@ -152,6 +188,16 @@ describe("portfolio tour wiring", () => {
     for (const f of files) expect(jpegSize(`public/portfolio/shevet-zevulun/${f}`)).toEqual({ width: 2560, height: 1440 });
   });
 
+  it("points the חסידא 17 card at its hosted tour", () => {
+    const card = portfolio.find((item) => item.id === 15);
+    expect(card?.title).toBe("חסידא 17 · אשדוד");
+    expect(card?.tour).toBe("chasida-17");
+    expect(card?.matterport).toBeUndefined();
+    expect(card?.tag).toBe("דירה + סיור וירטואלי");
+    expect(card?.tags).toContain("סיור וירטואלי 3D");
+    expect(card?.gallery[0]).toBe("/portfolio/chasida-17/01.jpg");
+  });
+
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
     const src = fs.readFileSync("src/App.jsx", "utf8");
     expect(src).toMatch(/p\.tour\n\s+\? `\/tours\/\$\{p\.tour\}`/);
@@ -200,7 +246,7 @@ describe("card text never mentions RE/MAX", () => {
     const zev = portfolio.find((p) => p.id === 16);
     expect(cardTagLine(zev)).toBe("מרפסת · סלון · מטבח · סיור וירטואלי 3D");
     const hasida = portfolio.find((p) => p.id === 15);
-    expect(cardTagLine(hasida)).toBe("מטבח · פינת אוכל");
+    expect(cardTagLine(hasida)).toBe("מטבח · פינת אוכל · סיור וירטואלי 3D");
   });
 });
 
