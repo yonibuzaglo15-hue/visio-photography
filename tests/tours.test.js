@@ -5,11 +5,8 @@ import { listTourSlugs, loadTour } from "../lib/tours/loadTour.js";
 const KEPT_MATTERPORT = {
   1: "ooDYEMx6TCr",
   2: "g1C8Upb3G6q",
-  3: "Z76pbSkPMXX",
   4: "9YJGFmX8KbJ",
   5: "AF18oBWVfrm",
-  6: "C6Uvbihrqvm",
-  7: "Xh34KkeoLb5",
   8: "so6PszZrxgx",
 };
 
@@ -181,6 +178,17 @@ describe("hosted tours", () => {
 describe("portfolio tour wiring", () => {
   const portfolio = portfolioFromApp();
 
+  it("drops deleted Matterport models and their virtual-tour wording", () => {
+    const dead = ["Z76pbSkPMXX","C6Uvbihrqvm","Xh34KkeoLb5","xZ4M9pKzoBr","eqKC1zuQDfa","m1ArnEzVJCY","YcGsq9ppCTT","x8CmoHwwyA1","FkkW9mVhJC4"];
+    const src = fs.readFileSync("src/App.jsx", "utf8");
+    for (const id of dead) expect(src).not.toContain(id);
+    for (const card of portfolio) {
+      if (card.matterport || card.tour) continue;
+      expect(card.tag || "").not.toMatch(/סיור וירטואלי|3D/);
+      for (const t of card.tags || []) expect(t).not.toMatch(/סיור וירטואלי|3D/);
+    }
+  });
+
   it("keeps every existing Matterport model", () => {
     for (const [id, model] of Object.entries(KEPT_MATTERPORT)) {
       const card = portfolio.find((item) => item.id === Number(id));
@@ -340,12 +348,12 @@ describe("gallery lightbox (all cards)", () => {
 describe("Yan Shindelman (REHOUSE) works", () => {
   const portfolio = portfolioFromApp();
   const YAN = [
-    [17, "shevet-levi-4", "שבט לוי 4", "רובע י״ב · אשדוד", "xZ4M9pKzoBr", 14],
-    [18, "atzmaut-21", "העצמאות 21", "סיטי · אשדוד", "eqKC1zuQDfa", 18],
-    [19, "tzionut-55", "הציונות 55", "סיטי · אשדוד", "m1ArnEzVJCY", 14],
-    [20, "kalanit-7a", "הכלנית 7א", "רובע ח׳ · אשדוד", "YcGsq9ppCTT", 19],
-    [21, "ussishkin-21", "אוסישקין 21", "רובע ט״ו · אשדוד", "x8CmoHwwyA1", 12],
-    [22, "petah-tikva-9", "פתח תקווה 9", "רובע ט׳ · אשדוד", "FkkW9mVhJC4", 17],
+    [17, "shevet-levi-4", "שבט לוי 4", "רובע י״ב · אשדוד", null, 14],
+    [18, "atzmaut-21", "העצמאות 21", "סיטי · אשדוד", null, 18],
+    [19, "tzionut-55", "הציונות 55", "סיטי · אשדוד", null, 14],
+    [20, "kalanit-7a", "הכלנית 7א", "רובע ח׳ · אשדוד", null, 19],
+    [21, "ussishkin-21", "אוסישקין 21", "רובע ט״ו · אשדוד", null, 12],
+    [22, "petah-tikva-9", "פתח תקווה 9", "רובע ט׳ · אשדוד", null, 17],
     [23, "agnon-21", "שי עגנון 21", "עתיקות · אשקלון", "JN6a8HHqRpX", 11],
     [24, "nahal-snir-9", "נחל שניר 9", "רובע י״א · אשדוד", "mDADwNnNKtD", 13],
     [25, "micha-hanavi-13", "מיכה הנביא 13", "רובע י׳ · אשדוד", null, 14],
@@ -366,7 +374,8 @@ describe("Yan Shindelman (REHOUSE) works", () => {
       expect(card.tags).toContain("סיור וירטואלי 3D");
     } else {
       expect(card.matterport).toBeUndefined();
-      expect(card.tag).toBe("דירה");
+      expect(card.tag).toBe(id === 19 ? "פנטהאוז" : "דירה");
+      expect((card.tags || []).join(" ")).not.toMatch(/סיור וירטואלי|3D/);
     }
     expect(card.hero).toBe(`/portfolio/${slug}/cover.jpg`);
     expect(card.gallery).not.toContain(card.hero);
@@ -380,7 +389,7 @@ describe("Yan Shindelman (REHOUSE) works", () => {
   });
 
   it("marks הציונות 55 as a penthouse", () => {
-    expect(portfolio.find((p) => p.id === 19).tag).toBe("פנטהאוז + סיור וירטואלי");
+    expect(portfolio.find((p) => p.id === 19).tag).toBe("פנטהאוז");
   });
 
   it("never names the brokerage in Yan card text", () => {
