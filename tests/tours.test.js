@@ -100,6 +100,41 @@ describe("hosted tours", () => {
     expect(loadTour("ashdod-apartment").scenes.some((scene) => "heading" in scene.map)).toBe(false);
   });
 
+  it("loads the self-hosted יהויכין 11 tour with every Matterport point on the plan", () => {
+    expect(listTourSlugs()).toContain("yehoyakin-11");
+    const tour = loadTour("yehoyakin-11");
+    expect(tour).toBeTruthy();
+    expect(tour.scenes).toHaveLength(35);
+    expect(tour.firstScene).toBe("y19");
+    expect(tour.assetBase).toBe("/tours/yehoyakin-11");
+    expect(tour.credit).toBe("יונתן בוזגלו | VISIO");
+    expect(tour.plan).toBe("plan.jpg");
+    for (const text of [tour.title, tour.location, tour.note]) {
+      expect(text).not.toMatch(/re\s*\/?\s*max|re\s*house|רימקס|ריהאוס|גיא רוזן/i);
+    }
+    const ids = new Set(tour.scenes.map((scene) => scene.id));
+    const seen = new Set();
+    for (const scene of tour.scenes) {
+      expect(scene.title).toMatch(/[\u0590-\u05FF]/);
+      expect(scene.hotspots.length).toBeGreaterThan(0);
+      for (const h of scene.hotspots) {
+        expect(ids.has(h.scene)).toBe(true);
+        expect(h.scene).not.toBe(scene.id);
+        expect(h.pitch).toBeLessThanOrEqual(-12);
+        expect(h.pitch).toBeGreaterThanOrEqual(-60);
+      }
+      const { x, y, heading } = scene.map;
+      expect(x).toBeGreaterThan(2);
+      expect(x).toBeLessThan(98);
+      expect(y).toBeGreaterThan(2);
+      expect(y).toBeLessThan(98);
+      expect(Number.isFinite(heading)).toBe(true);
+      expect(seen.has(`${x},${y}`)).toBe(false);
+      seen.add(`${x},${y}`);
+      expect(jpegSize(`public/tours/yehoyakin-11/pano/${scene.id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
+    }
+  });
+
   it("rejects unsafe slugs", () => {
     expect(loadTour("../etc")).toBeNull();
     expect(loadTour("nope")).toBeNull();
@@ -150,6 +185,16 @@ describe("portfolio tour wiring", () => {
     const files = fs.readdirSync("public/portfolio/shevet-zevulun").sort();
     expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
     for (const f of files) expect(jpegSize(`public/portfolio/shevet-zevulun/${f}`)).toEqual({ width: 2560, height: 1440 });
+  });
+
+  it("points the יהויכין 11 card at its hosted tour", () => {
+    const card = portfolio.find((item) => item.id === 13);
+    expect(card?.title).toBe("יהויכין 11 · אשדוד");
+    expect(card?.tour).toBe("yehoyakin-11");
+    expect(card?.matterport).toBeUndefined();
+    expect(card?.tag).toBe("דירה + סיור וירטואלי");
+    expect(card?.tags).toContain("סיור וירטואלי 3D");
+    expect(card?.gallery[0]).toBe("/portfolio/yehoyachin-11/01.jpg");
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
