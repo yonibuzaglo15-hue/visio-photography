@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { listTourSlugs, loadTour } from "@/lib/tours/loadTour";
 import TourViewer from "@/src/tours/TourViewer";
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return listTourSlugs().map((slug) => ({ slug }));
 }
