@@ -2,12 +2,17 @@ import fs from "fs";
 import { describe, expect, it } from "vitest";
 import { listTourSlugs, loadTour } from "../lib/tours/loadTour.js";
 
-const KEPT_MATTERPORT = {
-  1: "ooDYEMx6TCr",
-  2: "g1C8Upb3G6q",
-  4: "9YJGFmX8KbJ",
-  5: "AF18oBWVfrm",
-  8: "so6PszZrxgx",
+const HOSTED_MATTERPORT = {
+  1: ["ooDYEMx6TCr", "dekel-72"],
+  2: ["g1C8Upb3G6q", "shevet-levi-1"],
+  4: ["9YJGFmX8KbJ", "balfour-7"],
+  5: ["AF18oBWVfrm", "haptel-17"],
+  8: ["so6PszZrxgx", "keren-hayesod-43"],
+  23: ["JN6a8HHqRpX", "agnon-21"],
+  24: ["mDADwNnNKtD", "nahal-snir-9"],
+  27: ["mWxuq2zaKdZ", "haeshkol-8"],
+  29: ["idnfQzzt684", "cheshvan-7"],
+  30: ["eo6fpaEEiA9", "eshkolit-3"],
 };
 
 function jpegSize(file) {
@@ -173,6 +178,47 @@ describe("hosted tours", () => {
     expect(loadTour("../etc")).toBeNull();
     expect(loadTour("nope")).toBeNull();
   });
+
+  it.each(Object.values(HOSTED_MATTERPORT))("hosts %s as %s with Matterport measurements", (model, slug) => {
+    const tour = loadTour(slug);
+    expect(tour?.matterportId).toBe(model);
+    expect(tour.scenes.length).toBeGreaterThan(1);
+    expect(tour.plan).toBe("plan.jpg");
+    const ids = new Set(tour.scenes.map((scene) => scene.id));
+    const seen = new Set();
+    for (const scene of tour.scenes) {
+      expect(scene.title).toMatch(/[\u0590-\u05FF]/);
+      expect(scene.hotspots.length).toBeGreaterThan(0);
+      for (const hotspot of scene.hotspots) {
+        expect(ids.has(hotspot.scene)).toBe(true);
+        expect(hotspot.pitch).toBeLessThan(-4);
+        expect(hotspot.pitch).toBeGreaterThan(-75);
+      }
+      expect(scene.floor).toBeTypeOf("string");
+      expect(scene.map.x).toBeGreaterThan(-5);
+      expect(scene.map.x).toBeLessThan(105);
+      expect(scene.map.y).toBeGreaterThan(-5);
+      expect(scene.map.y).toBeLessThan(105);
+      expect(Number.isFinite(scene.map.heading)).toBe(true);
+      const key = `${scene.floor}:${scene.map.x},${scene.map.y}`;
+      expect(seen.has(key)).toBe(false);
+      seen.add(key);
+      expect(fs.existsSync(`public/tours/${slug}/pano/${scene.id}_m.jpg`)).toBe(true);
+      expect(fs.existsSync(`public/tours/${slug}/pano/${scene.id}_s.jpg`)).toBe(true);
+    }
+    expect(jpegSize(`public/tours/${slug}/pano/${tour.scenes[0].id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
+    expect(jpegSize(`public/tours/${slug}/pano/${tour.scenes[0].id}_s.jpg`)).toEqual({ width: 2048, height: 1024 });
+    const measure = JSON.parse(fs.readFileSync(`public/tours/${slug}/measure.json`, "utf8"));
+    expect(measure.source).toBe(`matterport:${model}`);
+    expect(measure.mode).toBe("surfaces");
+    expect(Object.keys(measure.scenes)).toHaveLength(tour.scenes.length);
+    expect(measure.walls.length).toBeGreaterThan(0);
+    expect(measure.rooms.length).toBeGreaterThan(0);
+    for (const id of Object.keys(measure.scenes)) {
+      expect(measure.scenes[id].position).toHaveLength(3);
+      expect(measure.scenes[id].rotation).toHaveLength(4);
+    }
+  });
 });
 
 describe("portfolio tour wiring", () => {
@@ -189,11 +235,11 @@ describe("portfolio tour wiring", () => {
     }
   });
 
-  it("keeps every existing Matterport model", () => {
-    for (const [id, model] of Object.entries(KEPT_MATTERPORT)) {
+  it("points every public Matterport card at its hosted tour", () => {
+    for (const [id, [model, slug]] of Object.entries(HOSTED_MATTERPORT)) {
       const card = portfolio.find((item) => item.id === Number(id));
       expect(card?.matterport).toBe(model);
-      expect(card?.tour).toBeUndefined();
+      expect(card?.tour).toBe(slug);
     }
   });
 
@@ -241,8 +287,7 @@ describe("portfolio tour wiring", () => {
     expect(card?.partner).toBe("RE/MAX");
     expect(card?.tag).toBe("דירה + סיור וירטואלי");
     expect(card?.tags).toEqual(["מרפסת", "סלון", "מטבח", "סיור וירטואלי 3D"]);
-    // no self-hosted tour: the button uses the Matterport model id and opens a new tab
-    expect(card?.tour).toBeUndefined();
+    expect(card?.tour).toBe("cheshvan-7");
     expect(card?.matterport).toBe("idnfQzzt684");
     const order = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, "0"));
     expect(card?.hero).toBe("/portfolio/cheshvan-7/cover.jpg");
@@ -268,8 +313,7 @@ describe("portfolio tour wiring", () => {
     expect(card?.partner).toBe("RE/MAX");
     expect(card?.tag).toBe("דירה + סיור וירטואלי");
     expect(card?.tags).toEqual(["מרפסת", "סלון", "מטבח", "סיור וירטואלי 3D"]);
-    // no self-hosted tour: the button uses the Matterport model id and opens a new tab
-    expect(card?.tour).toBeUndefined();
+    expect(card?.tour).toBe("eshkolit-3");
     expect(card?.matterport).toBe("eo6fpaEEiA9");
     const order = Array.from({ length: 16 }, (_, i) => String(i + 1).padStart(2, "0"));
     expect(card?.hero).toBe("/portfolio/eshkolit-3/cover.jpg");
@@ -421,7 +465,9 @@ describe("Yan Shindelman (REHOUSE) works", () => {
     expect(card.title).toBe(`${street} - יאן שינדלמן`);
     expect(card.sub).toBe(sub);
     expect(card.company).toBe("rehouse");
-    expect(card.tour).toBeUndefined();
+    const hosted = HOSTED_MATTERPORT[id];
+    if (hosted) expect(card.tour).toBe(hosted[1]);
+    else expect(card.tour).toBeUndefined();
     if (model) {
       expect(card.matterport).toBe(model);
       expect(card.tag).toMatch(/\+ סיור וירטואלי$/);
