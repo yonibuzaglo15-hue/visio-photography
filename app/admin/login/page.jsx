@@ -11,8 +11,8 @@ const ERROR_HEB = {
   Default: "ההתחברות נכשלה. נסה שוב.",
 };
 
-export default function AdminLoginPage({ searchParams }) {
-  const errorKey = searchParams?.error || null;
+export default async function AdminLoginPage({ searchParams }) {
+  const errorKey = (await searchParams)?.error || null;
   const initialError =
     errorKey && (ERROR_HEB[errorKey] || ERROR_HEB.Default);
 

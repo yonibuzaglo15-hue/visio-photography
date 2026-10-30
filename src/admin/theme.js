@@ -13,8 +13,8 @@ export const ADMIN = {
   accent: "var(--visio-accent)",
   success: "var(--visio-success)",
   error: "var(--visio-error)",
-  fontDisplay: "'Bebas Neue', sans-serif",
-  fontBody: "'Heebo', sans-serif",
+  fontDisplay: "var(--font-bebas), sans-serif",
+  fontBody: "var(--font-heebo), sans-serif",
   panel: "var(--visio-panel)",
   panelBorder: "var(--visio-border-subtle)",
 };

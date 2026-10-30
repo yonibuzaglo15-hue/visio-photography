@@ -21,7 +21,8 @@ function mimeFromName(name) {
  * Stores originals under branding/{jobId}/originals/ on Blob.
  * HEIC is stored as-is — conversion is Phase 3 (local worker), not here.
  */
-export async function POST(request, { params }) {
+export async function POST(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 

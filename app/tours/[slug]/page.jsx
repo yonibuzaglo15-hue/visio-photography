@@ -6,8 +6,9 @@ export function generateStaticParams() {
   return listTourSlugs().map((slug) => ({ slug }));
 }
 
-export function generateMetadata({ params }) {
-  const tour = loadTour(params.slug);
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const tour = loadTour(slug);
   if (!tour) return { title: "סיור וירטואלי · VISIO" };
   const heading = [tour.title || "סיור וירטואלי", tour.location].filter(Boolean).join(" · ");
   return {
@@ -16,8 +17,9 @@ export function generateMetadata({ params }) {
   };
 }
 
-export default function TourPage({ params }) {
-  const tour = loadTour(params.slug);
+export default async function TourPage({ params }) {
+  const { slug } = await params;
+  const tour = loadTour(slug);
   if (!tour) notFound();
   return <TourViewer tour={tour} />;
 }

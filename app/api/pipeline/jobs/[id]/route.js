@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getJob } from "@/lib/pipeline/store.js";
 import { requireAllowedApi } from "@/lib/auth/require.js";
 
-export async function GET(request, { params }) {
+export async function GET(request, ctx) {
+  const params = await ctx.params;
   const gate = await requireAllowedApi(request);
   if (gate.errorResponse) return gate.errorResponse;
 
