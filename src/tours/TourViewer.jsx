@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import AutoDimensions from "./AutoDimensions";
 import MeasureLayer from "./MeasureLayer";
 import "./tour.css";
 
@@ -71,6 +72,8 @@ export default function TourViewer({ tour }) {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [measureOn, setMeasureOn] = useState(false);
+  const [dimsOn, setDimsOn] = useState(true);
+  const hasRooms = Array.isArray(tour.measure?.rooms) && tour.measure.rooms.length > 0;
 
   useEffect(() => {
     setGyroAvailable("DeviceOrientationEvent" in window);
@@ -245,11 +248,26 @@ export default function TourViewer({ tour }) {
           >
             i
           </button>
+          {hasRooms && (
+            <button
+              type="button"
+              title="מידות אוטומטיות"
+              aria-label="מידות אוטומטיות"
+              aria-pressed={dimsOn}
+              data-testid="auto-dims-toggle"
+              className={dimsOn ? "on" : undefined}
+              onClick={() => setDimsOn((open) => !open)}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 17h16M4 15v4M20 15v4M8 17V7M16 17V7" fill="none" stroke="currentColor" strokeWidth="1.7" />
+              </svg>
+            </button>
+          )}
           {tour.measure && (
             <button
               type="button"
-              title="מדידה"
-              aria-label="מדידה"
+              title="מדידה ידנית"
+              aria-label="מדידה ידנית"
               aria-pressed={measureOn}
               data-testid="measure-toggle"
               className={measureOn ? "on" : undefined}
@@ -283,6 +301,18 @@ export default function TourViewer({ tour }) {
           </button>
         </div>
       </header>
+
+      {hasRooms && (
+        <AutoDimensions
+          model={tour.measure}
+          sceneId={sceneId}
+          sceneTitle={room}
+          viewerRef={viewerRef}
+          panoRef={panoRef}
+          ready={ready}
+          visible={dimsOn && !measureOn}
+        />
+      )}
 
       {tour.measure && (
         <MeasureLayer
@@ -327,6 +357,18 @@ export default function TourViewer({ tour }) {
                 onClick={() => loadScene(scene.id)}
               />
             ))}
+            {dimsOn && hasRooms && tour.measure.rooms
+              .filter((item) => item.map && item.sceneIds?.includes(sceneId))
+              .map((item) => (
+                <div
+                  key={item.id}
+                  className="visio-tour-map-dim"
+                  style={{ left: `${item.map.x}%`, top: `${item.map.y}%` }}
+                  dir="ltr"
+                >
+                  {`${item.width.toFixed(1)}×${item.length.toFixed(1)}`}
+                </div>
+              ))}
           </div>
         </div>
       )}

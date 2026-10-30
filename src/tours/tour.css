@@ -455,3 +455,77 @@ body:has(.visio-tour) {
   padding: 4px 10px;
   cursor: pointer;
 }
+
+.visio-tour-autodim {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.visio-tour-autodim svg {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.visio-tour-autodim line {
+  stroke: #fff;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+}
+
+.visio-tour-measure-label.is-auto {
+  font-size: 13px;
+  padding: 2px 6px;
+}
+
+.visio-tour-autodim-chip {
+  position: fixed;
+  top: 92px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px 10px;
+  max-width: min(440px, calc(100vw - 24px));
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  font-family: "Heebo", sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+  padding: 6px 12px;
+  pointer-events: none;
+}
+
+.visio-tour-autodim-chip strong {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.visio-tour-map-dim {
+  position: absolute;
+  transform: translate(-50%, -18px);
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-family: "Heebo", sans-serif;
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .visio-tour-autodim-chip {
+    top: auto;
+    bottom: calc(58px + env(safe-area-inset-bottom));
+    font-size: 13px;
+  }
+}

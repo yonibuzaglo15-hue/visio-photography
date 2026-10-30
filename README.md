@@ -61,11 +61,31 @@ The viewer keeps the panorama stage `dir="ltr"` even though the page is RTL. Tha
 
 ### Measuring
 
-The מדידה button is an estimate, not a survey. The disclaimer in `note` should say so.
+Dimensions are an estimate, not a survey. Say so in `note`.
 
-`measure.json` beside `tour.json` (`mode: "surfaces"`) stores Matterport sweep poses and wall centerlines. A click is a ray against those walls and the floor under that sweep. Furniture and open doorways are not solid, so a click on a sofa or through a doorway is wrong. שבט לוי uses this.
+The viewer shows them in two ways, for every tour that has the data:
 
-Without that file, a tour whose every scene has `map.heading` and whose floor-ring pitches agree on one scale gets a floor-only ruler. Distances assume the lens is 1.27 m above the floor (the שבט לוי Matterport camera). Clicks on a wall hit the floor behind it. If the pitches do not share a scale, there is no button — שבט זבולון is in that group.
+- **Automatic, on by default.** When `measure.json` contains `rooms`, entering a panorama draws that room’s two main dimensions on the floor and a small label (`3.75 × 3.10 מ׳ · גובה 2.60 מ׳`). The current room’s size is also marked on the minimap. The button next to the info button hides them. Open-plan rooms that are not a rectangle are labelled as main walls plus area, so a 10 m bounding box is not presented as the room.
+- **Manual, off by default.** The ruler button measures two clicks. It needs sweep poses (`scenes` in `measure.json`). Walls make the click hit a wall; otherwise it hits the floor plane.
+
+Generate `measure.json` from a public Matterport model:
+
+```bash
+node tools/measure/from-matterport.mjs public/tours/<slug>
+```
+
+`tour.json` must have `matterportId` (the id in `my.matterport.com/show/?m=`). The model has to be public. The script reads room outlines, interior width/depth/ceiling height, and sweep poses, and writes `measure.json`. Re-running keeps panorama poses that are already there and refreshes the rooms.
+
+A new tour gets automatic dimensions by dropping the folder as usual, setting `matterportId`, and running that command. No viewer change.
+
+What is still missing on the tours that do not show automatic dimensions:
+
+| Tour | Missing |
+| --- | --- |
+| חסידא 17, יהויכין 11 | No `matterportId`. Floor-ring headings share a scale, so the manual ruler works on the floor only (lens height assumed 1.27 m, the שבט לוי camera). Add the model id and run the script for real room sizes. |
+| שבט זבולון | No `matterportId`, and the floor rings do not share one scale, so there is no ruler at all. Same fix: model id, then the script. |
+
+There is no depth mesh in the repo. Furniture and open doorways are not solid.
 
 Pannellum 2.5.6 is vendored at `public/vendor/pannellum/` (MIT).
 

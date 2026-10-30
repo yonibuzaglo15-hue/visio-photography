@@ -1,10 +1,9 @@
 {
-  "source": "matterport:Hkg7xrnXgoM",
   "mode": "surfaces",
   "approx": true,
+  "source": "matterport:Hkg7xrnXgoM",
   "floorZ": 0,
   "ceilingZ": 2.85,
-  "note": "Sweep poses and wall centerlines from the public Matterport model. No mesh; furniture and door slabs are not solid. Distances on walls and the floor plane only.",
   "scenes": {
     "p02": {
       "position": [
@@ -18,7 +17,8 @@
         0.4517895,
         0.8921173
       ],
-      "floorZ": 0.0074
+      "floorZ": 0.0074,
+      "roomId": "xy2x8mpaaqknp7q2c3nnbw1ma"
     },
     "p25": {
       "position": [
@@ -32,7 +32,8 @@
         -0.0944774,
         0.9955152
       ],
-      "floorZ": -0.0145
+      "floorZ": -0.0145,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p24": {
       "position": [
@@ -46,7 +47,8 @@
         -0.3673422,
         0.930082
       ],
-      "floorZ": -0.0194
+      "floorZ": -0.0194,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p32": {
       "position": [
@@ -88,7 +90,8 @@
         -0.2092669,
         0.9778519
       ],
-      "floorZ": 0.0008
+      "floorZ": 0.0008,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p36": {
       "position": [
@@ -102,7 +105,8 @@
         -0.4596694,
         0.8880766
       ],
-      "floorZ": 0.0036
+      "floorZ": 0.0036,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p14": {
       "position": [
@@ -116,7 +120,8 @@
         0.5928056,
         0.8053434
       ],
-      "floorZ": -0.0081
+      "floorZ": -0.0081,
+      "roomId": "3m54yff1z7crxaywd8if9rb0d"
     },
     "p39": {
       "position": [
@@ -130,7 +135,8 @@
         0.8997175,
         -0.4364582
       ],
-      "floorZ": 0.0122
+      "floorZ": 0.0122,
+      "roomId": "tt6gm2a0463x9wmnx7rn6gugc"
     },
     "p30": {
       "position": [
@@ -144,7 +150,8 @@
         -0.8150668,
         0.5793634
       ],
-      "floorZ": -0.0332
+      "floorZ": -0.0332,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p11": {
       "position": [
@@ -158,7 +165,8 @@
         -0.2677903,
         0.9634697
       ],
-      "floorZ": 0.0194
+      "floorZ": 0.0194,
+      "roomId": "h26t7ky77ew74yb0pg8qqf5rd"
     },
     "p31": {
       "position": [
@@ -172,7 +180,8 @@
         -0.6989899,
         0.7151161
       ],
-      "floorZ": -0.0278
+      "floorZ": -0.0278,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p40": {
       "position": [
@@ -186,7 +195,8 @@
         -0.2039446,
         0.9789813
       ],
-      "floorZ": 0.0184
+      "floorZ": 0.0184,
+      "roomId": "tt6gm2a0463x9wmnx7rn6gugc"
     },
     "p23": {
       "position": [
@@ -200,7 +210,8 @@
         0.970134,
         0.2425578
       ],
-      "floorZ": -0.0173
+      "floorZ": -0.0173,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p09": {
       "position": [
@@ -228,7 +239,8 @@
         0.9871323,
         0.1598803
       ],
-      "floorZ": -0.003
+      "floorZ": -0.003,
+      "roomId": "2qdmc5i9byxi79ry1pxdkqzea"
     },
     "p21": {
       "position": [
@@ -242,7 +254,8 @@
         0.9610938,
         -0.2761922
       ],
-      "floorZ": -0.0172
+      "floorZ": -0.0172,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p13": {
       "position": [
@@ -256,7 +269,8 @@
         0.5061253,
         0.8624561
       ],
-      "floorZ": -0.0003
+      "floorZ": -0.0003,
+      "roomId": "2qdmc5i9byxi79ry1pxdkqzea"
     },
     "p42": {
       "position": [
@@ -270,7 +284,8 @@
         0.3267265,
         0.9451126
       ],
-      "floorZ": 0.0172
+      "floorZ": 0.0172,
+      "roomId": "2qdmc5i9byxi79ry1pxdkqzea"
     },
     "p44": {
       "position": [
@@ -284,7 +299,8 @@
         0.8513684,
         0.5245611
       ],
-      "floorZ": 0.0041
+      "floorZ": 0.0041,
+      "roomId": "xy2x8mpaaqknp7q2c3nnbw1ma"
     },
     "p05": {
       "position": [
@@ -298,7 +314,8 @@
         0.9527451,
         -0.303753
       ],
-      "floorZ": 0.0156
+      "floorZ": 0.0156,
+      "roomId": "a5f9age4zzxewres6iqux2emc"
     },
     "p43": {
       "position": [
@@ -312,7 +329,8 @@
         0.5602294,
         0.8283312
       ],
-      "floorZ": -0.0007
+      "floorZ": -0.0007,
+      "roomId": "2qdmc5i9byxi79ry1pxdkqzea"
     },
     "p29": {
       "position": [
@@ -326,7 +344,8 @@
         0.0671693,
         0.9977399
       ],
-      "floorZ": 0.0028
+      "floorZ": 0.0028,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p19": {
       "position": [
@@ -340,7 +359,8 @@
         0.7747464,
         0.6322528
       ],
-      "floorZ": -0.0101
+      "floorZ": -0.0101,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p04": {
       "position": [
@@ -354,7 +374,8 @@
         0.9911351,
         -0.1328101
       ],
-      "floorZ": 0.0172
+      "floorZ": 0.0172,
+      "roomId": "xy2x8mpaaqknp7q2c3nnbw1ma"
     },
     "p18": {
       "position": [
@@ -368,7 +389,8 @@
         0.5591031,
         0.8290876
       ],
-      "floorZ": 0.0006
+      "floorZ": 0.0006,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p37": {
       "position": [
@@ -382,7 +404,8 @@
         0.8252187,
         0.5648096
       ],
-      "floorZ": -0.0075
+      "floorZ": -0.0075,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p28": {
       "position": [
@@ -396,7 +419,8 @@
         -0.6978194,
         0.7162663
       ],
-      "floorZ": -0.0058
+      "floorZ": -0.0058,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p33": {
       "position": [
@@ -405,7 +429,7 @@
         1.2182
       ],
       "rotation": [
-        -1.4e-05,
+        -0.000014,
         -0.0012054,
         0.0148219,
         0.9998894
@@ -424,7 +448,8 @@
         0.9360222,
         0.3519168
       ],
-      "floorZ": 0.0052
+      "floorZ": 0.0052,
+      "roomId": "xy2x8mpaaqknp7q2c3nnbw1ma"
     },
     "p08": {
       "position": [
@@ -438,7 +463,8 @@
         -0.542632,
         0.8399674
       ],
-      "floorZ": 0.0226
+      "floorZ": 0.0226,
+      "roomId": "xy2x8mpaaqknp7q2c3nnbw1ma"
     },
     "p26": {
       "position": [
@@ -452,7 +478,8 @@
         0.0694763,
         0.9975774
       ],
-      "floorZ": -0.0119
+      "floorZ": -0.0119,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p34": {
       "position": [
@@ -480,7 +507,8 @@
         0.9178159,
         0.3970014
       ],
-      "floorZ": -0.0142
+      "floorZ": -0.0142,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p07": {
       "position": [
@@ -494,7 +522,8 @@
         0.9595578,
         0.2814659
       ],
-      "floorZ": 0.0206
+      "floorZ": 0.0206,
+      "roomId": "xy2x8mpaaqknp7q2c3nnbw1ma"
     },
     "p27": {
       "position": [
@@ -508,7 +537,8 @@
         0.9725583,
         0.2326199
       ],
-      "floorZ": -0.014
+      "floorZ": -0.014,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p41": {
       "position": [
@@ -522,7 +552,8 @@
         0.8787597,
         -0.4772645
       ],
-      "floorZ": 0.0147
+      "floorZ": 0.0147,
+      "roomId": "tt6gm2a0463x9wmnx7rn6gugc"
     },
     "p10": {
       "position": [
@@ -536,7 +567,8 @@
         0.0485991,
         0.9988084
       ],
-      "floorZ": 0.0076
+      "floorZ": 0.0076,
+      "roomId": "h26t7ky77ew74yb0pg8qqf5rd"
     },
     "p20": {
       "position": [
@@ -550,7 +582,8 @@
         0.7953874,
         0.6060809
       ],
-      "floorZ": -0.0132
+      "floorZ": -0.0132,
+      "roomId": "613htqkzf66zz7hf7n8kzszed"
     },
     "p38": {
       "position": [
@@ -564,7 +597,8 @@
         -0.7815747,
         0.6237833
       ],
-      "floorZ": 0.0062
+      "floorZ": 0.0062,
+      "roomId": "tt6gm2a0463x9wmnx7rn6gugc"
     },
     "p15": {
       "position": [
@@ -578,7 +612,8 @@
         0.4084125,
         0.9127963
       ],
-      "floorZ": -0.0123
+      "floorZ": -0.0123,
+      "roomId": "3m54yff1z7crxaywd8if9rb0d"
     },
     "p06": {
       "position": [
@@ -592,7 +627,8 @@
         0.1059128,
         0.9943754
       ],
-      "floorZ": 0.017
+      "floorZ": 0.017,
+      "roomId": "a5f9age4zzxewres6iqux2emc"
     },
     "p12": {
       "position": [
@@ -606,7 +642,8 @@
         0.3275998,
         0.944815
       ],
-      "floorZ": 0.1057
+      "floorZ": 0.1057,
+      "roomId": "h26t7ky77ew74yb0pg8qqf5rd"
     }
   },
   "walls": [
@@ -1419,6 +1456,386 @@
       ],
       "thickness": 0.19,
       "openings": []
+    }
+  ],
+  "note": "Sweep poses and wall centerlines from the public Matterport model. No mesh; furniture and door slabs are not solid. Distances on walls and the floor plane only.",
+  "rooms": [
+    {
+      "id": "613htqkzf66zz7hf7n8kzszed",
+      "zones": [
+        "חדר שירות / כביסה",
+        "מטבח",
+        "פינת אוכל",
+        "סלון",
+        "קיר תמונות",
+        "מבואת כניסה",
+        "מעבר כניסה",
+        "דלת כניסה"
+      ],
+      "width": 5.71,
+      "length": 4.96,
+      "height": 2.63,
+      "area": 57.22,
+      "rectangular": false,
+      "source": "walls",
+      "floorZ": -0.01,
+      "sceneIds": [
+        "p25",
+        "p24",
+        "p17",
+        "p36",
+        "p30",
+        "p31",
+        "p23",
+        "p21",
+        "p29",
+        "p19",
+        "p18",
+        "p37",
+        "p28",
+        "p26",
+        "p22",
+        "p27",
+        "p20"
+      ],
+      "lines": [
+        {
+          "a": [
+            -7.21,
+            -2,
+            0.02
+          ],
+          "b": [
+            -2.25,
+            -1.96,
+            0.02
+          ],
+          "meters": 4.96
+        },
+        {
+          "a": [
+            -6.92,
+            3.38,
+            0.02
+          ],
+          "b": [
+            -6.87,
+            -2.33,
+            0.02
+          ],
+          "meters": 5.71
+        }
+      ],
+      "map": {
+        "x": 43.52,
+        "y": 48.3
+      }
+    },
+    {
+      "id": "xy2x8mpaaqknp7q2c3nnbw1ma",
+      "zones": [
+        "חדר שינה הורים",
+        "כניסה לחדר השינה הראשי"
+      ],
+      "width": 3.76,
+      "length": 3.11,
+      "height": 2.61,
+      "area": 12.05,
+      "rectangular": true,
+      "source": "walls",
+      "floorZ": 0.02,
+      "sceneIds": [
+        "p02",
+        "p44",
+        "p04",
+        "p01",
+        "p08",
+        "p07"
+      ],
+      "lines": [
+        {
+          "a": [
+            5.38,
+            -1.58,
+            0.05
+          ],
+          "b": [
+            2.26,
+            -1.61,
+            0.05
+          ],
+          "meters": 3.11
+        },
+        {
+          "a": [
+            4.85,
+            1.41,
+            0.05
+          ],
+          "b": [
+            4.88,
+            -2.35,
+            0.05
+          ],
+          "meters": 3.76
+        }
+      ],
+      "map": {
+        "x": 47.68,
+        "y": 49.65
+      }
+    },
+    {
+      "id": "tt6gm2a0463x9wmnx7rn6gugc",
+      "zones": [
+        "חדר ילדים"
+      ],
+      "width": 3.43,
+      "length": 2.64,
+      "height": 2.59,
+      "area": 9.46,
+      "rectangular": true,
+      "source": "walls",
+      "floorZ": 0.01,
+      "sceneIds": [
+        "p39",
+        "p40",
+        "p41",
+        "p38"
+      ],
+      "lines": [
+        {
+          "a": [
+            -2.34,
+            -1.86,
+            0.04
+          ],
+          "b": [
+            1.09,
+            -1.84,
+            0.04
+          ],
+          "meters": 3.43
+        },
+        {
+          "a": [
+            -1.69,
+            0.16,
+            0.04
+          ],
+          "b": [
+            -1.67,
+            -2.48,
+            0.04
+          ],
+          "meters": 2.64
+        }
+      ],
+      "map": {
+        "x": 46.5,
+        "y": 47.48
+      }
+    },
+    {
+      "id": "h26t7ky77ew74yb0pg8qqf5rd",
+      "zones": [
+        "חדר עבודה"
+      ],
+      "width": 3.37,
+      "length": 2.46,
+      "height": 2.64,
+      "area": 8.41,
+      "rectangular": true,
+      "source": "matterport",
+      "floorZ": 0.02,
+      "sceneIds": [
+        "p11",
+        "p10",
+        "p12"
+      ],
+      "lines": [
+        {
+          "a": [
+            3.01,
+            2.38,
+            0.05
+          ],
+          "b": [
+            5.46,
+            2.4,
+            0.05
+          ],
+          "meters": 2.46
+        },
+        {
+          "a": [
+            4.85,
+            1.34,
+            0.05
+          ],
+          "b": [
+            4.82,
+            4.7,
+            0.05
+          ],
+          "meters": 3.37
+        }
+      ],
+      "map": {
+        "x": 46.2,
+        "y": 51.48
+      }
+    },
+    {
+      "id": "3m54yff1z7crxaywd8if9rb0d",
+      "zones": [
+        "חדר רחצה"
+      ],
+      "width": 2.2,
+      "length": 2.08,
+      "height": 2.62,
+      "area": 4.59,
+      "rectangular": true,
+      "source": "matterport",
+      "floorZ": -0.01,
+      "sceneIds": [
+        "p14",
+        "p15"
+      ],
+      "lines": [
+        {
+          "a": [
+            0.41,
+            3.51,
+            0.02
+          ],
+          "b": [
+            2.49,
+            3.52,
+            0.02
+          ],
+          "meters": 2.08
+        },
+        {
+          "a": [
+            1.57,
+            2.54,
+            0.02
+          ],
+          "b": [
+            1.55,
+            4.74,
+            0.02
+          ],
+          "meters": 2.2
+        }
+      ],
+      "map": {
+        "x": 44.73,
+        "y": 50.26
+      }
+    },
+    {
+      "id": "2qdmc5i9byxi79ry1pxdkqzea",
+      "zones": [
+        "מסדרון",
+        "כניסה לחדר הרחצה",
+        "מסדרון חדרים"
+      ],
+      "width": 2.17,
+      "length": 1.98,
+      "height": 2.18,
+      "area": 4.29,
+      "rectangular": true,
+      "source": "matterport",
+      "floorZ": 0,
+      "sceneIds": [
+        "p16",
+        "p13",
+        "p42",
+        "p43"
+      ],
+      "lines": [
+        {
+          "a": [
+            2.64,
+            1.43,
+            0.03
+          ],
+          "b": [
+            0.47,
+            1.41,
+            0.03
+          ],
+          "meters": 2.17
+        },
+        {
+          "a": [
+            1.34,
+            2.27,
+            0.03
+          ],
+          "b": [
+            1.36,
+            0.3,
+            0.03
+          ],
+          "meters": 1.98
+        }
+      ],
+      "map": {
+        "x": 46.14,
+        "y": 49.37
+      }
+    },
+    {
+      "id": "a5f9age4zzxewres6iqux2emc",
+      "zones": [
+        "חדר רחצה הורים"
+      ],
+      "width": 1.73,
+      "length": 1.6,
+      "height": 2.58,
+      "area": 2.73,
+      "rectangular": true,
+      "source": "matterport",
+      "floorZ": 0.02,
+      "sceneIds": [
+        "p05",
+        "p06"
+      ],
+      "lines": [
+        {
+          "a": [
+            2.8,
+            -1.96,
+            0.05
+          ],
+          "b": [
+            1.24,
+            -1.97,
+            0.05
+          ],
+          "meters": 1.56
+        },
+        {
+          "a": [
+            1.93,
+            -3.08,
+            0.05
+          ],
+          "b": [
+            1.91,
+            -1.35,
+            0.05
+          ],
+          "meters": 1.73
+        }
+      ],
+      "map": {
+        "x": 48.27,
+        "y": 48.18
+      }
     }
   ]
 }
