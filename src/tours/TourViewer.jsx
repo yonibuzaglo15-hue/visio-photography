@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import MeasureLayer from "./MeasureLayer";
 import "./tour.css";
 
 const PANNELLUM_SRC = "/vendor/pannellum/pannellum.js";
@@ -69,6 +70,7 @@ export default function TourViewer({ tour }) {
   const [gyroAvailable, setGyroAvailable] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [measureOn, setMeasureOn] = useState(false);
 
   useEffect(() => {
     setGyroAvailable("DeviceOrientationEvent" in window);
@@ -128,6 +130,7 @@ export default function TourViewer({ tour }) {
           scenes,
         });
         viewerRef.current = viewer;
+        el.__viewer = viewer;
         const mark = () => {
           const id = viewer.getScene();
           setSceneId(id);
@@ -152,6 +155,7 @@ export default function TourViewer({ tour }) {
         viewerRef.current.destroy();
         viewerRef.current = null;
       }
+      if (el) el.__viewer = null;
     };
   }, [tour]);
 
@@ -209,7 +213,12 @@ export default function TourViewer({ tour }) {
   const noteLines = (tour.note || "").split("\n").filter(Boolean);
 
   return (
-    <div className="visio-tour" dir="rtl" data-scene={sceneId} data-tour={tour.slug}>
+    <div
+      className={`visio-tour${measureOn ? " is-measuring" : ""}`}
+      dir="rtl"
+      data-scene={sceneId}
+      data-tour={tour.slug}
+    >
       <link rel="stylesheet" href="/vendor/pannellum/pannellum.css" />
       <div id="pano" ref={panoRef} className="visio-tour-pano" dir="ltr" />
 
@@ -236,6 +245,22 @@ export default function TourViewer({ tour }) {
           >
             i
           </button>
+          {tour.measure && (
+            <button
+              type="button"
+              title="מדידה"
+              aria-label="מדידה"
+              aria-pressed={measureOn}
+              data-testid="measure-toggle"
+              className={measureOn ? "on" : undefined}
+              onClick={() => setMeasureOn((open) => !open)}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2.5" y="7" width="19" height="10" rx="1" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M7 7v4M11 7v3M15 7v4M19 7v3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+              </svg>
+            </button>
+          )}
           {gyroAvailable && (
             <button
               type="button"
@@ -258,6 +283,18 @@ export default function TourViewer({ tour }) {
           </button>
         </div>
       </header>
+
+      {tour.measure && (
+        <MeasureLayer
+          active={measureOn}
+          model={tour.measure}
+          viewerRef={viewerRef}
+          panoRef={panoRef}
+          sceneId={sceneId}
+          ready={ready}
+          onClose={() => setMeasureOn(false)}
+        />
+      )}
 
       {noteLines.length > 0 && (
         <div id="note" className={`visio-tour-note${noteOpen ? " show" : ""}`}>

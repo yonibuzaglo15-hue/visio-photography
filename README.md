@@ -59,6 +59,14 @@ Optional `assetBase` (`https://…`) loads panoramas and the plan from another h
 
 The viewer keeps the panorama stage `dir="ltr"` even though the page is RTL. That is what keeps the floor rings on the spot while you turn. Do not remove it.
 
+### Measuring
+
+The מדידה button is an estimate, not a survey. The disclaimer in `note` should say so.
+
+`measure.json` beside `tour.json` (`mode: "surfaces"`) stores Matterport sweep poses and wall centerlines. A click is a ray against those walls and the floor under that sweep. Furniture and open doorways are not solid, so a click on a sofa or through a doorway is wrong. שבט לוי uses this.
+
+Without that file, a tour whose every scene has `map.heading` and whose floor-ring pitches agree on one scale gets a floor-only ruler. Distances assume the lens is 1.27 m above the floor (the שבט לוי Matterport camera). Clicks on a wall hit the floor behind it. If the pitches do not share a scale, there is no button — שבט זבולון is in that group.
+
 Pannellum 2.5.6 is vendored at `public/vendor/pannellum/` (MIT).
 
 ### This apartment
