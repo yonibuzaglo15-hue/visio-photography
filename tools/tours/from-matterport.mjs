@@ -18,7 +18,7 @@ import sharp from "sharp";
 import { equirectFromSkyboxes } from "../../lib/tour/skybox.js";
 import { wallsFromFloors } from "../../lib/tour/matterport-walls.js";
 import { buildRoomRecords } from "../../lib/tour/room-dims.js";
-import { PLAN_MODES, buildTourScenes, measureScenesFromTour, projectToPlan } from "../../lib/tour/tour-build.js";
+import { buildTourScenes, measureScenesFromTour } from "../../lib/tour/tour-build.js";
 
 const ROOT = path.resolve("public/tours");
 const NOTE = "הסיור מבוסס על צילומי 360° ונועד להתרשמות בלבד. כלי המדידה נותן הערכה בלבד (רצפה וקירות, בלי רהיטים) ואינו מחליף מדידה מקצועית – לפרטים מדויקים יש לפנות למתווך.\nלחצו על העיגולים ברצפה כדי לעבור בין נקודות.";
@@ -163,96 +163,54 @@ async function loadRgb(buf) {
   return { data, width: info.width, height: info.height };
 }
 
-function chooseMode(groups) {
-  let best = null;
-  for (const mode of PLAN_MODES) {
-    let ink = 0;
-    let inside = 0;
-    let total = 0;
-    for (const group of groups) {
-      for (const point of group.points) {
-        total += 1;
-        const projected = projectToPlan(point.x, point.y, group.plan, mode);
-        const ix = Math.round(projected.px * (group.sample.width / group.plan.width));
-        const iy = Math.round(projected.py * (group.sample.height / group.plan.height));
-        if (ix < 0 || iy < 0 || ix >= group.sample.width || iy >= group.sample.height) continue;
-        inside += 1;
-        const o = (iy * group.sample.width + ix) * 3;
-        const sum = group.sample.data[o] + group.sample.data[o + 1] + group.sample.data[o + 2];
-        if (sum < 730) ink += 1;
-      }
-    }
-    const score = ink * 3 + inside;
-    if (!best || score > best.score) best = { mode, score, ink, inside, total };
-  }
-  return best;
-}
-
 async function buildPlan(model, dir) {
   const plans = (model.assets?.floorplans || []).filter((plan) => plan.width && plan.resolution && plan.origin && plan.url);
   const byFloor = new Map();
   const planRank = (plan) => {
     const url = plan.url || "";
     if (url.includes("colorplan_room")) return 3;
-    if (url.includes("colorplan")) return 2;
-    if (plan.format === "jpg" || plan.filename?.endsWith(".jpg")) return 1;
+    if (url.includes("colorplan") && !url.includes("measureplan")) return 2;
     return 0;
   };
   for (const plan of plans) {
     const floorId = plan.floor?.id || "*";
     const current = byFloor.get(floorId);
-    if (!current || planRank(plan) > planRank(current) || (planRank(plan) === planRank(current) && plan.width > current.width)) {
-      byFloor.set(floorId, plan);
-    }
+    if (!current || planRank(plan) > planRank(current)) byFloor.set(floorId, plan);
   }
   const floors = [...(model.floors || [])].sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
-  const tiles = [];
-  let y = 0;
-  let width = 0;
-  const groups = [];
+  const tiles = new Map();
+  const floorMeta = [];
   for (const floor of floors) {
-    const plan = byFloor.get(floor.id) || (floors.length === 1 ? byFloor.get("*") : null) || byFloor.get("*");
-    if (!plan) continue;
-    if (tiles.some((tile) => tile.sourceUrl === plan.url)) continue;
+    const plan = byFloor.get(floor.id) || (floors.length === 1 ? byFloor.get("*") : null);
+    if (!plan || planRank(plan) < 2) continue;
+    const sequence = floor.sequence ?? floorMeta.length;
+    const file = sequence === 0 ? "plan.jpg" : `plan-${sequence}.jpg`;
     const buf = await fetchBuf(plan.url);
-    const jpeg = await sharp(buf).flatten({ background: "#f4f1ea" }).resize({ width: 1600, withoutEnlargement: true }).jpeg({ quality: 84 }).toBuffer();
+    const jpeg = await sharp(buf).resize({ width: 1600, withoutEnlargement: true }).jpeg({ quality: 86 }).toBuffer();
     const meta = await sharp(jpeg).metadata();
-    const sample = await sharp(jpeg).resize(180, 180, { fit: "fill" }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
-    const points = (model.locations || [])
-      .filter((location) => !location.floor?.id || location.floor.id === floor.id || plan.floor?.id == null)
-      .map((location) => location.pano?.position)
-      .filter((position) => position);
-    groups.push({
-      plan: { origin: plan.origin, resolution: plan.resolution, width: plan.width, height: plan.height },
-      points,
-      sample: { data: sample.data, width: sample.info.width, height: sample.info.height },
+    const scale = meta.width / plan.width;
+    const frame = {
+      origin: { x: plan.origin.x, y: plan.origin.y },
+      resolution: plan.resolution * scale,
+      width: meta.width,
+      height: meta.height,
+    };
+    await fs.promises.writeFile(path.join(dir, file), jpeg);
+    const tile = { sequence, file, frame };
+    tiles.set(floor.id, tile);
+    floorMeta.push({
+      id: String(sequence),
+      label: `קומה ${sequence}`,
+      plan: file,
+      origin: frame.origin,
+      resolution: frame.resolution,
+      width: frame.width,
+      height: frame.height,
     });
-    tiles.push({
-      floorId: floor.id,
-      sourceUrl: plan.url,
-      plan: { origin: plan.origin, resolution: plan.resolution, width: plan.width, height: plan.height },
-      jpeg,
-      imageWidth: meta.width,
-      imageHeight: meta.height,
-      offsetX: 0,
-      offsetY: y,
-    });
-    width = Math.max(width, meta.width);
-    y += meta.height + (floor === floors[floors.length - 1] ? 0 : 28);
+    console.log(`  floor ${sequence} ${file} ${meta.width}x${meta.height}`);
   }
-  if (!tiles.length) {
-    return schematicPlan(model, dir);
-  }
-  const chosen = chooseMode(groups);
-  console.log(`  floorplan mode ${chosen.mode}  ink ${chosen.ink}/${chosen.total}  inside ${chosen.inside}`);
-  const height = tiles.reduce((sum, tile, index) => sum + tile.imageHeight + (index ? 28 : 0), 0);
-  const composites = tiles.map((tile) => ({ input: tile.jpeg, left: 0, top: tile.offsetY }));
-  await sharp({
-    create: { width, height, channels: 3, background: "#f4f1ea" },
-  }).composite(composites).jpeg({ quality: 86 }).toFile(path.join(dir, "plan.jpg"));
-  const map = new Map(tiles.map((tile) => [tile.floorId, tile]));
-  if (tiles.length === 1) map.set("*", tiles[0]);
-  return { mode: chosen.mode, width, height, tiles: map };
+  if (!floorMeta.length) return schematicPlan(model, dir);
+  return { tiles, floors: floorMeta };
 }
 
 function schematicPlan(model, dir) {
@@ -266,22 +224,23 @@ function schematicPlan(model, dir) {
   const resolution = 40;
   const width = Math.max(200, Math.ceil((maxX - minX) * resolution));
   const height = Math.max(200, Math.ceil((maxY - minY) * resolution));
-  const plan = { origin: { x: minX, y: maxY }, resolution, width, height };
-  const tile = {
-    floorId: "*",
-    plan,
-    imageWidth: width,
-    imageHeight: height,
-    offsetX: 0,
-    offsetY: 0,
-  };
+  const frame = { origin: { x: minX, y: minY }, resolution, width, height };
+  const tile = { sequence: 0, file: "plan.jpg", frame };
+  const tiles = new Map((model.floors || []).map((floor) => [floor.id, tile]));
+  tiles.set("*", tile);
   return sharp({
-    create: { width, height, channels: 3, background: "#f4f1ea" },
+    create: { width, height, channels: 3, background: "#33363b" },
   }).jpeg({ quality: 80 }).toFile(path.join(dir, "plan.jpg")).then(() => ({
-    mode: "top-y-up",
-    width,
-    height,
-    tiles: new Map([["*", tile], ...(model.floors || []).map((floor) => [floor.id, { ...tile, floorId: floor.id }])]),
+    tiles,
+    floors: [{
+      id: "0",
+      label: "קומה 0",
+      plan: "plan.jpg",
+      origin: frame.origin,
+      resolution,
+      width,
+      height,
+    }],
   }));
 }
 
@@ -376,11 +335,13 @@ async function buildJob(job) {
     firstScene: first.id,
     hfov: 105,
     pitch: -10,
-    plan: "plan.jpg",
+    plan: planLayout.floors[0]?.plan || "plan.jpg",
+    floors: planLayout.floors,
     note: NOTE,
     scenes: scenes.map((scene) => ({
       id: scene.id,
       title: scene.title,
+      floor: scene.floor,
       map: scene.map,
       hotspots: scene.hotspots,
     })),
@@ -396,9 +357,11 @@ async function buildJob(job) {
     rooms: [],
   };
   const titles = Object.fromEntries(tour.scenes.map((scene) => [scene.id, scene.title]));
-  const planPairs = scenes
-    .filter((scene) => scene.map)
-    .map((scene) => ({ world: [scene.position[0], scene.position[1]], map: [scene.map.x, scene.map.y] }));
+  const planPairs = planLayout.floors.length > 1
+    ? []
+    : scenes
+      .filter((scene) => scene.map)
+      .map((scene) => ({ world: [scene.position[0], scene.position[1]], map: [scene.map.x, scene.map.y] }));
   measure.rooms = buildRoomRecords({
     apiRooms: model.rooms || [],
     scenes: measure.scenes,

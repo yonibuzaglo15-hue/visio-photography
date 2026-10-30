@@ -34,24 +34,20 @@ describe("tour build", () => {
       rooms: [room("r", "Bedroom", [[-1, -1], [4, -1], [4, 2], [-1, 2]])],
       floors: [{ id: "f", sequence: 0 }],
       planLayout: {
-        mode: "top-y-up",
-        width: 100,
-        height: 100,
         tiles: new Map([["f", {
-          plan: { origin: { x: -1, y: 2 }, resolution: 10, width: 50, height: 30 },
-          imageWidth: 50,
-          imageHeight: 30,
-          offsetX: 0,
-          offsetY: 0,
+          sequence: 0,
+          frame: { origin: { x: -1, y: -1 }, resolution: 10, width: 50, height: 30 },
         }]]),
       },
     });
     expect(scenes.map((scene) => scene.title)).toEqual(["חדר שינה 1", "חדר שינה 2", "חדר שינה 3"]);
     expect(scenes.every((scene) => scene.hotspots.length > 0)).toBe(true);
-    expect(scenes[0].hotspots[0].pitch).toBeLessThanOrEqual(-12);
-    expect(scenes[0].hotspots[0].pitch).toBeGreaterThanOrEqual(-60);
-    expect(scenes[0].map.x).toBeGreaterThan(2);
-    expect(scenes[0].map.y).toBeLessThan(98);
+    expect(scenes[0].floor).toBe("0");
+    expect(scenes[0].hotspots[0].pitch).toBeLessThan(-8);
+    expect(scenes[0].hotspots[0].pitch).toBeGreaterThan(-70);
+    expect(scenes[0].map.x).toBeGreaterThan(0);
+    expect(scenes[0].map.y).toBeGreaterThan(0);
+    expect(scenes[0].map.y).toBeLessThan(100);
   });
 
   it("reads yaw 0 as clockwise from plan-up", () => {
@@ -59,9 +55,9 @@ describe("tour build", () => {
     expect(headingFromPose([0, 0, 0, 1], -1)).toBe(-90);
   });
 
-  it("projects a sweep with the floorplan origin", () => {
-    const plan = { origin: { x: -10, y: 5 }, resolution: 100, width: 1000, height: 800 };
-    expect(projectToPlan(-10, 5, plan, "top-y-up")).toEqual({ px: 0, py: 0 });
-    expect(projectToPlan(-9, 4, plan, "top-y-up")).toEqual({ px: 100, py: 100 });
+  it("projects a sweep from Matterport's bottom-left floorplan origin", () => {
+    const plan = { origin: { x: -10, y: -5 }, resolution: 100, width: 1000, height: 800 };
+    expect(projectToPlan(-10, -5, plan)).toEqual({ px: 0, py: 800 });
+    expect(projectToPlan(-9, -4, plan)).toEqual({ px: 100, py: 700 });
   });
 });

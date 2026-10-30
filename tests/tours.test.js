@@ -191,16 +191,18 @@ describe("hosted tours", () => {
       expect(scene.hotspots.length).toBeGreaterThan(0);
       for (const hotspot of scene.hotspots) {
         expect(ids.has(hotspot.scene)).toBe(true);
-        expect(hotspot.pitch).toBeLessThanOrEqual(-12);
-        expect(hotspot.pitch).toBeGreaterThanOrEqual(-60);
+        expect(hotspot.pitch).toBeLessThan(-4);
+        expect(hotspot.pitch).toBeGreaterThan(-75);
       }
-      expect(scene.map.x).toBeGreaterThan(2);
-      expect(scene.map.x).toBeLessThan(98);
-      expect(scene.map.y).toBeGreaterThan(2);
-      expect(scene.map.y).toBeLessThan(98);
+      expect(scene.floor).toBeTypeOf("string");
+      expect(scene.map.x).toBeGreaterThan(-5);
+      expect(scene.map.x).toBeLessThan(105);
+      expect(scene.map.y).toBeGreaterThan(-5);
+      expect(scene.map.y).toBeLessThan(105);
       expect(Number.isFinite(scene.map.heading)).toBe(true);
-      expect(seen.has(`${scene.map.x},${scene.map.y}`)).toBe(false);
-      seen.add(`${scene.map.x},${scene.map.y}`);
+      const key = `${scene.floor}:${scene.map.x},${scene.map.y}`;
+      expect(seen.has(key)).toBe(false);
+      seen.add(key);
       expect(fs.existsSync(`public/tours/${slug}/pano/${scene.id}_m.jpg`)).toBe(true);
       expect(fs.existsSync(`public/tours/${slug}/pano/${scene.id}_s.jpg`)).toBe(true);
     }

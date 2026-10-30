@@ -95,7 +95,7 @@ node tools/tours/from-matterport.mjs eshkolit-3
 node tools/tours/from-matterport.mjs --all
 ```
 
-The script reads the public model (skyboxes, floor plan, room classes, wall lengths). It writes `plan.jpg`, one equirectangular panorama per sweep (`pano/<id>_m.jpg` at 4096×2048 and `<id>_s.jpg`), `tour.json` (minimap dots, Hebrew room names, floor rings) and `measure.json`. Panorama yaw 0 is the skybox’s front face, so the sweep quaternion is stored as the pose. Hebrew names are Matterport’s room class (סלון, חדר שינה, מטבח, …). A private model, or a model id Matterport no longer publishes, cannot be built. After the folder exists, set `tour` on that property’s card in `src/App.jsx`.
+The script reads the public model (skyboxes, floor plan, room classes, wall lengths). It writes the Matterport color plan (`plan.jpg`, and `plan-1.jpg`, `plan-2.jpg` when the model has more floors), one equirectangular panorama per sweep (`pano/<id>_m.jpg` at 4096×2048 and `<id>_s.jpg`), `tour.json` and `measure.json`. Minimap dots use Matterport’s own floor-plan frame: the image origin is the bottom-left corner in model metres, and the resolution is pixels per metre. Floor rings use the sweep quaternion, aimed at the neighbouring sweep’s floor point. On a multi-floor model the minimap shows only the current floor and can be switched with קומה 0, קומה 1, …. Panorama yaw 0 is the skybox’s front face. Hebrew names are Matterport’s room class (סלון, חדר שינה, מטבח, …). Measurements are always metres. A private model, or a model id Matterport no longer publishes, cannot be built. After the folder exists, set `tour` on that property’s card in `src/App.jsx`.
 
 What is still missing on the tours that do not show automatic dimensions:
 

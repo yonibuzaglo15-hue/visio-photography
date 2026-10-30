@@ -5456,10 +5456,7 @@
           "meters": 6.9
         }
       ],
-      "map": {
-        "x": 44.61,
-        "y": 49.39
-      }
+      "map": null
     },
     {
       "id": "xy2x8mpaaqknp7q2c3nnbw1ma",
@@ -5546,10 +5543,7 @@
           "meters": 1.86
         }
       ],
-      "map": {
-        "x": 47.07,
-        "y": 38.74
-      }
+      "map": null
     },
     {
       "id": "tt6gm2a0463x9wmnx7rn6gugc",
@@ -5608,10 +5602,7 @@
           "meters": 2.18
         }
       ],
-      "map": {
-        "x": 41.42,
-        "y": 56.08
-      }
+      "map": null
     },
     {
       "id": "h26t7ky77ew74yb0pg8qqf5rd",
@@ -5670,10 +5661,7 @@
           "meters": 3.11
         }
       ],
-      "map": {
-        "x": 34.16,
-        "y": 60.89
-      }
+      "map": null
     },
     {
       "id": "ediidma5zg15dufx3n0qyq21a",
@@ -5766,10 +5754,7 @@
           "meters": 7.14
         }
       ],
-      "map": {
-        "x": 63.46,
-        "y": 42.39
-      }
+      "map": null
     },
     {
       "id": "n81qfe51azs8iexnbqwspye6c",
@@ -5868,10 +5853,7 @@
           "meters": 3.59
         }
       ],
-      "map": {
-        "x": 49.83,
-        "y": 41.38
-      }
+      "map": null
     },
     {
       "id": "kuc0fpmsgqxff63egrxrycfud",
@@ -5942,10 +5924,7 @@
           "meters": 3.27
         }
       ],
-      "map": {
-        "x": 50.94,
-        "y": 50.73
-      }
+      "map": null
     },
     {
       "id": "3ygfq6yfyyw3hi9x7u5rm2iqa",
@@ -6018,10 +5997,7 @@
           "meters": 3.3
         }
       ],
-      "map": {
-        "x": 41.52,
-        "y": 44.06
-      }
+      "map": null
     },
     {
       "id": "b2kez6wsw32fm2x3ui593u3hc",
@@ -6096,10 +6072,7 @@
           "meters": 1.49
         }
       ],
-      "map": {
-        "x": 34.96,
-        "y": 52.51
-      }
+      "map": null
     },
     {
       "id": "n2yqr30509t7i8whfdf2htwic",
@@ -6158,10 +6131,7 @@
           "meters": 1.15
         }
       ],
-      "map": {
-        "x": 44.33,
-        "y": 49.46
-      }
+      "map": null
     },
     {
       "id": "tyz3uyd99x00wa88mxhmugrxa",
@@ -6298,10 +6268,7 @@
           "meters": 4.17
         }
       ],
-      "map": {
-        "x": 51.72,
-        "y": 43.03
-      }
+      "map": null
     },
     {
       "id": "bmpu8rc0bpgc1bruwia8kktzd",
@@ -6380,10 +6347,7 @@
           "meters": 3.1
         }
       ],
-      "map": {
-        "x": 35.31,
-        "y": 60.95
-      }
+      "map": null
     },
     {
       "id": "f97s719x9ctqkce19r6s01b5a",
@@ -6488,10 +6452,7 @@
           "meters": 2.28
         }
       ],
-      "map": {
-        "x": 39.35,
-        "y": 50.96
-      }
+      "map": null
     },
     {
       "id": "40zku7irh3zwswpnc4emt870d",
@@ -6544,10 +6505,7 @@
           "meters": 2.77
         }
       ],
-      "map": {
-        "x": 32.71,
-        "y": 48.37
-      }
+      "map": null
     },
     {
       "id": "4zgy5afdb9eadqxq8qmauzh0d",
@@ -6608,10 +6566,7 @@
           "meters": 3.31
         }
       ],
-      "map": {
-        "x": 52.56,
-        "y": 51.3
-      }
+      "map": null
     },
     {
       "id": "xwmb36qphpzp9se68715kxfhb",
@@ -6658,10 +6613,7 @@
           "meters": 2.39
         }
       ],
-      "map": {
-        "x": 25.95,
-        "y": 52.45
-      }
+      "map": null
     },
     {
       "id": "pksbu53py2kqgiahqc3d44p7d",
@@ -6712,10 +6664,7 @@
           "meters": 1.82
         }
       ],
-      "map": {
-        "x": 28.62,
-        "y": 61
-      }
+      "map": null
     },
     {
       "id": "h3xqwmf70zit9a8t16sa0kt9b",
@@ -6772,10 +6721,7 @@
           "meters": 1.69
         }
       ],
-      "map": {
-        "x": 41.1,
-        "y": 40.75
-      }
+      "map": null
     },
     {
       "id": "c3ctq0c1byg9mgt7sigxpg6rd",
@@ -6828,10 +6774,7 @@
           "meters": 1.69
         }
       ],
-      "map": {
-        "x": 26.6,
-        "y": 58.12
-      }
+      "map": null
     },
     {
       "id": "yxhkt9gfk9zcmduwmxx131a6a",
@@ -6882,10 +6825,7 @@
           "meters": 2.48
         }
       ],
-      "map": {
-        "x": 39.42,
-        "y": 43.29
-      }
+      "map": null
     },
     {
       "id": "fac10mmacdecyd8fn9ph2gbhc",
@@ -6932,10 +6872,7 @@
           "meters": 1.67
         }
       ],
-      "map": {
-        "x": 44.81,
-        "y": 38.11
-      }
+      "map": null
     }
   ]
 }

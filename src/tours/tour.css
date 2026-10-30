@@ -244,6 +244,28 @@ body:has(.visio-tour) {
   display: block;
 }
 
+.visio-tour-floors {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.visio-tour-floors button {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 4px;
+  cursor: pointer;
+}
+
+.visio-tour-floors button.on {
+  background: #fff;
+  color: #111;
+}
+
 .visio-tour-map-in {
   position: relative;
   direction: ltr;

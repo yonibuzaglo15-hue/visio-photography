@@ -7,21 +7,36 @@
   "hfov": 105,
   "pitch": -10,
   "plan": "plan.jpg",
+  "floors": [
+    {
+      "id": "0",
+      "label": "קומה 0",
+      "plan": "plan.jpg",
+      "origin": {
+        "x": -11.720000267028809,
+        "y": -5.622499942779541
+      },
+      "resolution": 100,
+      "width": 1329,
+      "height": 1303
+    }
+  ],
   "note": "הסיור מבוסס על צילומי 360° ונועד להתרשמות בלבד. כלי המדידה נותן הערכה בלבד (רצפה וקירות, בלי רהיטים) ואינו מחליף מדידה מקצועית – לפרטים מדויקים יש לפנות למתווך.\nלחצו על העיגולים ברצפה כדי לעבור בין נקודות.",
   "scenes": [
     {
       "id": "p01",
       "title": "סלון 1",
+      "floor": "0",
       "map": {
-        "x": 59.93,
-        "y": 61.43,
-        "heading": -161.3
+        "x": 60.68,
+        "y": 37.71,
+        "heading": 18.7
       },
       "hotspots": [
         {
           "scene": "p25",
           "yaw": -40,
-          "pitch": -50.4
+          "pitch": -50.3
         },
         {
           "scene": "p02",
@@ -31,12 +46,12 @@
         {
           "scene": "p23",
           "yaw": 109.6,
-          "pitch": -39.6
+          "pitch": -39.7
         },
         {
           "scene": "p35",
           "yaw": 178.1,
-          "pitch": -34.3
+          "pitch": -32.1
         },
         {
           "scene": "p03",
@@ -46,23 +61,24 @@
         {
           "scene": "p36",
           "yaw": -90,
-          "pitch": -32.4
+          "pitch": -32.3
         }
       ]
     },
     {
       "id": "p02",
       "title": "סלון 2",
+      "floor": "0",
       "map": {
-        "x": 55.6,
-        "y": 54.17,
-        "heading": -39.3
+        "x": 56.02,
+        "y": 45.51,
+        "heading": 140.7
       },
       "hotspots": [
         {
           "scene": "p35",
           "yaw": 33.6,
-          "pitch": -58.2
+          "pitch": -55.9
         },
         {
           "scene": "p03",
@@ -87,17 +103,18 @@
         {
           "scene": "p24",
           "yaw": -13.9,
-          "pitch": -32.9
+          "pitch": -33
         }
       ]
     },
     {
       "id": "p03",
       "title": "סלון 3",
+      "floor": "0",
       "map": {
-        "x": 48.96,
-        "y": 52.7,
-        "heading": 28.3
+        "x": 48.88,
+        "y": 47.1,
+        "heading": -151.7
       },
       "hotspots": [
         {
@@ -112,8 +129,8 @@
         },
         {
           "scene": "p35",
-          "yaw": -89.8,
-          "pitch": -47.3
+          "yaw": -89.7,
+          "pitch": -44.8
         },
         {
           "scene": "p33",
@@ -128,17 +145,18 @@
         {
           "scene": "p36",
           "yaw": 141.6,
-          "pitch": -33.8
+          "pitch": -33.7
         }
       ]
     },
     {
       "id": "p04",
       "title": "סלון 4",
+      "floor": "0",
       "map": {
-        "x": 49,
-        "y": 41.57,
-        "heading": 27
+        "x": 48.93,
+        "y": 59.06,
+        "heading": -153
       },
       "hotspots": [
         {
@@ -149,7 +167,7 @@
         {
           "scene": "p35",
           "yaw": -160.9,
-          "pitch": -41.5
+          "pitch": -39.1
         },
         {
           "scene": "p03",
@@ -164,7 +182,7 @@
         {
           "scene": "p32",
           "yaw": 125.8,
-          "pitch": -35.8
+          "pitch": -35.7
         },
         {
           "scene": "p02",
@@ -176,10 +194,11 @@
     {
       "id": "p05",
       "title": "סלון 5",
+      "floor": "0",
       "map": {
-        "x": 42.21,
-        "y": 31.35,
-        "heading": -63
+        "x": 41.62,
+        "y": 70.05,
+        "heading": 117
       },
       "hotspots": [
         {
@@ -190,12 +209,12 @@
         {
           "scene": "p09",
           "yaw": 28.6,
-          "pitch": -39.8
+          "pitch": -39.9
         },
         {
           "scene": "p10",
           "yaw": -49.6,
-          "pitch": -38.8
+          "pitch": -38.9
         },
         {
           "scene": "p04",
@@ -205,22 +224,23 @@
         {
           "scene": "p17",
           "yaw": 155,
-          "pitch": -33.7
+          "pitch": -33.6
         },
         {
           "scene": "p18",
           "yaw": 175.2,
-          "pitch": -26.7
+          "pitch": -26.6
         }
       ]
     },
     {
       "id": "p06",
       "title": "סלון 6",
+      "floor": "0",
       "map": {
-        "x": 36.63,
-        "y": 26.85,
-        "heading": -72.7
+        "x": 35.62,
+        "y": 74.9,
+        "heading": 107.3
       },
       "hotspots": [
         {
@@ -231,7 +251,7 @@
         {
           "scene": "p17",
           "yaw": -165.1,
-          "pitch": -44.5
+          "pitch": -44.4
         },
         {
           "scene": "p07",
@@ -241,12 +261,12 @@
         {
           "scene": "p09",
           "yaw": 3.6,
-          "pitch": -35.7
+          "pitch": -35.8
         },
         {
           "scene": "p18",
           "yaw": -151.4,
-          "pitch": -30.2
+          "pitch": -30.1
         },
         {
           "scene": "p10",
@@ -258,21 +278,22 @@
     {
       "id": "p07",
       "title": "סלון 7",
+      "floor": "0",
       "map": {
-        "x": 33.68,
-        "y": 14.88,
-        "heading": -120.2
+        "x": 32.45,
+        "y": 87.76,
+        "heading": 59.8
       },
       "hotspots": [
         {
           "scene": "p06",
           "yaw": -45.9,
-          "pitch": -37
+          "pitch": -36.9
         },
         {
           "scene": "p08",
           "yaw": 41.3,
-          "pitch": -30.1
+          "pitch": -30.2
         },
         {
           "scene": "p09",
@@ -282,43 +303,44 @@
         {
           "scene": "p17",
           "yaw": -75.7,
-          "pitch": -27.7
+          "pitch": -27.6
         },
         {
           "scene": "p05",
           "yaw": -32.1,
-          "pitch": -26.6
+          "pitch": -26.5
         },
         {
           "scene": "p18",
           "yaw": -78.5,
-          "pitch": -20.6
+          "pitch": -20.5
         }
       ]
     },
     {
       "id": "p08",
       "title": "סלון 8",
+      "floor": "0",
       "map": {
-        "x": 49.31,
-        "y": 11.76,
-        "heading": -117
+        "x": 49.26,
+        "y": 91.12,
+        "heading": 63
       },
       "hotspots": [
         {
           "scene": "p09",
           "yaw": -68.6,
-          "pitch": -41.4
+          "pitch": -41.3
         },
         {
           "scene": "p07",
           "yaw": -142,
-          "pitch": -29.5
+          "pitch": -29.4
         },
         {
           "scene": "p06",
           "yaw": -103.7,
-          "pitch": -25
+          "pitch": -24.8
         },
         {
           "scene": "p12",
@@ -328,43 +350,44 @@
         {
           "scene": "p05",
           "yaw": -83.4,
-          "pitch": -24
+          "pitch": -23.8
         },
         {
           "scene": "p10",
           "yaw": -55.3,
-          "pitch": -21.2
+          "pitch": -21
         }
       ]
     },
     {
       "id": "p09",
       "title": "סלון 9",
+      "floor": "0",
       "map": {
-        "x": 48.35,
-        "y": 22.27,
-        "heading": -95.4
+        "x": 48.22,
+        "y": 79.81,
+        "heading": 84.6
       },
       "hotspots": [
         {
           "scene": "p08",
           "yaw": 90.1,
-          "pitch": -40.5
+          "pitch": -40.6
         },
         {
           "scene": "p05",
           "yaw": -119.5,
-          "pitch": -39.8
+          "pitch": -39.7
         },
         {
           "scene": "p06",
           "yaw": -154,
-          "pitch": -35.5
+          "pitch": -35.4
         },
         {
           "scene": "p10",
           "yaw": -67.1,
-          "pitch": -33.3
+          "pitch": -33.2
         },
         {
           "scene": "p07",
@@ -374,17 +397,18 @@
         {
           "scene": "p04",
           "yaw": -82.7,
-          "pitch": -25.6
+          "pitch": -25.5
         }
       ]
     },
     {
       "id": "p10",
       "title": "סלון 10",
+      "floor": "0",
       "map": {
-        "x": 52.51,
-        "y": 35.7,
-        "heading": -31
+        "x": 52.7,
+        "y": 65.38,
+        "heading": 149
       },
       "hotspots": [
         {
@@ -395,17 +419,17 @@
         {
           "scene": "p05",
           "yaw": 98.6,
-          "pitch": -38.8
+          "pitch": -38.7
         },
         {
           "scene": "p35",
-          "yaw": -133,
-          "pitch": -34.3
+          "yaw": -132.9,
+          "pitch": -32
         },
         {
           "scene": "p09",
           "yaw": 48.7,
-          "pitch": -33
+          "pitch": -33.1
         },
         {
           "scene": "p11",
@@ -415,43 +439,44 @@
         {
           "scene": "p03",
           "yaw": -161,
-          "pitch": -27.8
+          "pitch": -27.7
         }
       ]
     },
     {
       "id": "p11",
       "title": "סלון 11",
+      "floor": "0",
       "map": {
-        "x": 65.9,
-        "y": 30.45,
-        "heading": -15.9
+        "x": 67.09,
+        "y": 71.02,
+        "heading": 164.1
       },
       "hotspots": [
         {
           "scene": "p13",
           "yaw": -90.7,
-          "pitch": -55.5
+          "pitch": -55.6
         },
         {
           "scene": "p12",
           "yaw": 3,
-          "pitch": -34.7
+          "pitch": -34.8
         },
         {
           "scene": "p10",
           "yaw": 127.1,
-          "pitch": -31.8
+          "pitch": -31.7
         },
         {
           "scene": "p24",
           "yaw": -161.6,
-          "pitch": -30.4
+          "pitch": -30.3
         },
         {
           "scene": "p16",
           "yaw": -21.4,
-          "pitch": -28.3
+          "pitch": -30.4
         },
         {
           "scene": "p09",
@@ -463,16 +488,17 @@
     {
       "id": "p12",
       "title": "סלון 12",
+      "floor": "0",
       "map": {
-        "x": 68.82,
-        "y": 17.45,
-        "heading": -11
+        "x": 70.24,
+        "y": 85,
+        "heading": 169
       },
       "hotspots": [
         {
           "scene": "p16",
           "yaw": -74.1,
-          "pitch": -51
+          "pitch": -53.3
         },
         {
           "scene": "p11",
@@ -482,12 +508,12 @@
         {
           "scene": "p13",
           "yaw": -157.5,
-          "pitch": -31.1
+          "pitch": -31
         },
         {
           "scene": "p15",
           "yaw": -72.1,
-          "pitch": -26.4
+          "pitch": -28.3
         },
         {
           "scene": "p08",
@@ -497,99 +523,102 @@
         {
           "scene": "p09",
           "yaw": 114.1,
-          "pitch": -22.8
+          "pitch": -22.7
         }
       ]
     },
     {
       "id": "p13",
       "title": "סלון 13",
+      "floor": "0",
       "map": {
-        "x": 71.81,
-        "y": 32.19,
-        "heading": -95.5
+        "x": 73.45,
+        "y": 69.15,
+        "heading": 84.5
       },
       "hotspots": [
         {
           "scene": "p11",
           "yaw": 169.4,
-          "pitch": -54.2
+          "pitch": -54.1
         },
         {
           "scene": "p24",
           "yaw": -106.1,
-          "pitch": -30.8
+          "pitch": -30.7
         },
         {
           "scene": "p12",
           "yaw": 107.3,
-          "pitch": -30.1
+          "pitch": -30.2
         },
         {
           "scene": "p16",
           "yaw": 79.8,
-          "pitch": -28.7
+          "pitch": -30.9
         },
         {
           "scene": "p14",
           "yaw": 2.4,
-          "pitch": -28.2
+          "pitch": -28.3
         },
         {
           "scene": "p21",
           "yaw": -28.1,
-          "pitch": -26.9
+          "pitch": -27
         }
       ]
     },
     {
       "id": "p14",
       "title": "סלון 14",
+      "floor": "0",
       "map": {
-        "x": 87.98,
-        "y": 33.09,
-        "heading": -124.5
+        "x": 90.84,
+        "y": 68.19,
+        "heading": 55.5
       },
       "hotspots": [
         {
           "scene": "p21",
           "yaw": -68.5,
-          "pitch": -44
+          "pitch": -44.1
         },
         {
           "scene": "p13",
           "yaw": -148.7,
-          "pitch": -27.3
+          "pitch": -27.2
         },
         {
           "scene": "p15",
           "yaw": 128.1,
-          "pitch": -25.4
+          "pitch": -27.4
         },
         {
           "scene": "p16",
           "yaw": 161.1,
-          "pitch": -22.7
+          "pitch": -24.5
         },
         {
           "scene": "p11",
           "yaw": -152.3,
-          "pitch": -20.6
+          "pitch": -20.5
         },
         {
           "scene": "p22",
           "yaw": -57.8,
-          "pitch": -20.6
+          "pitch": -20.5
         }
       ]
     },
     {
       "id": "p15",
       "title": "סלון 15",
+      "floor": "0",
       "map": {
-        "x": 86.88,
-        "y": 15.21,
-        "heading": -9.7
+        "x": 89.65,
+        "y": 87.41,
+        "heading": 170.3
       },
       "hotspots": [
         {
@@ -600,43 +629,44 @@
         {
           "scene": "p14",
           "yaw": -166.7,
-          "pitch": -27.8
+          "pitch": -25.9
         },
         {
           "scene": "p12",
           "yaw": 106.6,
-          "pitch": -27.1
+          "pitch": -25.1
         },
         {
           "scene": "p13",
           "yaw": 147.6,
-          "pitch": -22.5
+          "pitch": -20.7
         },
         {
           "scene": "p11",
           "yaw": 135.1,
-          "pitch": -19.9
+          "pitch": -18.3
         },
         {
           "scene": "p21",
           "yaw": -172.1,
-          "pitch": -19.6
+          "pitch": -18.1
         }
       ]
     },
     {
       "id": "p16",
       "title": "סלון 16",
+      "floor": "0",
       "map": {
-        "x": 76.09,
-        "y": 16.79,
-        "heading": 144.7
+        "x": 78.05,
+        "y": 85.71,
+        "heading": -35.3
       },
       "hotspots": [
         {
           "scene": "p12",
           "yaw": -49.7,
-          "pitch": -52.6
+          "pitch": -50.2
         },
         {
           "scene": "p15",
@@ -646,73 +676,75 @@
         {
           "scene": "p13",
           "yaw": 19.4,
-          "pitch": -31.3
+          "pitch": -29.2
         },
         {
           "scene": "p11",
           "yaw": -2,
-          "pitch": -29.6
+          "pitch": -27.4
         },
         {
           "scene": "p14",
           "yaw": 72,
-          "pitch": -25.6
+          "pitch": -23.8
         },
         {
           "scene": "p21",
           "yaw": 57.4,
-          "pitch": -19.9
+          "pitch": -18.4
         }
       ]
     },
     {
       "id": "p17",
       "title": "סלון 17",
+      "floor": "0",
       "map": {
-        "x": 28.97,
-        "y": 31.8,
-        "heading": -46.9
+        "x": 27.39,
+        "y": 69.57,
+        "heading": 133.1
       },
       "hotspots": [
         {
           "scene": "p18",
           "yaw": -158.7,
-          "pitch": -52.7
+          "pitch": -52.6
         },
         {
           "scene": "p06",
           "yaw": -10.8,
-          "pitch": -44.6
+          "pitch": -44.7
         },
         {
           "scene": "p19",
           "yaw": 164.2,
-          "pitch": -34.1
+          "pitch": -34
         },
         {
           "scene": "p05",
           "yaw": -41.3,
-          "pitch": -34
+          "pitch": -34.1
         },
         {
           "scene": "p20",
           "yaw": 124.4,
-          "pitch": -28.9
+          "pitch": -28.7
         },
         {
           "scene": "p07",
           "yaw": 31,
-          "pitch": -27.5
+          "pitch": -27.6
         }
       ]
     },
     {
       "id": "p18",
       "title": "מטבח 1",
+      "floor": "0",
       "map": {
-        "x": 26.02,
-        "y": 38.06,
-        "heading": -10.6
+        "x": 24.21,
+        "y": 62.84,
+        "heading": 169.4
       },
       "hotspots": [
         {
@@ -728,32 +760,33 @@
         {
           "scene": "p34",
           "yaw": -149.7,
-          "pitch": -31.2
+          "pitch": -31.1
         },
         {
           "scene": "p06",
           "yaw": -33.4,
-          "pitch": -30.6
+          "pitch": -30.7
         },
         {
           "scene": "p20",
           "yaw": 63.9,
-          "pitch": -29.2
+          "pitch": -29
         },
         {
           "scene": "p05",
           "yaw": -57.4,
-          "pitch": -27.3
+          "pitch": -27.4
         }
       ]
     },
     {
       "id": "p19",
       "title": "מטבח 2",
+      "floor": "0",
       "map": {
-        "x": 17.2,
-        "y": 37.98,
-        "heading": -140.9
+        "x": 14.73,
+        "y": 62.93,
+        "heading": 39.1
       },
       "hotspots": [
         {
@@ -764,12 +797,12 @@
         {
           "scene": "p20",
           "yaw": 164.4,
-          "pitch": -40.6
+          "pitch": -40.5
         },
         {
           "scene": "p17",
           "yaw": 78.2,
-          "pitch": -34.3
+          "pitch": -34.4
         },
         {
           "scene": "p34",
@@ -779,63 +812,65 @@
         {
           "scene": "p06",
           "yaw": 80.2,
-          "pitch": -22
+          "pitch": -22.2
         },
         {
           "scene": "p05",
           "yaw": 65.5,
-          "pitch": -19.3
+          "pitch": -19.4
         }
       ]
     },
     {
       "id": "p20",
       "title": "מטבח 3",
+      "floor": "0",
       "map": {
-        "x": 13.04,
-        "y": 28.19,
-        "heading": 49.9
+        "x": 10.26,
+        "y": 73.45,
+        "heading": -130.1
       },
       "hotspots": [
         {
           "scene": "p19",
           "yaw": 153.6,
-          "pitch": -40.3
+          "pitch": -40.4
         },
         {
           "scene": "p18",
           "yaw": -176.6,
-          "pitch": -28.7
+          "pitch": -28.8
         },
         {
           "scene": "p17",
           "yaw": -152.4,
-          "pitch": -28.5
+          "pitch": -28.7
         },
         {
           "scene": "p06",
           "yaw": -136.7,
-          "pitch": -20.5
+          "pitch": -20.7
         },
         {
           "scene": "p07",
           "yaw": -107.6,
-          "pitch": -20
+          "pitch": -20.2
         },
         {
           "scene": "p05",
           "yaw": -146,
-          "pitch": -16.8
+          "pitch": -16.9
         }
       ]
     },
     {
       "id": "p21",
       "title": "חדר שינה 1",
+      "floor": "0",
       "map": {
-        "x": 86.05,
-        "y": 41.8,
-        "heading": -33.5
+        "x": 88.77,
+        "y": 58.81,
+        "heading": 146.5
       },
       "hotspots": [
         {
@@ -846,140 +881,143 @@
         {
           "scene": "p22",
           "yaw": -142.1,
-          "pitch": -33.4
+          "pitch": -33.3
         },
         {
           "scene": "p13",
           "yaw": 90,
-          "pitch": -28.8
+          "pitch": -28.7
         },
         {
           "scene": "p24",
           "yaw": 135,
-          "pitch": -25.2
+          "pitch": -25
         },
         {
           "scene": "p23",
           "yaw": 159,
-          "pitch": -23.5
+          "pitch": -23.2
         },
         {
           "scene": "p11",
           "yaw": 94.6,
-          "pitch": -22.2
+          "pitch": -22
         }
       ]
     },
     {
       "id": "p22",
       "title": "חדר שינה 2",
+      "floor": "0",
       "map": {
-        "x": 87.13,
-        "y": 56.12,
-        "heading": -128.3
+        "x": 89.92,
+        "y": 43.41,
+        "heading": 51.7
       },
       "hotspots": [
         {
           "scene": "p29",
           "yaw": -56.6,
-          "pitch": -45.5
+          "pitch": -45.4
         },
         {
           "scene": "p21",
           "yaw": 132.7,
-          "pitch": -33.6
+          "pitch": -33.7
         },
         {
           "scene": "p23",
           "yaw": -146.5,
-          "pitch": -26.5
+          "pitch": -26.4
         },
         {
           "scene": "p30",
           "yaw": -55.6,
-          "pitch": -25.9
+          "pitch": -25.7
         },
         {
           "scene": "p31",
           "yaw": -71.9,
-          "pitch": -24.1
+          "pitch": -21
         },
         {
           "scene": "p28",
           "yaw": -98.6,
-          "pitch": -22.9
+          "pitch": -22.7
         }
       ]
     },
     {
       "id": "p23",
       "title": "חדר שינה 3",
+      "floor": "0",
       "map": {
-        "x": 68.56,
-        "y": 54.54,
-        "heading": 75.5
+        "x": 69.95,
+        "y": 45.12,
+        "heading": -104.5
       },
       "hotspots": [
         {
           "scene": "p24",
           "yaw": -62.5,
-          "pitch": -46.7
+          "pitch": -46.8
         },
         {
           "scene": "p01",
           "yaw": 52.8,
-          "pitch": -40
+          "pitch": -39.9
         },
         {
           "scene": "p02",
           "yaw": 13.1,
-          "pitch": -35.6
+          "pitch": -35.5
         },
         {
           "scene": "p35",
           "yaw": -10.5,
-          "pitch": -34.2
+          "pitch": -32
         },
         {
           "scene": "p28",
           "yaw": 113.2,
-          "pitch": -28.4
+          "pitch": -28.3
         },
         {
           "scene": "p25",
           "yaw": 65.3,
-          "pitch": -27.2
+          "pitch": -27.1
         }
       ]
     },
     {
       "id": "p24",
       "title": "חדר שינה 4",
+      "floor": "0",
       "map": {
-        "x": 66.56,
-        "y": 45.83,
-        "heading": 131.7
+        "x": 67.8,
+        "y": 54.48,
+        "heading": -48.3
       },
       "hotspots": [
         {
           "scene": "p23",
           "yaw": 61.4,
-          "pitch": -46.6
+          "pitch": -46.5
         },
         {
           "scene": "p35",
           "yaw": -27.1,
-          "pitch": -40.6
+          "pitch": -38.2
         },
         {
           "scene": "p02",
           "yaw": -5,
-          "pitch": -34
+          "pitch": -33.9
         },
         {
           "scene": "p13",
           "yaw": -153.1,
-          "pitch": -32.7
+          "pitch": -32.8
         },
         {
           "scene": "p11",
@@ -989,23 +1027,24 @@
         {
           "scene": "p01",
           "yaw": 24.8,
-          "pitch": -29.1
+          "pitch": -28.9
         }
       ]
     },
     {
       "id": "p25",
       "title": "חדר שינה 5",
+      "floor": "0",
       "map": {
-        "x": 57.25,
-        "y": 68.59,
-        "heading": 146.5
+        "x": 57.8,
+        "y": 30.01,
+        "heading": -33.5
       },
       "hotspots": [
         {
           "scene": "p01",
           "yaw": -167.4,
-          "pitch": -49.9
+          "pitch": -50
         },
         {
           "scene": "p36",
@@ -1020,27 +1059,28 @@
         {
           "scene": "p28",
           "yaw": 112,
-          "pitch": -32.5
+          "pitch": -32.6
         },
         {
           "scene": "p02",
           "yaw": -140,
-          "pitch": -32.1
+          "pitch": -32.2
         },
         {
           "scene": "p39",
           "yaw": 2.4,
-          "pitch": -29.3
+          "pitch": -29.1
         }
       ]
     },
     {
       "id": "p26",
       "title": "חדר שינה 6",
+      "floor": "0",
       "map": {
-        "x": 60.84,
-        "y": 80.02,
-        "heading": 148.8
+        "x": 61.66,
+        "y": 17.72,
+        "heading": -31.2
       },
       "hotspots": [
         {
@@ -1056,32 +1096,33 @@
         {
           "scene": "p39",
           "yaw": -45.8,
-          "pitch": -36.4
+          "pitch": -36.3
         },
         {
           "scene": "p28",
           "yaw": 160.4,
-          "pitch": -33.8
+          "pitch": -33.9
         },
         {
           "scene": "p01",
           "yaw": -146.1,
-          "pitch": -26
+          "pitch": -26.1
         },
         {
           "scene": "p31",
           "yaw": 132.8,
-          "pitch": -24.3
+          "pitch": -21.3
         }
       ]
     },
     {
       "id": "p27",
       "title": "חדר שינה 7",
+      "floor": "0",
       "map": {
-        "x": 68.86,
-        "y": 84.94,
-        "heading": -150.6
+        "x": 70.28,
+        "y": 12.43,
+        "heading": 29.4
       },
       "hotspots": [
         {
@@ -1092,58 +1133,59 @@
         {
           "scene": "p28",
           "yaw": 141.1,
-          "pitch": -33.8
+          "pitch": -33.9
         },
         {
           "scene": "p31",
-          "yaw": 98.9,
-          "pitch": -32.5
+          "yaw": 98.8,
+          "pitch": -28.9
         },
         {
           "scene": "p30",
           "yaw": 88.9,
-          "pitch": -25
+          "pitch": -25.1
         },
         {
           "scene": "p25",
           "yaw": -173.5,
-          "pitch": -24.2
+          "pitch": -24.3
         },
         {
           "scene": "p39",
           "yaw": -125.3,
-          "pitch": -23.9
+          "pitch": -23.8
         }
       ]
     },
     {
       "id": "p28",
       "title": "חדר שינה 8",
+      "floor": "0",
       "map": {
-        "x": 71.08,
-        "y": 71.49,
-        "heading": -7.7
+        "x": 72.67,
+        "y": 26.89,
+        "heading": 172.3
       },
       "hotspots": [
         {
           "scene": "p31",
-          "yaw": -109.6,
-          "pitch": -42.3
+          "yaw": -109.5,
+          "pitch": -38.2
         },
         {
           "scene": "p26",
           "yaw": 137.1,
-          "pitch": -34
+          "pitch": -33.9
         },
         {
           "scene": "p27",
           "yaw": 178.1,
-          "pitch": -33.6
+          "pitch": -33.5
         },
         {
           "scene": "p25",
           "yaw": 86.4,
-          "pitch": -32.7
+          "pitch": -32.6
         },
         {
           "scene": "p01",
@@ -1153,69 +1195,71 @@
         {
           "scene": "p30",
           "yaw": -98.1,
-          "pitch": -30.7
+          "pitch": -30.6
         }
       ]
     },
     {
       "id": "p29",
       "title": "חדר רחצה 1",
+      "floor": "0",
       "map": {
-        "x": 86.36,
-        "y": 65.42,
-        "heading": 179
+        "x": 89.1,
+        "y": 33.42,
+        "heading": -1
       },
       "hotspots": [
         {
           "scene": "p22",
           "yaw": 176.2,
-          "pitch": -45
+          "pitch": -45.1
         },
         {
           "scene": "p30",
           "yaw": -1.9,
-          "pitch": -43.1
+          "pitch": -42.9
         },
         {
           "scene": "p31",
           "yaw": -30.7,
-          "pitch": -37.5
+          "pitch": -33.5
         },
         {
           "scene": "p28",
           "yaw": -67.9,
-          "pitch": -29.6
+          "pitch": -29.5
         },
         {
           "scene": "p23",
           "yaw": -120,
-          "pitch": -23.9
+          "pitch": -23.8
         },
         {
           "scene": "p21",
           "yaw": -178.2,
-          "pitch": -21.4
+          "pitch": -21.6
         }
       ]
     },
     {
       "id": "p30",
       "title": "חדר רחצה 2",
+      "floor": "0",
       "map": {
-        "x": 85.85,
-        "y": 75.64,
-        "heading": 57.9
+        "x": 88.55,
+        "y": 22.43,
+        "heading": -122.1
       },
       "hotspots": [
         {
           "scene": "p31",
           "yaw": 35.9,
-          "pitch": -57.8
+          "pitch": -54.1
         },
         {
           "scene": "p29",
           "yaw": -60.7,
-          "pitch": -43.2
+          "pitch": -43.3
         },
         {
           "scene": "p28",
@@ -1225,7 +1269,7 @@
         {
           "scene": "p22",
           "yaw": -61.6,
-          "pitch": -26.2
+          "pitch": -26.4
         },
         {
           "scene": "p27",
@@ -1242,57 +1286,59 @@
     {
       "id": "p31",
       "title": "חדר רחצה 3",
+      "floor": "0",
       "map": {
-        "x": 79.95,
-        "y": 76.05,
-        "heading": 19.8
+        "x": 82.21,
+        "y": 21.99,
+        "heading": -160.2
       },
       "hotspots": [
         {
           "scene": "p30",
           "yaw": -106,
-          "pitch": -53.4
+          "pitch": -57.2
         },
         {
           "scene": "p28",
-          "yaw": 43.5,
-          "pitch": -39
+          "yaw": 43.6,
+          "pitch": -43
         },
         {
           "scene": "p29",
-          "yaw": -51.4,
-          "pitch": -33.2
+          "yaw": -51.5,
+          "pitch": -37.1
         },
         {
           "scene": "p27",
           "yaw": 108.5,
-          "pitch": -29.6
+          "pitch": -33.1
         },
         {
           "scene": "p26",
           "yaw": 81.8,
-          "pitch": -22.4
+          "pitch": -25.3
         },
         {
           "scene": "p22",
           "yaw": -40,
-          "pitch": -21.1
+          "pitch": -24.1
         }
       ]
     },
     {
       "id": "p32",
       "title": "חדר רחצה 4",
+      "floor": "0",
       "map": {
-        "x": 43.26,
-        "y": 52.81,
-        "heading": -73.2
+        "x": 42.75,
+        "y": 46.98,
+        "heading": 106.8
       },
       "hotspots": [
         {
           "scene": "p33",
           "yaw": -116.5,
-          "pitch": -59
+          "pitch": -58.9
         },
         {
           "scene": "p03",
@@ -1302,7 +1348,7 @@
         {
           "scene": "p34",
           "yaw": 160.9,
-          "pitch": -36.2
+          "pitch": -36.1
         },
         {
           "scene": "p02",
@@ -1317,17 +1363,18 @@
         {
           "scene": "p36",
           "yaw": -92.7,
-          "pitch": -33.6
+          "pitch": -33.5
         }
       ]
     },
     {
       "id": "p33",
       "title": "חדר רחצה 5",
+      "floor": "0",
       "map": {
-        "x": 42.34,
-        "y": 58.2,
-        "heading": -116.8
+        "x": 41.76,
+        "y": 41.18,
+        "heading": 63.2
       },
       "hotspots": [
         {
@@ -1338,17 +1385,17 @@
         {
           "scene": "p03",
           "yaw": 66.5,
-          "pitch": -46.4
+          "pitch": -46.5
         },
         {
           "scene": "p36",
           "yaw": -34.9,
-          "pitch": -46
+          "pitch": -45.9
         },
         {
           "scene": "p34",
           "yaw": 179.6,
-          "pitch": -34.7
+          "pitch": -34.6
         },
         {
           "scene": "p02",
@@ -1358,28 +1405,29 @@
         {
           "scene": "p35",
           "yaw": 61.3,
-          "pitch": -28.3
+          "pitch": -26.3
         }
       ]
     },
     {
       "id": "p34",
       "title": "חדר רחצה 6",
+      "floor": "0",
       "map": {
-        "x": 31,
-        "y": 52.28,
-        "heading": 114.6
+        "x": 29.57,
+        "y": 47.55,
+        "heading": -65.4
       },
       "hotspots": [
         {
           "scene": "p32",
           "yaw": 153,
-          "pitch": -35.8
+          "pitch": -35.9
         },
         {
           "scene": "p33",
           "yaw": 128.4,
-          "pitch": -34.8
+          "pitch": -34.9
         },
         {
           "scene": "p18",
@@ -1389,7 +1437,7 @@
         {
           "scene": "p03",
           "yaw": 154.1,
-          "pitch": -26.2
+          "pitch": -26.3
         },
         {
           "scene": "p19",
@@ -1398,59 +1446,61 @@
         },
         {
           "scene": "p17",
-          "yaw": -108.9,
-          "pitch": -23.8
+          "yaw": -109,
+          "pitch": -23.9
         }
       ]
     },
     {
       "id": "p35",
       "title": "חדר ארונות",
+      "floor": "0",
       "map": {
-        "x": 56.16,
-        "y": 48.61,
-        "heading": 88.5
+        "x": 56.62,
+        "y": 51.49,
+        "heading": -91.5
       },
       "hotspots": [
         {
           "scene": "p02",
           "yaw": 85.8,
-          "pitch": -58.2
+          "pitch": -60.2
         },
         {
           "scene": "p03",
           "yaw": 30.6,
-          "pitch": -47
+          "pitch": -49.3
         },
         {
           "scene": "p04",
           "yaw": -42.5,
-          "pitch": -41.6
+          "pitch": -43.9
         },
         {
           "scene": "p24",
           "yaw": -163.8,
-          "pitch": -39.3
+          "pitch": -41.7
         },
         {
           "scene": "p01",
           "yaw": 108.3,
-          "pitch": -33.9
+          "pitch": -36
         },
         {
           "scene": "p10",
           "yaw": -72.5,
-          "pitch": -33.8
+          "pitch": -36
         }
       ]
     },
     {
       "id": "p36",
       "title": "חלל 1",
+      "floor": "0",
       "map": {
-        "x": 46.53,
-        "y": 66.11,
-        "heading": 177
+        "x": 46.27,
+        "y": 32.68,
+        "heading": -3
       },
       "hotspots": [
         {
@@ -1466,17 +1516,17 @@
         {
           "scene": "p37",
           "yaw": -43.7,
-          "pitch": -35.8
+          "pitch": -35.7
         },
         {
           "scene": "p03",
           "yaw": 172.5,
-          "pitch": -34.9
+          "pitch": -35
         },
         {
           "scene": "p32",
           "yaw": -163,
-          "pitch": -34.8
+          "pitch": -34.9
         },
         {
           "scene": "p01",
@@ -1488,10 +1538,11 @@
     {
       "id": "p37",
       "title": "חלל 2",
+      "floor": "0",
       "map": {
-        "x": 37.02,
-        "y": 75.25,
-        "heading": 163.7
+        "x": 36.04,
+        "y": 22.85,
+        "heading": -16.3
       },
       "hotspots": [
         {
@@ -1502,7 +1553,7 @@
         {
           "scene": "p36",
           "yaw": 149.7,
-          "pitch": -35
+          "pitch": -35.1
         },
         {
           "scene": "p39",
@@ -1512,27 +1563,28 @@
         {
           "scene": "p33",
           "yaw": 178.7,
-          "pitch": -27.5
+          "pitch": -27.6
         },
         {
           "scene": "p25",
           "yaw": 124.3,
-          "pitch": -23.3
+          "pitch": -23.4
         },
         {
           "scene": "p32",
           "yaw": -179.5,
-          "pitch": -21.7
+          "pitch": -21.9
         }
       ]
     },
     {
       "id": "p38",
       "title": "חלל 3",
+      "floor": "0",
       "map": {
-        "x": 39.55,
-        "y": 84.76,
-        "heading": -86.7
+        "x": 38.76,
+        "y": 12.62,
+        "heading": 93.3
       },
       "hotspots": [
         {
@@ -1548,7 +1600,7 @@
         {
           "scene": "p36",
           "yaw": 65.9,
-          "pitch": -25.4
+          "pitch": -25.5
         },
         {
           "scene": "p26",
@@ -1558,33 +1610,34 @@
         {
           "scene": "p25",
           "yaw": 38.6,
-          "pitch": -21.5
+          "pitch": -21.6
         },
         {
           "scene": "p33",
           "yaw": 80.7,
-          "pitch": -19.5
+          "pitch": -19.6
         }
       ]
     },
     {
       "id": "p39",
       "title": "חלל 4",
+      "floor": "0",
       "map": {
-        "x": 48.82,
-        "y": 82.85,
-        "heading": 43.1
+        "x": 48.73,
+        "y": 14.68,
+        "heading": -136.9
       },
       "hotspots": [
         {
           "scene": "p38",
           "yaw": 58.4,
-          "pitch": -44.8
+          "pitch": -44.7
         },
         {
           "scene": "p26",
           "yaw": -120.3,
-          "pitch": -36.9
+          "pitch": -37
         },
         {
           "scene": "p37",
@@ -1594,17 +1647,17 @@
         {
           "scene": "p25",
           "yaw": -74.4,
-          "pitch": -29.7
+          "pitch": -29.8
         },
         {
           "scene": "p36",
           "yaw": -35.3,
-          "pitch": -29.5
+          "pitch": -29.6
         },
         {
           "scene": "p27",
           "yaw": -139,
-          "pitch": -24.6
+          "pitch": -24.7
         }
       ]
     }
