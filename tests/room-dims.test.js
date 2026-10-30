@@ -69,16 +69,18 @@ describe("room dimensions", () => {
     expect(rooms[0].length).toBeCloseTo(3, 2);
     const chip = roomChip(rooms[0], "חדר עבודה – חלון");
     expect(chip.title).toBe("חדר עבודה");
-    expect(chip.sizeLabel.startsWith("קירות")).toBe(false);
+    expect(chip.sizeLabel.startsWith("\u200E4.00")).toBe(true);
     const open = roomChip({
       rectangular: false,
+      source: "walls",
       width: 5.71,
       length: 4.96,
       height: 2.63,
       area: 57,
-      zones: ["חדר שירות / כביסה", "מטבח", "סלון", "פינת אוכל"],
+      zones: ["סלון"],
     }, "סלון");
-    expect(open.title).toBe("סלון · מטבח · פינת אוכל");
+    expect(open.sizeLabel).toBeNull();
+    expect(open.height).toContain("2.63");
   });
 
   it("fits the floor plan and skips hidden voids", () => {

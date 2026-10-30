@@ -358,7 +358,7 @@ export default function TourViewer({ tour }) {
               />
             ))}
             {dimsOn && hasRooms && tour.measure.rooms
-              .filter((item) => item.map && item.sceneIds?.includes(sceneId))
+              .filter((item) => item.source === "matterport" && item.map && item.sceneIds?.includes(sceneId))
               .map((item) => (
                 <div
                   key={item.id}

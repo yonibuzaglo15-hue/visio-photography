@@ -65,7 +65,7 @@ Dimensions are an estimate, not a survey. Say so in `note`.
 
 The viewer shows them in two ways, for every tour that has the data:
 
-- **Automatic, on by default.** When `measure.json` contains `rooms`, entering a panorama draws that room’s two main dimensions on the floor and a small label (`3.75 × 3.10 מ׳ · גובה 2.60 מ׳`). The current room’s size is also marked on the minimap. The button next to the info button hides them. Open-plan rooms that are not a rectangle are labelled as main walls plus area, so a 10 m bounding box is not presented as the room.
+- **Automatic, on by default.** Each visible Matterport wall is drawn on the floor at that wall’s face, labelled with the distance between Matterport’s own vertices. Door and window labels use Matterport’s opening width. Ceiling height, and width × depth, appear only when Matterport published those numbers (they are in feet in the API and shown in metres). A room with no published width, such as the open salon, does not get an estimated box. Segments behind the camera or behind another wall are hidden. Furniture is not in the model, so a line can still draw over a bed that stands in front of a wall. The minimap shows width × depth only for rooms where Matterport published both.
 - **Manual, off by default.** The ruler button measures two clicks. It needs sweep poses (`scenes` in `measure.json`). Walls make the click hit a wall; otherwise it hits the floor plane.
 
 Generate `measure.json` from a public Matterport model:
