@@ -36,6 +36,22 @@ describe("room dimensions", () => {
     expect(feetToMetres(8.6286)).toBeCloseTo(2.63, 2);
   });
 
+  it("keeps metric Matterport sizes in metres", () => {
+    const room = rectRoom("r", 0, 0, 4, 3);
+    room.dimensionEstimates = { units: "metric", height: 2.6, area: 12, width: 4, depth: 3 };
+    room.ceiling = { maxHeight: 2.6 };
+    const rooms = buildRoomRecords({
+      apiRooms: [room],
+      scenes: { a: { position: [1, 1, 1.27], floorZ: 0 } },
+      titles: { a: "סלון" },
+      planPairs: [{ world: [1, 1], map: [10, 20] }, { world: [3, 1], map: [30, 20] }, { world: [1, 2], map: [10, 40] }],
+    });
+    expect(rooms[0].source).toBe("matterport");
+    expect(rooms[0].height).toBeCloseTo(2.6, 2);
+    expect(rooms[0].width).toBeCloseTo(4, 2);
+    expect(rooms[0].length).toBeCloseTo(3, 2);
+  });
+
   it("chains a rectangle and sizes it from the walls", () => {
     const poly = chainPolygon(rectRoom("r", 0, 0, 4, 3).boundary.edges);
     expect(poly).toHaveLength(4);
