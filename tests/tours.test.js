@@ -259,6 +259,33 @@ describe("portfolio tour wiring", () => {
     expect(src).toContain('target: "_blank"');
   });
 
+  it("points the האשכולית 3 card at the external Matterport tour with a stills gallery", () => {
+    const card = portfolio.find((item) => item.id === 30);
+    expect(card?.title).toBe("האשכולית 3 - גיא רוזן");
+    expect(card?.city).toBe("אשדוד");
+    expect(card?.sub).toBe("רובע ט״ז · מרפסת · סלון · מטבח");
+    expect(card?.company).toBe("remax");
+    expect(card?.partner).toBe("RE/MAX");
+    expect(card?.tag).toBe("דירה + סיור וירטואלי");
+    expect(card?.tags).toEqual(["מרפסת", "סלון", "מטבח", "סיור וירטואלי 3D"]);
+    // no self-hosted tour: the button uses the Matterport model id and opens a new tab
+    expect(card?.tour).toBeUndefined();
+    expect(card?.matterport).toBe("eo6fpaEEiA9");
+    const order = Array.from({ length: 16 }, (_, i) => String(i + 1).padStart(2, "0"));
+    expect(card?.hero).toBe("/portfolio/eshkolit-3/cover.jpg");
+    expect(card?.gallery).not.toContain(card?.hero);
+    expect(jpegSize("public/portfolio/eshkolit-3/cover.jpg")).toEqual({ width: 2560, height: 1440 });
+    expect(card?.gallery).toHaveLength(16);
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/eshkolit-3/${n}.jpg`));
+    for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
+    const files = fs.readdirSync("public/portfolio/eshkolit-3").sort();
+    expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
+    for (const f of files) expect(jpegSize(`public/portfolio/eshkolit-3/${f}`)).toEqual({ width: 2560, height: 1440 });
+    const src = fs.readFileSync("src/App.jsx", "utf8");
+    expect(src).toContain("https://my.matterport.com/show/?m=${p.matterport}");
+    expect(src).toContain('target: "_blank"');
+  });
+
   it("points the חסידא 17 card at its hosted tour", () => {
     const card = portfolio.find((item) => item.id === 15);
     expect(card?.title).toBe("חסידא 17 · אשדוד");
