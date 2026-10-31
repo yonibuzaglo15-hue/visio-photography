@@ -136,7 +136,7 @@
 }
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -144,7 +144,7 @@ body {
   background: var(--visio-bg);
   color: var(--visio-text);
   font-family: 'Heebo', sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -570,3 +570,316 @@ button:hover { opacity: 0.85; }
 [data-theme="dark"] .visio-pkg-logo.metal-social { filter: drop-shadow(0 0 .6px rgba(255,255,255,.55)); }
 [data-theme="dark"] .visio-price-card.metal-social { --metal: linear-gradient(90deg, #1a1a1a, #6a6a6a 45%, #222); }
 @media (max-width: 768px) { .visio-pkg-logo { width: 84px; height: 84px; } }
+
+/* ════════════════════════════════════════════════════════════
+   Scroll-craft motion. Tokens follow the existing editorial
+   palette. Device rules stay in scrollcraft.css.
+   ════════════════════════════════════════════════════════════ */
+.visio-public {
+  --sc-canvas: var(--pub-bg);
+  --sc-surface: var(--pub-bg-2);
+  --sc-ink: var(--pub-ink);
+  --sc-ink-soft: var(--pub-muted);
+  --sc-accent: var(--pub-ink);
+  --sc-accent-ink: var(--pub-on-ink);
+  --sc-font-display: var(--pub-serif);
+  --sc-font-text: var(--pub-sans);
+}
+.visio-public :is(#home, #portfolio, #pricing, #booking, #charter, #about) {
+  scroll-margin-top: 72px;
+}
+
+/* Before the engine boots, copy stays readable. After boot, cues are driven inline. */
+html:not(.sc-ready) .visio-public [data-sc-cue] { opacity: 1; transform: none; }
+html:not(.sc-ready) .visio-public [data-sc-in],
+html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform: none; }
+
+/* Pinned stages sit below the sticky index so the bar does not crop the frame. */
+.visio-public { --visio-sticky: 48px; }
+.visio-public .sc-stage {
+  background: var(--pub-bg);
+  top: var(--visio-sticky);
+  height: calc(100svh - var(--visio-sticky));
+}
+@media (max-width: 768px) {
+  .visio-public { --visio-sticky: 60px; }
+}
+.visio-hero-act .sc-stage,
+.visio-opener-act .sc-stage,
+.visio-quote-act .sc-stage { background: #111; }
+
+.visio-hero-plate,
+.visio-opener-photo,
+.visio-quote-photo {
+  position: absolute;
+  inset: -12% 0;
+  overflow: hidden;
+}
+.visio-hero-plate img,
+.visio-opener-photo img,
+.visio-quote-photo img,
+.visio-photo-shift img,
+.visio-hero-print img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  display: block;
+}
+.visio-hero-plate {
+  clip-path: inset(
+    calc(var(--sc-p, 0) * 8%)
+    calc(var(--sc-p, 0) * 6%)
+    calc(var(--sc-p, 0) * 9%)
+    calc(var(--sc-p, 0) * 6%)
+  );
+}
+
+/* Signature: a photographer's frame that tightens with the scroll. */
+.visio-viewfinder {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  top: calc(var(--sc-p, 0) * 6% + 16px);
+  bottom: calc(var(--sc-p, 0) * 8% + 16px);
+  left: calc(var(--sc-p, 0) * 5% + 14px);
+  right: calc(var(--sc-p, 0) * 5% + 14px);
+}
+.visio-viewfinder i {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid #fff;
+}
+.visio-viewfinder i:nth-child(1) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.visio-viewfinder i:nth-child(2) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.visio-viewfinder i:nth-child(3) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+.visio-viewfinder i:nth-child(4) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+
+.visio-hero-scrim {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  height: 64%;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, .94) 0%,
+    rgba(0, 0, 0, .94) 82%,
+    transparent 100%);
+}
+.visio-hero-act .visio-hero-scrim {
+  width: min(46rem, 100%);
+  inset-inline-start: 0;
+  left: auto;
+  right: auto;
+  height: 72%;
+  -webkit-mask-image: linear-gradient(to left, #000 88%, transparent);
+  mask-image: linear-gradient(to left, #000 88%, transparent);
+}
+.visio-hero-plate img {
+  object-position: center 36%;
+  transform: scale(1.55);
+  transform-origin: center 22%;
+}
+.visio-hero-act .visio-cover-text.visio-hero-copy {
+  left: auto;
+  right: auto;
+  inset-inline-start: clamp(16px, 4vw, 48px);
+  width: min(40rem, calc(100% - 32px));
+  text-align: right;
+  bottom: clamp(16px, 3vh, 36px);
+}
+.visio-hero-copy .visio-cover-title { font-size: clamp(36px, 5.2vw, 72px); }
+.visio-hero-copy .visio-cover-sub { margin: 0 0 22px; max-width: none; }
+.visio-hero-copy .visio-cover-btns { justify-content: flex-start; }
+.visio-expose {
+  position: absolute;
+  z-index: 6;
+  left: 7%;
+  right: 7%;
+  bottom: 22px;
+  height: 1px;
+  background: rgba(255, 255, 255, .9);
+  pointer-events: none;
+}
+.visio-hero-copy,
+.visio-opener-copy,
+.visio-quote-copy {
+  z-index: 5;
+}
+.visio-hero-copy,
+.visio-hero-copy .visio-kicker,
+.visio-opener-copy,
+.visio-opener-copy .visio-kicker,
+.visio-opener-copy .visio-section-title,
+.visio-quote-copy,
+.visio-quote-copy .visio-pullquote {
+  color: #fff;
+}
+.visio-hero-copy .visio-cover-sub { opacity: 1; color: #f3f3f3; }
+
+.visio-hero-print {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  width: min(22vw, 240px);
+  aspect-ratio: 4 / 5;
+  top: 7vh;
+  inset-inline-end: clamp(18px, 4vw, 56px);
+  background: #111;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, .35);
+}
+.visio-hero-print figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 10px;
+  background: #111;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.visio-assemble > span {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.18em;
+  margin-bottom: -0.14em;
+}
+.visio-assemble > span > span {
+  display: block;
+  transform: translate3d(0, calc((1 - var(--lv, 1)) * 110%), 0);
+}
+.visio-assemble > span:first-child > span { --lv: 1; }
+.visio-assemble > span:nth-child(2) > span {
+  --lv: clamp(0, calc((var(--sc-p, 1) - 0.02) / 0.16), 1);
+}
+
+.visio-work-stage {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  direction: ltr;
+}
+.visio-work-rail {
+  direction: ltr;
+  align-items: stretch;
+  gap: clamp(18px, 3vw, 36px);
+  width: max-content;
+  margin: 0;
+  padding-inline: clamp(20px, 5vw, 64px);
+}
+.visio-work-intro,
+.visio-work-card { direction: rtl; text-align: right; }
+.visio-work-intro,
+.visio-work-card { flex: 0 0 auto; }
+.visio-work-intro {
+  width: min(46vw, 280px);
+  align-self: center;
+  text-align: right;
+}
+.visio-work-intro-title {
+  font-family: var(--pub-serif);
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.25;
+  color: var(--pub-ink);
+  margin: 14px 0 0;
+}
+.visio-work-card {
+  width: min(68vw, 400px);
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .visio-work-card {
+    transform: translate3d(0, calc((1 - clamp(0, (var(--sc-p, 1) - (var(--i, 0) * 0.07)) / 0.22, 1)) * 14px), 0);
+  }
+}
+
+.visio-opener-copy,
+.visio-quote-copy {
+  position: absolute;
+  inset-inline: clamp(20px, 6vw, 80px);
+  bottom: clamp(28px, 8vh, 72px);
+  max-width: min(40rem, 86vw);
+  text-align: right;
+}
+.visio-opener-title {
+  max-width: 4.4em;
+  color: #fff;
+  margin-inline: 0;
+}
+.visio-opener-copy p,
+.visio-quote-copy p { color: #f2f2f2; margin: 8px 0 0; }
+
+.visio-quote-copy {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: min(16em, calc(100vw - 32px));
+  text-align: center;
+  padding-inline: 8px;
+}
+.visio-quote-copy .visio-pullquote {
+  border: 0;
+  margin: 0 auto;
+  max-width: 14em;
+  background: transparent;
+}
+
+.visio-photo-shift {
+  position: absolute;
+  inset: -8% 0;
+  will-change: auto;
+}
+.visio-portfolio-card { animation: none; }
+.visio-portfolio-img-wrap .visio-img-label { z-index: 2; }
+
+.visio-price-card[data-sc-tilt] { transform-style: preserve-3d; }
+
+@media (max-width: 860px) {
+  .visio-hero-act .visio-hero-scrim {
+    width: 100%;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .visio-hero-act .visio-cover-text.visio-hero-copy { width: calc(100% - 24px); inset-inline-start: 12px; }
+  .visio-hero-print {
+    width: 30vw;
+    top: 10px;
+    aspect-ratio: 1;
+    inset-inline-end: 12px;
+  }
+  .visio-viewfinder i { width: 20px; height: 20px; }
+  .visio-opener-copy,
+  .visio-quote-copy { bottom: 24px; }
+}
+@media (max-height: 740px) {
+  .visio-hero-print { width: min(22vw, 180px); top: 10vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visio-hero-plate { clip-path: none; }
+  .visio-viewfinder {
+    top: 16px;
+    bottom: 16px;
+    left: 14px;
+    right: 14px;
+  }
+  .visio-assemble > span > span,
+  .visio-work-card { transform: none !important; }
+  .sc-split__i { opacity: 1 !important; }
+  .visio-portfolio-card { animation: none; }
+}
+
+/* Tour viewer and lightbox keep their own image sizing. */
+.psv-container img,
+.psv-container canvas,
+.visio-lightbox img { max-width: none; }
