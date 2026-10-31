@@ -1,4 +1,5 @@
 import Script from "next/script";
+import "../src/vendor/scrollcraft/scrollcraft.css";
 import "./globals.css";
 import { THEME_BOOTSTRAP_SCRIPT } from "../src/theme/bootstrap.js";
 
