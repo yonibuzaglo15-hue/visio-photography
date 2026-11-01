@@ -10,6 +10,9 @@ const nextConfig = {
       bodySizeLimit: "16mb",
     },
   },
+  async rewrites() {
+    return [{ source: "/favicon.ico", destination: "/favicon.svg" }];
+  },
   async headers() {
     return [
       {
