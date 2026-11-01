@@ -207,6 +207,11 @@ const PORTFOLIO = [
 
 const COVER_ID = 8;
 
+// The selected-works grid shows these six covers only: three ReHouse apartments
+// and three RE/MAX apartments. Every other property stays in PORTFOLIO so its
+// gallery, tour, and drone-window link still open.
+const SELECTED_WORK_IDS = [19, 27, 17, 30, 16, 11];
+
 // Company of a card: explicit `company`, otherwise derived from `partner`.
 const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
 // City of a card: explicit `city`, otherwise the last "·" segment of sub/title that names a known city.
@@ -448,8 +453,9 @@ function PortfolioSection() {
   const [lightboxImgs, setLightboxImgs] = useState([]);
   const [lightboxIdx, setLightboxIdx] = useState(0);
   const [company, setCompany] = useState("all");
-  const shown = company === "all" ? PORTFOLIO : PORTFOLIO.filter(p => companyOf(p) === company);
-  const opener = PORTFOLIO.find(p => typeof p.hero === "string" && p.hero.startsWith("/")) || PORTFOLIO.find(p => PROPERTY_IMAGES[p.id]);
+  const selectedWorks = SELECTED_WORK_IDS.map((id) => PORTFOLIO.find((p) => p.id === id)).filter(Boolean);
+  const shown = company === "all" ? selectedWorks : selectedWorks.filter((p) => companyOf(p) === company);
+  const opener = selectedWorks[0];
   const openerSrc = opener?.hero || PROPERTY_IMAGES[opener?.id]?.hero;
   const skipRefresh = useRef(true);
   useEffect(() => {
