@@ -178,7 +178,7 @@ button:hover { opacity: 0.85; }
 .visio-input { font-size: 16px; min-height: 48px; padding: 10px 14px; }
 
 /* ════════ Public site — editorial ════════ */
-.visio-public { min-height: 100vh; background: var(--pub-bg); color: var(--pub-text); font-family: var(--pub-sans); line-height: var(--pub-lh-body); direction: rtl; }
+.visio-public { min-height: 100vh; max-width: 100%; background: var(--pub-bg); color: var(--pub-text); font-family: var(--pub-sans); line-height: var(--pub-lh-body); direction: rtl; }
 .visio-public bdi[lang="en"], .visio-public [lang="en"][dir="ltr"] { unicode-bidi: isolate; }
 .visio-public :is(.visio-cover-title, .visio-section-title, .visio-section-sub, .visio-story-title, .visio-term-title, .visio-panel-title, .visio-pullquote) bdi[lang="en"] { font-family: var(--pub-display); }
 .visio-public .visio-theme-toggle { width: 36px; height: 36px; min-width: 36px; border-color: var(--pub-rule); color: var(--pub-ink); border-radius: 0; }
@@ -189,7 +189,7 @@ button:hover { opacity: 0.85; }
 .visio-kicker.muted { color: var(--pub-muted); }
 .visio-credit { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--pub-muted); }
 .visio-section { padding: clamp(48px, 7vw, 80px) 20px; }
-.visio-narrow { max-width: 720px; margin: 0 auto; }
+.visio-narrow { max-width: min(720px, 100%); margin: 0 auto; min-width: 0; }
 .visio-wrap { max-width: 1280px; margin-left: auto; margin-right: auto; }
 
 /* ── Buttons ── */
@@ -255,12 +255,15 @@ button:hover { opacity: 0.85; }
 /* ── Stats ── */
 .visio-stats { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-rule); }
 .visio-stat { background: var(--pub-bg); padding: 32px 16px; text-align: center; }
+.visio-stats-wrap { padding: 48px 20px 0; max-width: 100%; }
 .visio-stat-num { direction: ltr; unicode-bidi: isolate; font-family: var(--pub-display); font-size: clamp(36px, 5vw, 52px); line-height: 1; color: var(--pub-ink); margin-bottom: 10px; }
+.visio-stat-figure { display: inline-block; direction: ltr; unicode-bidi: isolate; white-space: nowrap; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; font-weight: 500; letter-spacing: 0; }
+.visio-stat .visio-kicker { letter-spacing: 0.04em; text-transform: none; line-height: 1.45; overflow-wrap: anywhere; }
 
 /* ── Section titles ── */
 .visio-section-head { text-align: center; margin-bottom: clamp(32px, 5vw, 56px); }
-.visio-section-title { font-family: var(--pub-serif); font-weight: 500; font-size: clamp(36px, 6vw, 64px); line-height: var(--pub-lh-heading); color: var(--pub-ink); margin: 12px 0 14px; }
-.visio-section-sub { font-family: var(--pub-serif); font-size: 18px; line-height: var(--pub-lh-heading); color: var(--pub-muted); margin: 0; }
+.visio-section-title { font-family: var(--pub-serif); font-weight: 500; font-size: clamp(36px, 6vw, 64px); line-height: var(--pub-lh-heading); color: var(--pub-ink); margin: 12px 0 14px; overflow-wrap: break-word; max-width: 100%; }
+.visio-section-sub { font-family: var(--pub-serif); font-size: 18px; line-height: var(--pub-lh-heading); color: var(--pub-muted); margin: 0; overflow-wrap: break-word; max-width: 100%; }
 
 /* ── Portfolio ── */
 .visio-region-list { display: flex; flex-direction: column; gap: clamp(56px, 8vw, 96px); }
@@ -276,7 +279,9 @@ button:hover { opacity: 0.85; }
 .visio-portfolio-card:hover .visio-portfolio-img-wrap.contain img { transform: none; }
 .visio-img-label { position: absolute; top: 12px; right: 12px; background: var(--pub-bg); color: var(--pub-ink); padding: 5px 10px; font-size: 10px; font-weight: 600; letter-spacing: .2em; }
 .visio-img-label.left { right: auto; left: 12px; }
-.visio-portfolio-hover { position: absolute; inset: 0; background: var(--pub-scrim); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.visio-portfolio-hover { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.62); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; }
+.visio-portfolio-hover .visio-btn.on-image { background: #ffffff; color: #111111; border-color: #ffffff; }
+.visio-portfolio-hover .visio-btn.on-image.outline { background: #111111; color: #ffffff; border-color: #ffffff; }
 .visio-portfolio-meta { padding-top: 16px; }
 
 /* ── Portfolio filter (segmented pill) ── */
@@ -289,7 +294,10 @@ button:hover { opacity: 0.85; }
 .visio-filter-btn:focus-visible { outline: 1px solid var(--pub-ink); outline-offset: 2px; }
 .visio-portfolio-card { animation: visioCardIn .5s cubic-bezier(.2,.7,.2,1) both; }
 @keyframes visioCardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@media (max-width: 480px) { .visio-filter-btn { padding: 9px 16px; letter-spacing: .16em; } }
+@media (max-width: 480px) {
+  .visio-filter { max-width: 100%; flex-wrap: wrap; justify-content: center; }
+  .visio-filter-btn { padding: 9px 16px; letter-spacing: .12em; }
+}
 @media (prefers-reduced-motion: reduce) { .visio-portfolio-card { animation: none; } .visio-filter-indicator { transition: none; } }
 
 /* ── Lightbox ── */
@@ -326,7 +334,8 @@ button:hover { opacity: 0.85; }
 .visio-price-note { font-size: 12px; line-height: 1.6; color: var(--pub-muted); margin: -12px 0 24px; text-align: right; }
 
 /* ── Booking ── */
-.visio-booking-wrap { padding: clamp(48px, 7vw, 80px) 20px; max-width: 720px; margin: 0 auto; width: 100%; }
+.visio-booking-wrap { padding: clamp(56px, 8vw, 96px) 20px clamp(96px, 14vw, 168px); max-width: min(720px, 100%); margin: 0 auto; width: 100%; }
+.visio-booking-wrap .visio-panel { overflow: visible; }
 .visio-steps { display: flex; align-items: center; margin-bottom: 32px; }
 .visio-step-dot { width: 30px; height: 30px; border: 1px solid var(--pub-rule); display: flex; align-items: center; justify-content: center; font-family: var(--pub-display); font-size: 14px; color: var(--pub-muted); }
 .visio-step-dot.current { border-color: var(--pub-ink); color: var(--pub-ink); }
@@ -366,13 +375,18 @@ button:hover { opacity: 0.85; }
 .visio-term { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--pub-rule); }
 .visio-term:first-of-type { border-top: 1px solid var(--pub-ink); }
 .visio-term-title { font-family: var(--pub-serif); font-weight: 500; font-size: 22px; line-height: var(--pub-lh-heading); color: var(--pub-ink); }
-.visio-term p, .visio-article p { font-size: 18px; color: var(--pub-text); margin: 0; }
+.visio-term p, .visio-article p { font-size: 18px; color: var(--pub-text); margin: 0; overflow-wrap: break-word; max-width: 100%; }
+.visio-about-lead { overflow-wrap: break-word; word-break: break-word; max-width: 100%; }
 .visio-pullquote { font-family: var(--pub-serif); font-weight: 500; font-size: clamp(26px, 4vw, 38px); line-height: var(--pub-lh-heading); text-align: center; color: var(--pub-ink); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-ink); padding: 32px 8px; margin: 48px 0; }
 .visio-about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-rule); border-bottom: 1px solid var(--pub-rule); margin-bottom: 48px; }
-.visio-about-grid > div { background: var(--pub-bg); padding: 28px 24px; }
+.visio-about-grid > div { background: var(--pub-bg); padding: 28px 24px; min-width: 0; overflow-wrap: break-word; }
 .visio-about-num { font-family: var(--pub-display); font-size: 32px; color: var(--pub-ink); margin-bottom: 10px; }
-.visio-partners { display: flex; justify-content: center; gap: clamp(24px, 5vw, 64px); flex-wrap: wrap; }
+.visio-partners { display: flex; justify-content: center; align-items: flex-start; gap: clamp(48px, 8vw, 128px); row-gap: clamp(32px, 5vw, 56px); flex-wrap: wrap; padding: 8px clamp(12px, 4vw, 40px); }
+.visio-partner { min-width: min(160px, 100%); padding: 8px 16px; }
 .visio-partner-name { font-family: var(--pub-display); font-weight: 500; font-size: 24px; letter-spacing: .06em; color: var(--pub-ink); }
+.visio-public .visio-cta .visio-cta-btn { background: #111111; color: #ffffff; border-color: #111111; }
+[data-theme="dark"] .visio-public .visio-cta .visio-cta-btn { background: #f4f4f4; color: #111111; border-color: #f4f4f4; }
+.visio-public .visio-cta .visio-cta-btn:hover { opacity: 1; }
 
 /* ── Done confirmation ── */
 .visio-done-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-rule); max-width: 440px; margin: 32px auto 0; width: 100%; }
@@ -530,7 +544,7 @@ button:hover { opacity: 0.85; }
   .visio-about-grid { grid-template-columns: 1fr; }
   .visio-term { grid-template-columns: 1fr; gap: 8px; }
 
-  .visio-booking-wrap { padding: 40px 16px; }
+  .visio-booking-wrap { padding: 48px 16px 112px; }
   .visio-calendar-day { min-height: 48px; }
   .visio-admin-sidebar { position: fixed; top: 52px; right: 0; height: calc(100vh - 52px); z-index: 90; transform: translateX(100%); transition: transform .3s ease; width: min(240px, 80vw); }
   .visio-admin-sidebar.open { transform: translateX(0); }
@@ -608,31 +622,34 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 .visio-opener-act .sc-stage,
 .visio-quote-act .sc-stage { background: #111; }
 
+.visio-hero-act,
+.visio-opener-act,
+.visio-quote-act,
+.visio-work-act {
+  max-width: 100%;
+}
 .visio-hero-plate,
 .visio-opener-photo,
 .visio-quote-photo {
   position: absolute;
-  inset: -12% 0;
-  overflow: hidden;
+  inset: -8% 0;
+  overflow: clip;
 }
+.visio-hero-plate { inset: 0; }
 .visio-hero-plate img,
 .visio-opener-photo img,
 .visio-quote-photo img,
-.visio-photo-shift img,
-.visio-hero-print img {
+.visio-photo-shift img {
   width: 100%;
   height: 100%;
   max-width: none;
   object-fit: cover;
   display: block;
 }
-.visio-hero-plate {
-  clip-path: inset(
-    calc(var(--sc-p, 0) * 8%)
-    calc(var(--sc-p, 0) * 6%)
-    calc(var(--sc-p, 0) * 9%)
-    calc(var(--sc-p, 0) * 6%)
-  );
+.visio-hero-plate img {
+  object-position: center 42%;
+  transform: scale(calc(1.06 - var(--sc-p, 0) * 0.06));
+  transform-origin: center center;
 }
 
 /* Signature: a photographer's frame that tightens with the scroll. */
@@ -656,7 +673,8 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 .visio-viewfinder i:nth-child(3) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 .visio-viewfinder i:nth-child(4) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
 
-.visio-hero-scrim {
+.visio-hero-scrim,
+.visio-scene-scrim {
   position: absolute;
   z-index: 2;
   pointer-events: none;
@@ -664,25 +682,21 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   right: 0;
   top: auto;
   bottom: 0;
-  height: 64%;
+  width: 100%;
+}
+.visio-hero-scrim {
+  height: 48%;
   background: linear-gradient(to top,
-    rgba(0, 0, 0, .94) 0%,
-    rgba(0, 0, 0, .94) 82%,
+    rgba(0, 0, 0, .68) 0%,
+    rgba(0, 0, 0, .28) 48%,
     transparent 100%);
 }
-.visio-hero-act .visio-hero-scrim {
-  width: min(46rem, 100%);
-  inset-inline-start: 0;
-  left: auto;
-  right: auto;
-  height: 72%;
-  -webkit-mask-image: linear-gradient(to left, #000 88%, transparent);
-  mask-image: linear-gradient(to left, #000 88%, transparent);
-}
-.visio-hero-plate img {
-  object-position: center 36%;
-  transform: scale(1.55);
-  transform-origin: center 22%;
+.visio-scene-scrim {
+  height: 40%;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, .42) 0%,
+    rgba(0, 0, 0, .14) 46%,
+    transparent 100%);
 }
 .visio-hero-act .visio-cover-text.visio-hero-copy {
   left: auto;
@@ -721,31 +735,7 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 }
 .visio-hero-copy .visio-cover-sub { opacity: 1; color: #f3f3f3; }
 
-.visio-hero-print {
-  position: absolute;
-  z-index: 3;
-  margin: 0;
-  width: min(22vw, 240px);
-  aspect-ratio: 4 / 5;
-  top: 7vh;
-  inset-inline-end: clamp(18px, 4vw, 56px);
-  background: #111;
-  overflow: hidden;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, .35);
-}
-.visio-hero-print figcaption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 8px 10px;
-  background: #111;
-  color: #fff;
-  font-size: 12px;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-
+html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 .visio-assemble > span {
   display: block;
   overflow: hidden;
@@ -756,33 +746,40 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   display: block;
   transform: translate3d(0, calc((1 - var(--lv, 1)) * 110%), 0);
 }
-.visio-assemble > span:first-child > span { --lv: 1; }
+.visio-assemble > span:first-child > span {
+  --lv: clamp(0, calc(0.35 + var(--sc-p, 0) / 0.2), 1);
+}
 .visio-assemble > span:nth-child(2) > span {
-  --lv: clamp(0, calc((var(--sc-p, 1) - 0.02) / 0.16), 1);
+  --lv: clamp(0, calc((var(--sc-p, 0) - 0.06) / 0.22), 1);
 }
 
-.visio-work-stage {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  direction: ltr;
+.visio-work-act { position: relative; height: 220vh; }
+.visio-work-sticky {
+  position: sticky;
+  top: var(--visio-sticky);
+  height: calc(100svh - var(--visio-sticky));
+  overflow: clip;
+  contain: paint;
+  max-width: 100%;
 }
 .visio-work-rail {
-  direction: ltr;
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0;
+  display: flex;
+  direction: rtl;
   align-items: stretch;
-  gap: clamp(18px, 3vw, 36px);
+  gap: clamp(20px, 3vw, 40px);
   width: max-content;
   margin: 0;
-  padding-inline: clamp(20px, 5vw, 64px);
+  padding-inline: clamp(20px, 5vw, 72px);
+  transform: translate3d(0, -50%, 0);
 }
 .visio-work-intro,
-.visio-work-card { direction: rtl; text-align: right; }
-.visio-work-intro,
-.visio-work-card { flex: 0 0 auto; }
+.visio-work-card { direction: rtl; text-align: right; flex: 0 0 auto; }
 .visio-work-intro {
-  width: min(46vw, 280px);
+  width: min(42vw, 260px);
   align-self: center;
-  text-align: right;
 }
 .visio-work-intro-title {
   font-family: var(--pub-serif);
@@ -795,12 +792,6 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   width: min(68vw, 400px);
   display: flex;
   flex-direction: column;
-  text-align: right;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .visio-work-card {
-    transform: translate3d(0, calc((1 - clamp(0, (var(--sc-p, 1) - (var(--i, 0) * 0.07)) / 0.22, 1)) * 14px), 0);
-  }
 }
 
 .visio-opener-copy,
@@ -823,7 +814,7 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   left: 0;
   right: 0;
   margin-inline: auto;
-  width: min(16em, calc(100vw - 32px));
+  width: min(16em, calc(100% - 32px));
   text-align: center;
   padding-inline: 8px;
 }
@@ -845,38 +836,46 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 .visio-price-card[data-sc-tilt] { transform-style: preserve-3d; }
 
 @media (max-width: 860px) {
-  .visio-hero-act .visio-hero-scrim {
-    width: 100%;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
   .visio-hero-act .visio-cover-text.visio-hero-copy { width: calc(100% - 24px); inset-inline-start: 12px; }
-  .visio-hero-print {
-    width: 30vw;
-    top: 10px;
-    aspect-ratio: 1;
-    inset-inline-end: 12px;
-  }
   .visio-viewfinder i { width: 20px; height: 20px; }
   .visio-opener-copy,
   .visio-quote-copy { bottom: 24px; }
-}
-@media (max-height: 740px) {
-  .visio-hero-print { width: min(22vw, 180px); top: 10vh; }
+  .visio-work-act { height: 180vh; }
+  .visio-work-card { width: min(78vw, 340px); }
+  .visio-work-intro { width: min(70vw, 240px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .visio-hero-plate { clip-path: none; }
+  .visio-hero-plate img { transform: none; }
   .visio-viewfinder {
     top: 16px;
     bottom: 16px;
     left: 14px;
     right: 14px;
   }
-  .visio-assemble > span > span,
-  .visio-work-card { transform: none !important; }
+  .visio-assemble > span > span { transform: none !important; }
   .sc-split__i { opacity: 1 !important; }
   .visio-portfolio-card { animation: none; }
+  .visio-work-act { height: auto; }
+  .visio-work-sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    overflow: visible;
+    contain: none;
+  }
+  .visio-work-rail {
+    position: relative;
+    top: auto;
+    inset-inline-start: auto;
+    width: auto;
+    max-width: 100%;
+    overflow-x: auto;
+    transform: none !important;
+    scroll-snap-type: x mandatory;
+    padding-block: 28px 40px;
+  }
+  .visio-work-card { scroll-snap-align: start; }
 }
 
 /* Tour viewer and lightbox keep their own image sizing. */
