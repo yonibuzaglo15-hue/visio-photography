@@ -141,7 +141,7 @@ function useWorkPan(ref) {
       const p = Math.min(1, Math.max(0, -root.getBoundingClientRect().top / travel));
       const view = sticky.clientWidth || window.innerWidth;
       const over = Math.max(0, rail.scrollWidth - view);
-      rail.style.transform = `translate3d(${(over * p).toFixed(2)}px, -50%, 0)`;
+      rail.style.transform = `translate3d(${(over * p).toFixed(2)}px, 0, 0)`;
     };
     const onScroll = () => {
       cancelAnimationFrame(raf);
@@ -318,7 +318,7 @@ function HomeSection({ onNav }) {
               <span><span>נדל״ן.</span></span>
               <span><span>בצילום שמוכר.</span></span>
             </h1>
-            <p className="visio-cover-sub" data-sc-cue="0.18 0.62 0.4 0"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
+            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
             <div className="visio-cover-btns" data-sc-cue="0.28 0.78 0.35 0">
               <button className="visio-btn on-image" onClick={() => onNav("booking")}>הזמן צילום עכשיו</button>
               <button className="visio-btn on-image outline" onClick={() => onNav("portfolio")}>צפה בעבודות</button>

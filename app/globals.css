@@ -255,7 +255,7 @@ button:hover { opacity: 0.85; }
 /* ── Stats ── */
 .visio-stats { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-rule); }
 .visio-stat { background: var(--pub-bg); padding: 32px 16px; text-align: center; }
-.visio-stats-wrap { padding: 48px 20px 0; max-width: 100%; }
+.visio-stats-wrap { padding: 28px 20px 0; max-width: 100%; }
 .visio-stat-num { direction: ltr; unicode-bidi: isolate; font-family: var(--pub-display); font-size: clamp(36px, 5vw, 52px); line-height: 1; color: var(--pub-ink); margin-bottom: 10px; }
 .visio-stat-figure { display: inline-block; direction: ltr; unicode-bidi: isolate; white-space: nowrap; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; font-weight: 500; letter-spacing: 0; }
 .visio-stat .visio-kicker { letter-spacing: 0.04em; text-transform: none; line-height: 1.45; overflow-wrap: anywhere; }
@@ -685,10 +685,11 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   width: 100%;
 }
 .visio-hero-scrim {
-  height: 48%;
+  height: 64%;
   background: linear-gradient(to top,
-    rgba(0, 0, 0, .68) 0%,
-    rgba(0, 0, 0, .28) 48%,
+    rgba(0, 0, 0, .82) 0%,
+    rgba(0, 0, 0, .55) 36%,
+    rgba(0, 0, 0, .22) 68%,
     transparent 100%);
 }
 .visio-scene-scrim {
@@ -733,7 +734,11 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 .visio-quote-copy .visio-pullquote {
   color: #fff;
 }
-.visio-hero-copy .visio-cover-sub { opacity: 1; color: #f3f3f3; }
+.visio-hero-copy .visio-cover-sub {
+  opacity: 1;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .72), 0 8px 22px rgba(0, 0, 0, .55);
+}
 
 html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 .visio-assemble > span {
@@ -764,7 +769,8 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 }
 .visio-work-rail {
   position: absolute;
-  top: 50%;
+  top: auto;
+  bottom: 0;
   inset-inline-start: 0;
   display: flex;
   direction: rtl;
@@ -773,7 +779,8 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
   width: max-content;
   margin: 0;
   padding-inline: clamp(20px, 5vw, 72px);
-  transform: translate3d(0, -50%, 0);
+  padding-bottom: 12px;
+  transform: none;
 }
 .visio-work-intro,
 .visio-work-card { direction: rtl; text-align: right; flex: 0 0 auto; }
@@ -867,13 +874,14 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
   .visio-work-rail {
     position: relative;
     top: auto;
+    bottom: auto;
     inset-inline-start: auto;
     width: auto;
     max-width: 100%;
     overflow-x: auto;
     transform: none !important;
     scroll-snap-type: x mandatory;
-    padding-block: 28px 40px;
+    padding-block: 28px 24px;
   }
   .visio-work-card { scroll-snap-align: start; }
 }
