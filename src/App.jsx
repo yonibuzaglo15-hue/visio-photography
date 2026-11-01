@@ -6,6 +6,7 @@ import { C } from "./theme/colors.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
 import { useScrollCraft } from "./scroll/useScrollCraft.js";
 import DroneFloors from "./scroll/DroneFloors.jsx";
+import LampLobby from "./scroll/LampLobby.jsx";
 const PROPERTY_IMAGES = {
   1: { hero: "/home/1/hero.webp", gallery: ["/home/1/01.webp"] },
   2: { hero: "/home/2/hero.webp", gallery: ["/home/2/01.webp"] },
@@ -925,7 +926,6 @@ function CharterSection() {
 
 /* ─── ABOUT ─── */
 function AboutSection({ onNav }) {
-  const quoteStill = PORTFOLIO.find(p => p.id === 4)?.hero || PORTFOLIO.find(p => typeof p.hero === "string")?.hero;
   return (
     <>
     <section id="about" className="visio-section">
@@ -941,23 +941,7 @@ function AboutSection({ onNav }) {
       </div>
     </section>
 
-    <section className="visio-quote-act" data-sc-act="pin" data-sc-span="2.35" aria-label="נדל״ן. בצילום שמוכר.">
-      <div data-sc-stage className="visio-quote-stage">
-        {quoteStill && (
-          <div className="visio-quote-photo" data-sc-parallax="-0.12">
-            <img src={quoteStill} alt="" loading="lazy" decoding="async" />
-          </div>
-        )}
-        <div className="visio-scene-scrim" aria-hidden="true" />
-        <div className="visio-expose" data-sc-reveal="left" data-sc-reveal-at="0 1" aria-hidden="true" />
-        <div className="visio-quote-copy">
-          <blockquote className="visio-pullquote visio-assemble">
-            <span><span>נדל״ן.</span></span>
-            <span><span>בצילום שמוכר.</span></span>
-          </blockquote>
-        </div>
-      </div>
-    </section>
+    <LampLobby />
 
     <section className="visio-section">
       <div className="visio-narrow visio-article">

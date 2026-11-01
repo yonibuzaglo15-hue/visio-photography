@@ -620,7 +620,32 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 }
 .visio-hero-act .sc-stage,
 .visio-opener-act .sc-stage,
-.visio-quote-act .sc-stage { background: #111; }
+.visio-quote-act .sc-stage,
+.visio-quote-stage { background: #111; }
+
+.visio-quote-act {
+  position: relative;
+  height: 300vh;
+  background: #111;
+}
+.visio-lamp-live { height: 100%; }
+.visio-quote-stage {
+  position: sticky;
+  top: var(--visio-sticky);
+  height: calc(100svh - var(--visio-sticky));
+  overflow: clip;
+}
+.visio-lamp-poster,
+.visio-lamp-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.visio-lamp-poster { object-fit: cover; }
+.visio-lamp-canvas { opacity: 0; }
+.visio-lamp-canvas.is-ready { opacity: 1; }
 
 .visio-hero-act,
 .visio-opener-act,
@@ -847,6 +872,7 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
   .visio-viewfinder i { width: 20px; height: 20px; }
   .visio-opener-copy,
   .visio-quote-copy { bottom: 24px; }
+  .visio-quote-act { height: 240vh; }
   .visio-work-act { height: 180vh; }
   .visio-work-card { width: min(78vw, 340px); }
   .visio-work-intro { width: min(70vw, 240px); }
@@ -1033,6 +1059,13 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
     gap: 8px;
   }
   .visio-drone-card { animation: none; max-height: none; }
+  .visio-quote-act,
+  .visio-quote-act.is-reduced { height: auto; }
+  .visio-quote-stage {
+    position: relative;
+    top: auto;
+    height: min(78vh, 720px);
+  }
 }
 @media (prefers-reduced-motion: reduce) and (max-width: 768px) {
   .visio-drone-card-slot { grid-template-columns: 1fr 1fr; }
