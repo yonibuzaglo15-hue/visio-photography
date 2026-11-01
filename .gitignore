@@ -7,6 +7,8 @@ dist
 .data/
 .tmp-fp-verify/
 # Hosted tours in public/tours/<slug>/ are committed. Do not ignore that tree.
+# Sweep-id map used only so a rebuilt tour does not reuse a panorama under the wrong scene id.
+public/tours/**/.sweeps.json
 .vercel/
 .vercel
 

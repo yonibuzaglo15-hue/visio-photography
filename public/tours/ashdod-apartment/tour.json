@@ -1,7 +1,9 @@
 {
   "title": "דירה · אשדוד",
   "location": "שבט לוי 11",
-  "aliases": ["shevet-levi-11"],
+  "aliases": [
+    "shevet-levi-11"
+  ],
   "credit": "יונתן בוזגלו | VISIO",
   "matterportId": "Hkg7xrnXgoM",
   "firstScene": "p27",
@@ -19,19 +21,34 @@
       },
       "hotspots": [
         {
-          "scene": "p28",
-          "yaw": -150,
-          "pitch": -51.1
+          "scene": "p26",
+          "yaw": 170.8,
+          "pitch": -31.2
         },
         {
           "scene": "p37",
-          "yaw": -120,
-          "pitch": -41.1
+          "yaw": -73.4,
+          "pitch": -30.6
         },
         {
-          "scene": "p26",
-          "yaw": 150,
-          "pitch": -36.8
+          "scene": "p28",
+          "yaw": -137.9,
+          "pitch": -29.4
+        },
+        {
+          "scene": "p21",
+          "yaw": 126.5,
+          "pitch": -20.6
+        },
+        {
+          "scene": "p24",
+          "yaw": 113.8,
+          "pitch": -19.6
+        },
+        {
+          "scene": "p20",
+          "yaw": 148,
+          "pitch": -17.5
         }
       ]
     },
@@ -44,34 +61,34 @@
       },
       "hotspots": [
         {
-          "scene": "p27",
-          "yaw": 125,
-          "pitch": -51.1
+          "scene": "p26",
+          "yaw": -139.9,
+          "pitch": -34.1
         },
         {
-          "scene": "p37",
-          "yaw": 95,
-          "pitch": -48.7
+          "scene": "p27",
+          "yaw": 160.8,
+          "pitch": -29.5
         },
         {
           "scene": "p29",
-          "yaw": -30,
-          "pitch": -25.0
+          "yaw": -40.8,
+          "pitch": -29.5
+        },
+        {
+          "scene": "p37",
+          "yaw": 104.5,
+          "pitch": -28.5
         },
         {
           "scene": "p36",
-          "yaw": 0,
-          "pitch": -19.2
-        },
-        {
-          "scene": "p26",
-          "yaw": -110,
-          "pitch": -48.1
+          "yaw": -2.2,
+          "pitch": -28.1
         },
         {
           "scene": "p18",
-          "yaw": -65.0,
-          "pitch": -22.3
+          "yaw": -69.7,
+          "pitch": -24.1
         }
       ]
     },
@@ -85,18 +102,33 @@
       "hotspots": [
         {
           "scene": "p27",
-          "yaw": 115,
-          "pitch": -30
+          "yaw": 65,
+          "pitch": -30.6
         },
         {
           "scene": "p28",
-          "yaw": 130,
-          "pitch": -48.7
+          "yaw": 124,
+          "pitch": -28.4
+        },
+        {
+          "scene": "p26",
+          "yaw": 96.1,
+          "pitch": -19.5
+        },
+        {
+          "scene": "p36",
+          "yaw": 161.2,
+          "pitch": -18.3
         },
         {
           "scene": "p29",
-          "yaw": 160,
-          "pitch": -24.5
+          "yaw": 141.2,
+          "pitch": -15.9
+        },
+        {
+          "scene": "p18",
+          "yaw": 127.4,
+          "pitch": -13.6
         }
       ]
     },
@@ -109,34 +141,34 @@
       },
       "hotspots": [
         {
-          "scene": "p29",
-          "yaw": 110,
-          "pitch": -23.3
+          "scene": "p28",
+          "yaw": 136.8,
+          "pitch": -33.7
         },
         {
-          "scene": "p24",
-          "yaw": -35,
-          "pitch": -26.5
+          "scene": "p19",
+          "yaw": 11,
+          "pitch": -34.1
         },
         {
           "scene": "p27",
-          "yaw": -160,
-          "pitch": -36.8
+          "yaw": -154.3,
+          "pitch": -31.4
         },
         {
-          "scene": "p23",
-          "yaw": -31.5,
-          "pitch": -16.7
+          "scene": "p20",
+          "yaw": -18.9,
+          "pitch": -30.8
+        },
+        {
+          "scene": "p21",
+          "yaw": -57,
+          "pitch": -28.9
         },
         {
           "scene": "p18",
-          "yaw": 20,
-          "pitch": -27.8
-        },
-        {
-          "scene": "p28",
-          "yaw": 60,
-          "pitch": -48.1
+          "yaw": 65.6,
+          "pitch": -24.1
         }
       ]
     },
@@ -149,49 +181,34 @@
       },
       "hotspots": [
         {
-          "scene": "p17",
-          "yaw": -21.4,
-          "pitch": -21.4
-        },
-        {
-          "scene": "p26",
-          "yaw": -80,
-          "pitch": -23.3
-        },
-        {
           "scene": "p18",
-          "yaw": -60,
-          "pitch": -29.2
-        },
-        {
-          "scene": "p31",
-          "yaw": 95,
-          "pitch": -23.6
-        },
-        {
-          "scene": "p37",
-          "yaw": -150,
-          "pitch": -24.5
-        },
-        {
-          "scene": "p19",
-          "yaw": -61.4,
-          "pitch": -19.5
-        },
-        {
-          "scene": "p28",
-          "yaw": -120,
-          "pitch": -25.0
-        },
-        {
-          "scene": "p30",
-          "yaw": 115,
-          "pitch": -23.8
+          "yaw": -25.3,
+          "pitch": -42.3
         },
         {
           "scene": "p36",
-          "yaw": 60,
-          "pitch": -44.3
+          "yaw": 160,
+          "pitch": -38.9
+        },
+        {
+          "scene": "p28",
+          "yaw": -124.5,
+          "pitch": -29
+        },
+        {
+          "scene": "p30",
+          "yaw": 94.7,
+          "pitch": -29.1
+        },
+        {
+          "scene": "p17",
+          "yaw": -10.8,
+          "pitch": -23.1
+        },
+        {
+          "scene": "p31",
+          "yaw": 124.7,
+          "pitch": -23.1
         }
       ]
     },
@@ -204,29 +221,34 @@
       },
       "hotspots": [
         {
-          "scene": "p30",
-          "yaw": 25,
-          "pitch": -38.6
+          "scene": "p29",
+          "yaw": -82.8,
+          "pitch": -39.7
         },
         {
           "scene": "p31",
-          "yaw": 5,
-          "pitch": -35.8
+          "yaw": 35.3,
+          "pitch": -33.6
         },
         {
-          "scene": "p24",
-          "yaw": -105,
-          "pitch": -12
+          "scene": "p30",
+          "yaw": -7.7,
+          "pitch": -31.2
         },
         {
           "scene": "p28",
-          "yaw": -150,
-          "pitch": -19.2
+          "yaw": -148.7,
+          "pitch": -27.7
         },
         {
-          "scene": "p29",
-          "yaw": -170,
-          "pitch": -44.3
+          "scene": "p18",
+          "yaw": -85.1,
+          "pitch": -23.7
+        },
+        {
+          "scene": "p32",
+          "yaw": 26,
+          "pitch": -24.2
         }
       ]
     },
@@ -239,24 +261,34 @@
       },
       "hotspots": [
         {
-          "scene": "p36",
-          "yaw": 160,
-          "pitch": -35.8
-        },
-        {
-          "scene": "p29",
-          "yaw": 146.4,
-          "pitch": -23.6
-        },
-        {
           "scene": "p32",
-          "yaw": -30,
-          "pitch": -46.9
+          "yaw": -24.5,
+          "pitch": -50.7
         },
         {
           "scene": "p30",
-          "yaw": 60,
-          "pitch": -59.9
+          "yaw": -102.9,
+          "pitch": -40.5
+        },
+        {
+          "scene": "p36",
+          "yaw": -179.2,
+          "pitch": -32.3
+        },
+        {
+          "scene": "p29",
+          "yaw": -152,
+          "pitch": -22.5
+        },
+        {
+          "scene": "p33",
+          "yaw": -1.8,
+          "pitch": -24.8
+        },
+        {
+          "scene": "p34",
+          "yaw": -32.8,
+          "pitch": -21.7
         }
       ]
     },
@@ -269,24 +301,34 @@
       },
       "hotspots": [
         {
-          "scene": "p36",
-          "yaw": 150,
-          "pitch": -38.6
+          "scene": "p31",
+          "yaw": 57.2,
+          "pitch": -40.5
         },
         {
           "scene": "p32",
-          "yaw": 15,
-          "pitch": -46.6
+          "yaw": 17.4,
+          "pitch": -38.5
         },
         {
-          "scene": "p31",
-          "yaw": -60,
-          "pitch": -59.9
+          "scene": "p36",
+          "yaw": 117.6,
+          "pitch": -30.1
+        },
+        {
+          "scene": "p41",
+          "yaw": -101.6,
+          "pitch": -29.9
         },
         {
           "scene": "p29",
-          "yaw": -162.4,
-          "pitch": -23.8
+          "yaw": 157.5,
+          "pitch": -28.7
+        },
+        {
+          "scene": "p18",
+          "yaw": 179.5,
+          "pitch": -21.5
         }
       ]
     },
@@ -299,29 +341,34 @@
       },
       "hotspots": [
         {
-          "scene": "p34",
-          "yaw": 40,
-          "pitch": -54.7
-        },
-        {
-          "scene": "p33",
-          "yaw": 60,
-          "pitch": -56.8
+          "scene": "p31",
+          "yaw": -168.2,
+          "pitch": -48.1
         },
         {
           "scene": "p30",
-          "yaw": -140.2,
-          "pitch": -46.6
+          "yaw": -106,
+          "pitch": -36.4
         },
         {
-          "scene": "p31",
-          "yaw": -130,
-          "pitch": -46.9
+          "scene": "p33",
+          "yaw": 46.3,
+          "pitch": -32.7
         },
         {
-          "scene": "p35",
-          "yaw": 20,
-          "pitch": -33.8
+          "scene": "p34",
+          "yaw": 0,
+          "pitch": -28.2
+        },
+        {
+          "scene": "p36",
+          "yaw": -151.8,
+          "pitch": -21.9
+        },
+        {
+          "scene": "p41",
+          "yaw": -70.7,
+          "pitch": -19.6
         }
       ]
     },
@@ -334,19 +381,34 @@
       },
       "hotspots": [
         {
+          "scene": "p35",
+          "yaw": 62.1,
+          "pitch": -36.8
+        },
+        {
           "scene": "p33",
-          "yaw": 90,
-          "pitch": -35
+          "yaw": -103.6,
+          "pitch": -35.9
         },
         {
           "scene": "p32",
-          "yaw": -20,
-          "pitch": -54.7
+          "yaw": -50,
+          "pitch": -26.7
         },
         {
-          "scene": "p35",
-          "yaw": 40,
-          "pitch": -45.2
+          "scene": "p30",
+          "yaw": -21.7,
+          "pitch": -20
+        },
+        {
+          "scene": "p41",
+          "yaw": 15.7,
+          "pitch": -18.9
+        },
+        {
+          "scene": "p31",
+          "yaw": -46.5,
+          "pitch": -18.9
         }
       ]
     },
@@ -360,18 +422,33 @@
       "hotspots": [
         {
           "scene": "p34",
-          "yaw": 0,
-          "pitch": -45.8
+          "yaw": 0.4,
+          "pitch": -36.4
         },
         {
           "scene": "p32",
-          "yaw": -95,
-          "pitch": -30
+          "yaw": -79.9,
+          "pitch": -31.7
+        },
+        {
+          "scene": "p31",
+          "yaw": -91.6,
+          "pitch": -22.2
+        },
+        {
+          "scene": "p30",
+          "yaw": -67.4,
+          "pitch": -19
         },
         {
           "scene": "p35",
-          "yaw": -10,
-          "pitch": -18
+          "yaw": -6.6,
+          "pitch": -20.7
+        },
+        {
+          "scene": "p41",
+          "yaw": -39.9,
+          "pitch": -14.5
         }
       ]
     },
@@ -384,19 +461,34 @@
       },
       "hotspots": [
         {
-          "scene": "p33",
-          "yaw": -70,
-          "pitch": -20
+          "scene": "p34",
+          "yaw": -72.8,
+          "pitch": -36.2
+        },
+        {
+          "scene": "p41",
+          "yaw": 30.1,
+          "pitch": -24.6
+        },
+        {
+          "scene": "p40",
+          "yaw": 56.6,
+          "pitch": -21.6
         },
         {
           "scene": "p32",
-          "yaw": -40,
-          "pitch": -18
+          "yaw": -32.6,
+          "pitch": -19.1
         },
         {
-          "scene": "p34",
-          "yaw": -60,
-          "pitch": -45.2
+          "scene": "p33",
+          "yaw": -65.6,
+          "pitch": -19.8
+        },
+        {
+          "scene": "p30",
+          "yaw": -6.1,
+          "pitch": -18.5
         }
       ]
     },
@@ -409,44 +501,34 @@
       },
       "hotspots": [
         {
-          "scene": "p20",
-          "yaw": -33.2,
-          "pitch": -30.1
-        },
-        {
-          "scene": "p21",
-          "yaw": -15,
-          "pitch": -18
-        },
-        {
-          "scene": "p19",
-          "yaw": -40,
-          "pitch": -25
-        },
-        {
           "scene": "p29",
-          "yaw": -150,
-          "pitch": -29.2
+          "yaw": -144.8,
+          "pitch": -42
         },
         {
           "scene": "p17",
-          "yaw": 62,
-          "pitch": -35
+          "yaw": 61.7,
+          "pitch": -38
         },
         {
-          "scene": "p26",
-          "yaw": -110,
-          "pitch": -27.8
+          "scene": "p19",
+          "yaw": -12.7,
+          "pitch": -29.2
+        },
+        {
+          "scene": "p38",
+          "yaw": 88.7,
+          "pitch": -26.6
         },
         {
           "scene": "p42",
-          "yaw": 55,
-          "pitch": -26.3
+          "yaw": 66.7,
+          "pitch": -26.4
         },
         {
-          "scene": "p28",
-          "yaw": -100,
-          "pitch": -22.3
+          "scene": "p26",
+          "yaw": -54.7,
+          "pitch": -24.4
         }
       ]
     },
@@ -454,29 +536,39 @@
       "id": "p17",
       "title": "פינת אוכל – ליד המסדרון",
       "map": {
-        "x": 45.0,
+        "x": 45,
         "y": 53.19
       },
       "hotspots": [
         {
-          "scene": "p29",
-          "yaw": 160,
-          "pitch": -21.4
-        },
-        {
           "scene": "p42",
-          "yaw": -15,
-          "pitch": -54.3
+          "yaw": -17.1,
+          "pitch": -53.3
         },
         {
-          "scene": "p19",
-          "yaw": -128,
-          "pitch": -18
+          "scene": "p38",
+          "yaw": 30.6,
+          "pitch": -44.1
         },
         {
           "scene": "p18",
-          "yaw": -166,
-          "pitch": -60
+          "yaw": 149.7,
+          "pitch": -37.8
+        },
+        {
+          "scene": "p16",
+          "yaw": -47.2,
+          "pitch": -33
+        },
+        {
+          "scene": "p43",
+          "yaw": -34.7,
+          "pitch": -30.9
+        },
+        {
+          "scene": "p39",
+          "yaw": 50.4,
+          "pitch": -28.8
         }
       ]
     },
@@ -489,29 +581,34 @@
       },
       "hotspots": [
         {
-          "scene": "p18",
-          "yaw": 115,
-          "pitch": -55
-        },
-        {
-          "scene": "p22",
-          "yaw": 5,
-          "pitch": -30
-        },
-        {
           "scene": "p20",
-          "yaw": 0,
-          "pitch": -57.6
+          "yaw": 13.8,
+          "pitch": -50.3
         },
         {
-          "scene": "p29",
-          "yaw": -150,
-          "pitch": -19.5
+          "scene": "p26",
+          "yaw": -75.8,
+          "pitch": -34.3
+        },
+        {
+          "scene": "p18",
+          "yaw": -159.1,
+          "pitch": -28.3
+        },
+        {
+          "scene": "p21",
+          "yaw": -10.6,
+          "pitch": -28.7
         },
         {
           "scene": "p17",
-          "yaw": 160,
-          "pitch": -20
+          "yaw": 160.4,
+          "pitch": -26.8
+        },
+        {
+          "scene": "p22",
+          "yaw": 56.5,
+          "pitch": -25.7
         }
       ]
     },
@@ -524,24 +621,34 @@
       },
       "hotspots": [
         {
-          "scene": "p18",
-          "yaw": 140,
-          "pitch": -15
-        },
-        {
-          "scene": "p23",
-          "yaw": 75,
-          "pitch": -14
-        },
-        {
           "scene": "p19",
-          "yaw": -170,
-          "pitch": -57.6
+          "yaw": -163.5,
+          "pitch": -49.4
         },
         {
           "scene": "p21",
-          "yaw": -165,
-          "pitch": -45
+          "yaw": -24,
+          "pitch": -41.5
+        },
+        {
+          "scene": "p22",
+          "yaw": 81.7,
+          "pitch": -32.1
+        },
+        {
+          "scene": "p26",
+          "yaw": -101.8,
+          "pitch": -30.7
+        },
+        {
+          "scene": "p24",
+          "yaw": -16.8,
+          "pitch": -30.5
+        },
+        {
+          "scene": "p23",
+          "yaw": 57.8,
+          "pitch": -26.2
         }
       ]
     },
@@ -554,24 +661,34 @@
       },
       "hotspots": [
         {
-          "scene": "p18",
-          "yaw": -100,
-          "pitch": -15
+          "scene": "p24",
+          "yaw": 104.2,
+          "pitch": -58.6
         },
         {
           "scene": "p20",
-          "yaw": -20,
-          "pitch": -55
+          "yaw": -97.8,
+          "pitch": -40.5
+        },
+        {
+          "scene": "p26",
+          "yaw": -33,
+          "pitch": -28.7
+        },
+        {
+          "scene": "p19",
+          "yaw": -80.4,
+          "pitch": -27.8
+        },
+        {
+          "scene": "p23",
+          "yaw": -164.2,
+          "pitch": -24
         },
         {
           "scene": "p22",
-          "yaw": 30,
-          "pitch": -60
-        },
-        {
-          "scene": "p24",
-          "yaw": 10,
-          "pitch": -50
+          "yaw": -141.4,
+          "pitch": -23.9
         }
       ]
     },
@@ -584,24 +701,34 @@
       },
       "hotspots": [
         {
-          "scene": "p19",
-          "yaw": -60,
-          "pitch": -20
+          "scene": "p25",
+          "yaw": 90.5,
+          "pitch": -62.8
         },
         {
           "scene": "p23",
-          "yaw": 90,
-          "pitch": -40.8
+          "yaw": 38.1,
+          "pitch": -49.1
         },
         {
-          "scene": "p21",
-          "yaw": -90,
-          "pitch": -15
+          "scene": "p15",
+          "yaw": 148.6,
+          "pitch": -33.5
         },
         {
-          "scene": "p24",
-          "yaw": 10,
-          "pitch": -55.3
+          "scene": "p20",
+          "yaw": -70.6,
+          "pitch": -32.7
+        },
+        {
+          "scene": "p14",
+          "yaw": 163.8,
+          "pitch": -27.8
+        },
+        {
+          "scene": "p19",
+          "yaw": -92,
+          "pitch": -25.9
         }
       ]
     },
@@ -614,29 +741,34 @@
       },
       "hotspots": [
         {
-          "scene": "p20",
-          "yaw": -70,
-          "pitch": -25
+          "scene": "p25",
+          "yaw": -159.9,
+          "pitch": -55.4
         },
         {
           "scene": "p22",
-          "yaw": -60,
-          "pitch": -40.8
+          "yaw": -123.6,
+          "pitch": -49.2
         },
         {
-          "scene": "p26",
-          "yaw": -55,
-          "pitch": -14
+          "scene": "p15",
+          "yaw": -168.7,
+          "pitch": -26.5
+        },
+        {
+          "scene": "p20",
+          "yaw": -76,
+          "pitch": -26.6
+        },
+        {
+          "scene": "p21",
+          "yaw": -44.4,
+          "pitch": -25
         },
         {
           "scene": "p24",
-          "yaw": -45,
-          "pitch": -28.9
-        },
-        {
-          "scene": "p25",
-          "yaw": -175,
-          "pitch": -46.3
+          "yaw": -29,
+          "pitch": -24.1
         }
       ]
     },
@@ -649,34 +781,34 @@
       },
       "hotspots": [
         {
-          "scene": "p25",
-          "yaw": -40,
-          "pitch": -18
+          "scene": "p21",
+          "yaw": 27.9,
+          "pitch": -59
         },
         {
-          "scene": "p26",
-          "yaw": 40,
-          "pitch": -26.5
-        },
-        {
-          "scene": "p36",
-          "yaw": 14.1,
-          "pitch": -12
+          "scene": "p20",
+          "yaw": 14.4,
+          "pitch": -30.1
         },
         {
           "scene": "p23",
-          "yaw": -40,
-          "pitch": -35
+          "yaw": -44.1,
+          "pitch": -23.5
+        },
+        {
+          "scene": "p26",
+          "yaw": 61.5,
+          "pitch": -23.7
+        },
+        {
+          "scene": "p19",
+          "yaw": 25.4,
+          "pitch": -22.1
         },
         {
           "scene": "p22",
-          "yaw": -50,
-          "pitch": -55
-        },
-        {
-          "scene": "p21",
-          "yaw": 0,
-          "pitch": -15
+          "yaw": -24,
+          "pitch": -21.7
         }
       ]
     },
@@ -689,14 +821,34 @@
       },
       "hotspots": [
         {
-          "scene": "p24",
-          "yaw": 160,
-          "pitch": -19.9
+          "scene": "p22",
+          "yaw": 127.1,
+          "pitch": -62
         },
         {
           "scene": "p23",
-          "yaw": -150,
-          "pitch": -46.3
+          "yaw": -143.1,
+          "pitch": -54.9
+        },
+        {
+          "scene": "p15",
+          "yaw": 24.3,
+          "pitch": -37.1
+        },
+        {
+          "scene": "p14",
+          "yaw": 35.7,
+          "pitch": -28.5
+        },
+        {
+          "scene": "p20",
+          "yaw": 140.7,
+          "pitch": -24.9
+        },
+        {
+          "scene": "p13",
+          "yaw": 62.8,
+          "pitch": -21.2
         }
       ]
     },
@@ -710,23 +862,33 @@
       "hotspots": [
         {
           "scene": "p17",
-          "yaw": -150,
-          "pitch": -54.3
+          "yaw": -134.5,
+          "pitch": -53.3
         },
         {
           "scene": "p38",
-          "yaw": 95,
-          "pitch": -47.9
+          "yaw": 138.7,
+          "pitch": -52.1
         },
         {
-          "scene": "p18",
-          "yaw": -130,
-          "pitch": -26.3
+          "scene": "p16",
+          "yaw": -7.5,
+          "pitch": -46.3
         },
         {
           "scene": "p43",
-          "yaw": 0,
-          "pitch": -55.3
+          "yaw": 14.6,
+          "pitch": -45.7
+        },
+        {
+          "scene": "p13",
+          "yaw": -16,
+          "pitch": -35.2
+        },
+        {
+          "scene": "p39",
+          "yaw": 136.7,
+          "pitch": -30.2
         }
       ]
     },
@@ -739,34 +901,34 @@
       },
       "hotspots": [
         {
-          "scene": "p44",
-          "yaw": 110,
-          "pitch": -47.4
+          "scene": "p16",
+          "yaw": -60.3,
+          "pitch": -69.6
         },
         {
           "scene": "p13",
-          "yaw": -40,
-          "pitch": -51.1
-        },
-        {
-          "scene": "p16",
-          "yaw": 60,
-          "pitch": -60
+          "yaw": -27,
+          "pitch": -52.8
         },
         {
           "scene": "p09",
-          "yaw": 45,
-          "pitch": -36.9
-        },
-        {
-          "scene": "p38",
-          "yaw": -172.5,
-          "pitch": -35.2
+          "yaw": 52.1,
+          "pitch": -46.9
         },
         {
           "scene": "p42",
-          "yaw": -150,
-          "pitch": -55.3
+          "yaw": -135.6,
+          "pitch": -44.5
+        },
+        {
+          "scene": "p44",
+          "yaw": 99.7,
+          "pitch": -42.6
+        },
+        {
+          "scene": "p38",
+          "yaw": -159.7,
+          "pitch": -32.2
         }
       ]
     },
@@ -779,24 +941,34 @@
       },
       "hotspots": [
         {
-          "scene": "p09",
-          "yaw": 160,
-          "pitch": -42.7
-        },
-        {
           "scene": "p43",
-          "yaw": -100,
-          "pitch": -60
+          "yaw": -146.4,
+          "pitch": -69.3
         },
         {
           "scene": "p13",
-          "yaw": 75,
-          "pitch": -41.4
+          "yaw": 91.5,
+          "pitch": -63.7
+        },
+        {
+          "scene": "p42",
+          "yaw": -64.2,
+          "pitch": -45.7
+        },
+        {
+          "scene": "p09",
+          "yaw": 163.5,
+          "pitch": -41.2
         },
         {
           "scene": "p44",
-          "yaw": -170,
-          "pitch": -60
+          "yaw": -161.8,
+          "pitch": -34.5
+        },
+        {
+          "scene": "p17",
+          "yaw": -41.4,
+          "pitch": -33.4
         }
       ]
     },
@@ -810,18 +982,33 @@
       "hotspots": [
         {
           "scene": "p01",
-          "yaw": 100,
-          "pitch": -60
+          "yaw": 127.1,
+          "pitch": -52.1
+        },
+        {
+          "scene": "p09",
+          "yaw": 24.7,
+          "pitch": -50.3
         },
         {
           "scene": "p43",
-          "yaw": -30,
-          "pitch": -47.4
+          "yaw": -32.2,
+          "pitch": -42.9
+        },
+        {
+          "scene": "p10",
+          "yaw": 69.5,
+          "pitch": -40.4
         },
         {
           "scene": "p16",
-          "yaw": -60,
-          "pitch": -60
+          "yaw": -26.7,
+          "pitch": -35
+        },
+        {
+          "scene": "p13",
+          "yaw": -10.1,
+          "pitch": -31.3
         }
       ]
     },
@@ -834,24 +1021,34 @@
       },
       "hotspots": [
         {
-          "scene": "p03",
-          "yaw": 160,
-          "pitch": -51.9
+          "scene": "p44",
+          "yaw": -30.8,
+          "pitch": -52.8
         },
         {
-          "scene": "p44",
-          "yaw": -45,
-          "pitch": -60
+          "scene": "p10",
+          "yaw": 51.1,
+          "pitch": -44.8
+        },
+        {
+          "scene": "p09",
+          "yaw": 9.8,
+          "pitch": -38.7
         },
         {
           "scene": "p02",
-          "yaw": 120,
-          "pitch": -40
+          "yaw": 144.2,
+          "pitch": -37.6
         },
         {
-          "scene": "p07",
-          "yaw": -170,
-          "pitch": -49.2
+          "scene": "p43",
+          "yaw": -18.5,
+          "pitch": -29.1
+        },
+        {
+          "scene": "p04",
+          "yaw": -115.4,
+          "pitch": -27.9
         }
       ]
     },
@@ -865,18 +1062,33 @@
       "hotspots": [
         {
           "scene": "p01",
-          "yaw": -110,
-          "pitch": -22
+          "yaw": -121.1,
+          "pitch": -38.3
         },
         {
-          "scene": "p03",
-          "yaw": -140,
-          "pitch": -44.6
+          "scene": "p10",
+          "yaw": -84.3,
+          "pitch": -31.3
+        },
+        {
+          "scene": "p44",
+          "yaw": -119.2,
+          "pitch": -26.3
+        },
+        {
+          "scene": "p11",
+          "yaw": -29.5,
+          "pitch": -25.4
         },
         {
           "scene": "p08",
-          "yaw": 150,
-          "pitch": -60
+          "yaw": 145.4,
+          "pitch": -24.6
+        },
+        {
+          "scene": "p09",
+          "yaw": -98.6,
+          "pitch": -23.4
         }
       ]
     },
@@ -924,24 +1136,34 @@
       },
       "hotspots": [
         {
-          "scene": "p05",
-          "yaw": 0,
-          "pitch": -54.3
-        },
-        {
           "scene": "p07",
-          "yaw": 60,
-          "pitch": -60
+          "yaw": -118.6,
+          "pitch": -61.7
         },
         {
-          "scene": "p03",
-          "yaw": 130,
-          "pitch": -55.5
+          "scene": "p05",
+          "yaw": 39.1,
+          "pitch": -61.8
         },
         {
           "scene": "p06",
-          "yaw": -34.4,
-          "pitch": -39.9
+          "yaw": 8.3,
+          "pitch": -35.2
+        },
+        {
+          "scene": "p08",
+          "yaw": -150.9,
+          "pitch": -28.7
+        },
+        {
+          "scene": "p01",
+          "yaw": 121.4,
+          "pitch": -27.4
+        },
+        {
+          "scene": "p44",
+          "yaw": 98.5,
+          "pitch": -26.6
         }
       ]
     },
@@ -955,28 +1177,33 @@
       "hotspots": [
         {
           "scene": "p04",
-          "yaw": -10,
-          "pitch": -40
-        },
-        {
-          "scene": "p03",
-          "yaw": -159.8,
-          "pitch": -60
-        },
-        {
-          "scene": "p08",
-          "yaw": 60,
-          "pitch": -40.0
-        },
-        {
-          "scene": "p01",
-          "yaw": 110,
-          "pitch": -49.2
+          "yaw": 13.2,
+          "pitch": -61.9
         },
         {
           "scene": "p05",
-          "yaw": 5,
-          "pitch": -30
+          "yaw": 1.8,
+          "pitch": -43.6
+        },
+        {
+          "scene": "p08",
+          "yaw": 149.5,
+          "pitch": -35.9
+        },
+        {
+          "scene": "p06",
+          "yaw": -26.2,
+          "pitch": -28.9
+        },
+        {
+          "scene": "p01",
+          "yaw": 61.3,
+          "pitch": -24.8
+        },
+        {
+          "scene": "p44",
+          "yaw": 42.8,
+          "pitch": -22.9
         }
       ]
     },
@@ -989,24 +1216,34 @@
       },
       "hotspots": [
         {
-          "scene": "p03",
-          "yaw": 150,
-          "pitch": -20
-        },
-        {
           "scene": "p07",
-          "yaw": 125,
-          "pitch": -35
+          "yaw": 116.2,
+          "pitch": -35.6
         },
         {
-          "scene": "p05",
-          "yaw": 108,
-          "pitch": -18
+          "scene": "p04",
+          "yaw": 128.3,
+          "pitch": -28.8
         },
         {
           "scene": "p02",
-          "yaw": -45,
-          "pitch": -50
+          "yaw": -154.1,
+          "pitch": -25
+        },
+        {
+          "scene": "p05",
+          "yaw": 130.4,
+          "pitch": -22.9
+        },
+        {
+          "scene": "p01",
+          "yaw": 176,
+          "pitch": -21.1
+        },
+        {
+          "scene": "p44",
+          "yaw": 164.8,
+          "pitch": -17.7
         }
       ]
     },
@@ -1020,23 +1257,33 @@
       "hotspots": [
         {
           "scene": "p04",
-          "yaw": -150,
-          "pitch": -50
+          "yaw": -122.2,
+          "pitch": -61.5
         },
         {
           "scene": "p06",
-          "yaw": 20,
-          "pitch": -60
+          "yaw": 12.8,
+          "pitch": -44.9
         },
         {
           "scene": "p07",
-          "yaw": -170,
-          "pitch": -28
+          "yaw": -110,
+          "pitch": -43.3
         },
         {
-          "scene": "p08",
-          "yaw": -122.1,
-          "pitch": -37.8
+          "scene": "p44",
+          "yaw": 133.7,
+          "pitch": -28.9
+        },
+        {
+          "scene": "p40",
+          "yaw": 13.5,
+          "pitch": -28.8
+        },
+        {
+          "scene": "p39",
+          "yaw": 42.7,
+          "pitch": -28
         }
       ]
     },
@@ -1049,14 +1296,34 @@
       },
       "hotspots": [
         {
+          "scene": "p40",
+          "yaw": 171.3,
+          "pitch": -50.7
+        },
+        {
           "scene": "p05",
-          "yaw": 10,
-          "pitch": -58
+          "yaw": -10.7,
+          "pitch": -45
+        },
+        {
+          "scene": "p39",
+          "yaw": -134.3,
+          "pitch": -41.7
         },
         {
           "scene": "p04",
-          "yaw": -15,
-          "pitch": -39.9
+          "yaw": 5,
+          "pitch": -35
+        },
+        {
+          "scene": "p38",
+          "yaw": -105.9,
+          "pitch": -29.8
+        },
+        {
+          "scene": "p07",
+          "yaw": 19,
+          "pitch": -29.1
         }
       ]
     },
@@ -1069,19 +1336,34 @@
       },
       "hotspots": [
         {
-          "scene": "p16",
-          "yaw": 140,
-          "pitch": -42.7
+          "scene": "p10",
+          "yaw": -36.9,
+          "pitch": -51.2
+        },
+        {
+          "scene": "p44",
+          "yaw": 53.6,
+          "pitch": -50.9
         },
         {
           "scene": "p43",
-          "yaw": 110,
-          "pitch": -36.9
+          "yaw": 129.3,
+          "pitch": -47.1
         },
         {
-          "scene": "p10",
-          "yaw": -60,
-          "pitch": -47.3
+          "scene": "p13",
+          "yaw": 173.1,
+          "pitch": -42.7
+        },
+        {
+          "scene": "p16",
+          "yaw": 147.4,
+          "pitch": -41.8
+        },
+        {
+          "scene": "p01",
+          "yaw": 16.3,
+          "pitch": -39.4
         }
       ]
     },
@@ -1094,19 +1376,34 @@
       },
       "hotspots": [
         {
-          "scene": "p11",
-          "yaw": -60,
-          "pitch": -40.0
-        },
-        {
           "scene": "p09",
-          "yaw": -170,
-          "pitch": -47.3
+          "yaw": -176.6,
+          "pitch": -50.3
         },
         {
-          "scene": "p12",
-          "yaw": -90,
-          "pitch": -48.7
+          "scene": "p01",
+          "yaw": 97.9,
+          "pitch": -45.6
+        },
+        {
+          "scene": "p44",
+          "yaw": 138.4,
+          "pitch": -40.7
+        },
+        {
+          "scene": "p02",
+          "yaw": 47.9,
+          "pitch": -31.7
+        },
+        {
+          "scene": "p43",
+          "yaw": 175.9,
+          "pitch": -29.8
+        },
+        {
+          "scene": "p11",
+          "yaw": -28.3,
+          "pitch": -29.7
         }
       ]
     },
@@ -1120,13 +1417,33 @@
       "hotspots": [
         {
           "scene": "p10",
-          "yaw": 140,
-          "pitch": -40.0
+          "yaw": 115.4,
+          "pitch": -29.1
         },
         {
           "scene": "p12",
-          "yaw": -150,
-          "pitch": -40
+          "yaw": -176.4,
+          "pitch": -26.3
+        },
+        {
+          "scene": "p02",
+          "yaw": 65.9,
+          "pitch": -25.4
+        },
+        {
+          "scene": "p01",
+          "yaw": 96.5,
+          "pitch": -21.7
+        },
+        {
+          "scene": "p09",
+          "yaw": 125.1,
+          "pitch": -21.3
+        },
+        {
+          "scene": "p14",
+          "yaw": 160.9,
+          "pitch": -19.7
         }
       ]
     },
@@ -1139,14 +1456,34 @@
       },
       "hotspots": [
         {
+          "scene": "p14",
+          "yaw": -163.2,
+          "pitch": -38.3
+        },
+        {
+          "scene": "p15",
+          "yaw": -137.7,
+          "pitch": -36.5
+        },
+        {
           "scene": "p11",
-          "yaw": 45,
-          "pitch": -30
+          "yaw": 73.1,
+          "pitch": -28.5
         },
         {
           "scene": "p10",
-          "yaw": 150,
-          "pitch": -48.7
+          "yaw": 127.4,
+          "pitch": -26.2
+        },
+        {
+          "scene": "p09",
+          "yaw": 149.1,
+          "pitch": -24.3
+        },
+        {
+          "scene": "p13",
+          "yaw": 176.4,
+          "pitch": -23.3
         }
       ]
     },
@@ -1155,28 +1492,38 @@
       "title": "כניסה לחדר הרחצה",
       "map": {
         "x": 33.93,
-        "y": 60.0
+        "y": 60
       },
       "hotspots": [
         {
-          "scene": "p15",
-          "yaw": -20,
-          "pitch": -39.0
+          "scene": "p16",
+          "yaw": 169.8,
+          "pitch": -63.4
         },
         {
           "scene": "p43",
-          "yaw": 130,
-          "pitch": -51.1
+          "yaw": 145.9,
+          "pitch": -52.1
         },
         {
-          "scene": "p16",
-          "yaw": 150,
-          "pitch": -41.4
+          "scene": "p09",
+          "yaw": 88.7,
+          "pitch": -42.2
         },
         {
           "scene": "p14",
-          "yaw": -30,
-          "pitch": -53.2
+          "yaw": -2.4,
+          "pitch": -39.7
+        },
+        {
+          "scene": "p42",
+          "yaw": -173.3,
+          "pitch": -34.2
+        },
+        {
+          "scene": "p44",
+          "yaw": 114.1,
+          "pitch": -30.7
         }
       ]
     },
@@ -1190,13 +1537,33 @@
       "hotspots": [
         {
           "scene": "p15",
-          "yaw": 140,
-          "pitch": -45
+          "yaw": -34.8,
+          "pitch": -59.3
         },
         {
           "scene": "p13",
-          "yaw": -170,
-          "pitch": -53.2
+          "yaw": -170.8,
+          "pitch": -38.8
+        },
+        {
+          "scene": "p12",
+          "yaw": 51.5,
+          "pitch": -35.2
+        },
+        {
+          "scene": "p09",
+          "yaw": 148.2,
+          "pitch": -30.5
+        },
+        {
+          "scene": "p16",
+          "yaw": -172.9,
+          "pitch": -29.9
+        },
+        {
+          "scene": "p25",
+          "yaw": -61.1,
+          "pitch": -28.8
         }
       ]
     },
@@ -1210,13 +1577,33 @@
       "hotspots": [
         {
           "scene": "p14",
-          "yaw": -120,
-          "pitch": -55
+          "yaw": 120.9,
+          "pitch": -58.8
+        },
+        {
+          "scene": "p25",
+          "yaw": -97.1,
+          "pitch": -37
+        },
+        {
+          "scene": "p12",
+          "yaw": 52.5,
+          "pitch": -33.1
+        },
+        {
+          "scene": "p22",
+          "yaw": -116.4,
+          "pitch": -33.2
         },
         {
           "scene": "p13",
-          "yaw": 130,
-          "pitch": -39.0
+          "yaw": 150.7,
+          "pitch": -29.9
+        },
+        {
+          "scene": "p23",
+          "yaw": -92.4,
+          "pitch": -26.6
         }
       ]
     },
@@ -1229,29 +1616,34 @@
       },
       "hotspots": [
         {
-          "scene": "p40",
-          "yaw": 0,
-          "pitch": -30.2
+          "scene": "p42",
+          "yaw": 177.5,
+          "pitch": -51.6
         },
         {
           "scene": "p39",
-          "yaw": -20,
-          "pitch": -45.6
-        },
-        {
-          "scene": "p42",
-          "yaw": 150,
+          "yaw": -6.1,
           "pitch": -47.9
         },
         {
-          "scene": "p43",
-          "yaw": 170,
-          "pitch": -35.2
+          "scene": "p17",
+          "yaw": 132.8,
+          "pitch": -43.7
         },
         {
-          "scene": "p41",
-          "yaw": 26.8,
-          "pitch": -32.1
+          "scene": "p43",
+          "yaw": -150.8,
+          "pitch": -32.3
+        },
+        {
+          "scene": "p16",
+          "yaw": -163.5,
+          "pitch": -30.6
+        },
+        {
+          "scene": "p06",
+          "yaw": -41.1,
+          "pitch": -30.3
         }
       ]
     },
@@ -1264,19 +1656,34 @@
       },
       "hotspots": [
         {
-          "scene": "p41",
-          "yaw": 60,
-          "pitch": -41.9
-        },
-        {
           "scene": "p40",
-          "yaw": -90,
-          "pitch": -30
+          "yaw": -49.4,
+          "pitch": -47.9
         },
         {
           "scene": "p38",
-          "yaw": 150,
-          "pitch": -45.6
+          "yaw": 148.9,
+          "pitch": -47.3
+        },
+        {
+          "scene": "p06",
+          "yaw": -95.1,
+          "pitch": -42.1
+        },
+        {
+          "scene": "p41",
+          "yaw": 2.4,
+          "pitch": -37.4
+        },
+        {
+          "scene": "p42",
+          "yaw": 150.3,
+          "pitch": -30.4
+        },
+        {
+          "scene": "p17",
+          "yaw": 126.6,
+          "pitch": -28.7
         }
       ]
     },
@@ -1289,19 +1696,34 @@
       },
       "hotspots": [
         {
-          "scene": "p38",
-          "yaw": -130,
-          "pitch": -30.2
+          "scene": "p06",
+          "yaw": -44.5,
+          "pitch": -51.2
         },
         {
           "scene": "p39",
-          "yaw": -30,
-          "pitch": -35
+          "yaw": -124.5,
+          "pitch": -47.5
         },
         {
           "scene": "p41",
-          "yaw": 150,
-          "pitch": -42.0
+          "yaw": 150.3,
+          "pitch": -43.5
+        },
+        {
+          "scene": "p05",
+          "yaw": -45.5,
+          "pitch": -29.3
+        },
+        {
+          "scene": "p38",
+          "yaw": -115.5,
+          "pitch": -29
+        },
+        {
+          "scene": "p04",
+          "yaw": -35.7,
+          "pitch": -24.6
         }
       ]
     },
@@ -1314,19 +1736,34 @@
       },
       "hotspots": [
         {
-          "scene": "p39",
-          "yaw": -40,
-          "pitch": -30
+          "scene": "p40",
+          "yaw": -129.2,
+          "pitch": -43.6
         },
         {
-          "scene": "p40",
-          "yaw": 30,
-          "pitch": -42.0
+          "scene": "p39",
+          "yaw": -172.4,
+          "pitch": -36.9
+        },
+        {
+          "scene": "p30",
+          "yaw": 64.7,
+          "pitch": -30.7
+        },
+        {
+          "scene": "p06",
+          "yaw": -135.6,
+          "pitch": -28.5
+        },
+        {
+          "scene": "p35",
+          "yaw": -35.6,
+          "pitch": -29.1
         },
         {
           "scene": "p38",
-          "yaw": -175,
-          "pitch": -32.1
+          "yaw": 174,
+          "pitch": -24.9
         }
       ]
     }

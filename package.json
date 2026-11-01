@@ -12,7 +12,9 @@
     "test:gate:prod": "node tests/forged-session-gate.mjs",
     "test:e2e": "playwright test",
     "test:e2e:desktop": "playwright test --project=desktop",
-    "test:acceptance": "playwright test e2e/tour-acceptance.spec.js --project=desktop && playwright test e2e/tour-acceptance.spec.js --project=mobile -g 'MOBILE'"
+    "test:acceptance": "playwright test e2e/tour-acceptance.spec.js --project=desktop && playwright test e2e/tour-acceptance.spec.js --project=mobile -g 'MOBILE'",
+    "tour:matterport": "node tools/tours/from-matterport.mjs",
+    "measure:sync": "node tools/measure/sync-missing.mjs"
   },
   "dependencies": {
     "@photo-sphere-viewer/core": "^5.15.1",

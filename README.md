@@ -65,7 +65,7 @@ Dimensions are an estimate, not a survey. Say so in `note`.
 
 The viewer shows them in two ways, for every tour that has the data:
 
-- **Automatic, on by default.** Each visible Matterport wall is drawn on the floor at that wall’s face, labelled with the distance between Matterport’s own vertices. Door and window labels use Matterport’s opening width. Ceiling height, and width × depth, appear only when Matterport published those numbers (they are in feet in the API and shown in metres). A room with no published width, such as the open salon, does not get an estimated box. Segments behind the camera or behind another wall are hidden. Furniture is not in the model, so a line can still draw over a bed that stands in front of a wall. The minimap shows width × depth only for rooms where Matterport published both.
+- **Automatic, on by default.** Each visible Matterport wall is drawn on the floor at that wall’s face, labelled with the distance between Matterport’s own vertices. Door and window labels use Matterport’s opening width. Ceiling height, and width × depth, appear only when Matterport published those numbers. The API gives them in feet on older models and in metres on newer ones (`dimensionEstimates.units`); both are shown in metres. A room with no published width, such as the open salon, does not get an estimated box. Segments behind the camera or behind another wall are hidden. Furniture is not in the model, so a line can still draw over a bed that stands in front of a wall. The minimap shows width × depth only for rooms where Matterport published both.
 - **Manual, off by default.** The ruler button measures two clicks. It needs sweep poses (`scenes` in `measure.json`). Walls make the click hit a wall; otherwise it hits the floor plane.
 
 Generate `measure.json` from a public Matterport model:
@@ -77,6 +77,25 @@ node tools/measure/from-matterport.mjs public/tours/<slug>
 `tour.json` must have `matterportId` (the id in `my.matterport.com/show/?m=`). The model has to be public. The script reads room outlines, interior width/depth/ceiling height, and sweep poses, and writes `measure.json`. Re-running keeps panorama poses that are already there and refreshes the rooms.
 
 A new tour gets automatic dimensions by dropping the folder as usual, setting `matterportId`, and running that command. No viewer change.
+
+To fill every tour that already has a model id but no `measure.json`:
+
+```bash
+node tools/measure/sync-missing.mjs
+```
+
+Tours with no `matterportId` are skipped. The site build does not call Matterport.
+
+### Building a tour from Matterport
+
+Public models can be turned into the same folder the viewer already loads:
+
+```bash
+node tools/tours/from-matterport.mjs eshkolit-3
+node tools/tours/from-matterport.mjs --all
+```
+
+The script reads the public model (skyboxes, floor plan, room classes, wall lengths). It writes the Matterport color plan (`plan.jpg`, and `plan-1.jpg`, `plan-2.jpg` when the model has more floors), one equirectangular panorama per sweep (`pano/<id>_m.jpg` at 4096×2048 and `<id>_s.jpg`), `tour.json` and `measure.json`. Minimap dots use Matterport’s own floor-plan frame: the image origin is the bottom-left corner in model metres, and the resolution is pixels per metre. Floor rings use the sweep quaternion, aimed at the neighbouring sweep’s floor point. On a multi-floor model the minimap shows only the current floor and can be switched with קומה 0, קומה 1, …. Panorama yaw 0 is the skybox’s front face. Hebrew names are Matterport’s room class (סלון, חדר שינה, מטבח, …). Measurements are always metres. A private model, or a model id Matterport no longer publishes, cannot be built. After the folder exists, set `tour` on that property’s card in `src/App.jsx`.
 
 What is still missing on the tours that do not show automatic dimensions:
 

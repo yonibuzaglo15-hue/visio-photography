@@ -73,6 +73,7 @@ export default function TourViewer({ tour }) {
   const [failed, setFailed] = useState(false);
   const [measureOn, setMeasureOn] = useState(false);
   const [dimsOn, setDimsOn] = useState(true);
+  const [pickedFloor, setPickedFloor] = useState(null);
   const hasRooms = Array.isArray(tour.measure?.rooms) && tour.measure.rooms.length > 0;
 
   useEffect(() => {
@@ -166,7 +167,16 @@ export default function TourViewer({ tour }) {
   // (map bearing of pano yaw 0, degrees clockwise from plan-up) get a wedge that
   // follows the current yaw / field of view. Tours without headings are unaffected.
   const activeScene = tour.scenes.find((scene) => scene.id === sceneId);
-  const coneHeading = Number.isFinite(activeScene?.map?.heading) ? activeScene.map.heading : null;
+  const floors = Array.isArray(tour.floors) ? tour.floors : [];
+  useEffect(() => {
+    setPickedFloor(null);
+  }, [sceneId]);
+  const shownFloorId = pickedFloor || activeScene?.floor || floors[0]?.id || null;
+  const shownFloor = floors.find((floor) => floor.id === shownFloorId) || null;
+  const mapScenes = shownFloor ? tour.scenes.filter((scene) => scene.floor === shownFloor.id) : tour.scenes;
+  const coneHeading = Number.isFinite(activeScene?.map?.heading) && mapScenes.some((scene) => scene.id === sceneId)
+    ? activeScene.map.heading
+    : null;
   useEffect(() => {
     if (!mapOpen || !ready || coneHeading === null) return undefined;
     let frame = 0;
@@ -212,7 +222,8 @@ export default function TourViewer({ tour }) {
   }
 
   const heading = [tour.title, tour.location].filter(Boolean).join(" · ");
-  const planSrc = tour.plan ? `${tour.assetBase}/${tour.plan}` : null;
+  const planFile = shownFloor?.plan || tour.plan;
+  const planSrc = planFile ? `${tour.assetBase}/${planFile}` : null;
   const noteLines = (tour.note || "").split("\n").filter(Boolean);
 
   return (
@@ -336,7 +347,23 @@ export default function TourViewer({ tour }) {
 
       {planSrc && (
         <div id="map" className={`visio-tour-map${mapOpen ? " open" : ""}`}>
-          <div className="visio-tour-map-in" dir="ltr">
+          {floors.length > 1 && (
+              <div className="visio-tour-floors" dir="ltr">
+                {floors.map((floor) => (
+                  <button
+                    key={floor.id}
+                    type="button"
+                    data-testid={`floor-${floor.id}`}
+                    className={floor.id === shownFloorId ? "on" : undefined}
+                    aria-pressed={floor.id === shownFloorId}
+                    onClick={() => setPickedFloor(floor.id)}
+                  >
+                    {floor.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="visio-tour-map-in" dir="ltr">
             <img src={planSrc} alt="תוכנית הדירה" />
             {coneHeading !== null && activeScene && (
               <div
@@ -346,7 +373,7 @@ export default function TourViewer({ tour }) {
                 style={{ left: `${activeScene.map.x}%`, top: `${activeScene.map.y}%` }}
               />
             )}
-            {tour.scenes.map((scene) => (
+            {mapScenes.map((scene) => (
               <button
                 key={scene.id}
                 type="button"
@@ -358,7 +385,7 @@ export default function TourViewer({ tour }) {
               />
             ))}
             {dimsOn && hasRooms && tour.measure.rooms
-              .filter((item) => item.source === "matterport" && item.map && item.sceneIds?.includes(sceneId))
+              .filter((item) => item.source === "matterport" && item.map && item.sceneIds?.includes(sceneId) && mapScenes.some((scene) => scene.id === sceneId))
               .map((item) => (
                 <div
                   key={item.id}
@@ -366,7 +393,7 @@ export default function TourViewer({ tour }) {
                   style={{ left: `${item.map.x}%`, top: `${item.map.y}%` }}
                   dir="ltr"
                 >
-                  {`${item.width.toFixed(1)}×${item.length.toFixed(1)}`}
+                  {`\u200E${item.width.toFixed(2)}×${item.length.toFixed(2)}\u00A0מ׳`}
                 </div>
               ))}
           </div>
