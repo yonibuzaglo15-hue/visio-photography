@@ -5,6 +5,7 @@ import { useState, useRef, useLayoutEffect, useEffect, useCallback, memo } from 
 import { C } from "./theme/colors.js";
 import ThemeToggle from "./theme/ThemeToggle.jsx";
 import { useScrollCraft } from "./scroll/useScrollCraft.js";
+import DroneFloors from "./scroll/DroneFloors.jsx";
 const PROPERTY_IMAGES = {
   1: { hero: "/home/1/hero.webp", gallery: ["/home/1/01.webp"] },
   2: { hero: "/home/2/hero.webp", gallery: ["/home/2/01.webp"] },
@@ -572,11 +573,9 @@ function PricingSection({ onNav }) {
   const p = (base) => fmt(showVat ? base * (1 + VAT) : base);
 
   return (
-    <section id="pricing" className="visio-section">
-      <div data-sc-in>
-        <SectionTitle sup="PRICING" title="חבילות ומחירים" sub="מחירים שקופים · ללא הפתעות" />
-      </div>
-
+    <>
+      <DroneFloors packages={PACKAGES} onNav={onNav} showVat={showVat} formatPrice={p} />
+      <section className="visio-section" aria-label="חבילות ומחירים">
       {/* VAT toggle */}
       <div className="visio-switch">
         <span className="visio-credit" style={{ color: showVat ? C.muted : C.ink }}>ללא מע״מ</span>
@@ -605,6 +604,7 @@ function PricingSection({ onNav }) {
       </div>
       <p className="visio-gear-line" dir="rtl"><Bidi>{GEAR_LINE}</Bidi></p>
     </section>
+    </>
   );
 }
 
