@@ -122,6 +122,51 @@ function StatFigure({ value, suffix = "", duration = 1200 }) {
   );
 }
 
+/* The hero stage is taller than the first screen, because the masthead sits above it.
+   The headline lives at the bottom of that stage, so on the first view only the tops
+   of the letters crossed the fold. Lift the copy until it sits fully inside the
+   visible part of the stage, and hide it if there is no room to show it whole. */
+function useHeroCopyFit(ref) {
+  useEffect(() => {
+    const act = ref.current;
+    if (!act) return undefined;
+    const stage = act.querySelector(".visio-hero-stage");
+    const copy = act.querySelector(".visio-hero-copy");
+    if (!stage || !copy) return undefined;
+    let raf = 0;
+    const update = () => {
+      const rect = stage.getBoundingClientRect();
+      if (rect.height < 40) return;
+      const visibleTop = Math.max(rect.top, 0);
+      const visibleBottom = Math.min(rect.bottom, window.innerHeight);
+      const room = visibleBottom - visibleTop;
+      const needed = copy.offsetHeight + 28;
+      if (room < needed) {
+        copy.classList.remove("is-fit");
+        return;
+      }
+      const lift = Math.max(0, rect.bottom - window.innerHeight);
+      copy.style.bottom = `${Math.round(lift + 16)}px`;
+      copy.classList.add("is-fit");
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    const observer = new ResizeObserver(onScroll);
+    observer.observe(stage);
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [ref]);
+}
+
 /* Recent-work strip. The engine's pan always translates toward the left, which
    parks an RTL rail on the wrong edge. This pins the inline-start (right) and
    moves the rail toward the right as the section scrolls, revealing later jobs. */
@@ -303,14 +348,16 @@ const GEAR_LINE = "הצילומים נעשים במצלמת Insta360 X4 וברח
 /* ─── HOME ─── */
 function HomeSection({ onNav }) {
   const workRef = useRef(null);
+  const heroRef = useRef(null);
   useWorkPan(workRef);
+  useHeroCopyFit(heroRef);
   const stills = PORTFOLIO.filter(p => PROPERTY_IMAGES[p.id] && p.id !== COVER_ID);
   const cover = PORTFOLIO.find(p => p.id === COVER_ID);
   const rail = stills.slice(0, 5);
 
   return (
     <>
-      <section id="home" className="visio-hero-act" data-sc-act="pin" data-sc-span="2.15">
+      <section id="home" className="visio-hero-act" data-sc-act="pin" data-sc-span="2.15" ref={heroRef}>
         <div data-sc-stage className="visio-hero-stage">
           <div className="visio-hero-plate">
             <img src={PROPERTY_IMAGES[COVER_ID].hero} alt={cover?.title || "VISIO"} fetchPriority="high" decoding="async" />

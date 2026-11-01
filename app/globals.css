@@ -731,8 +731,15 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   width: min(40rem, calc(100% - 32px));
   text-align: right;
   bottom: clamp(16px, 3vh, 36px);
+  visibility: hidden;
 }
+.visio-hero-act .visio-cover-text.visio-hero-copy.is-fit { visibility: visible; }
 .visio-hero-copy .visio-cover-title { font-size: clamp(36px, 5.2vw, 72px); }
+/* The rise-in starts partly clipped, which reads as a cut word on the first screen. */
+.visio-hero-copy .visio-assemble > span > span {
+  --lv: 1;
+  transform: none;
+}
 .visio-hero-copy .visio-cover-sub { margin: 0 0 22px; max-width: none; }
 .visio-hero-copy .visio-cover-btns { justify-content: flex-start; }
 .visio-expose {
