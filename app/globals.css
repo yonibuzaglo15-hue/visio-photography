@@ -913,36 +913,6 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 .visio-drone-poster { object-fit: cover; }
 .visio-drone-canvas { opacity: 0; }
 .visio-drone-canvas.is-ready { opacity: 1; }
-.visio-drone-windows {
-  position: absolute;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 3px;
-  padding: 3px;
-  margin: 0;
-  pointer-events: none;
-  opacity: 0;
-  overflow: hidden;
-  background: rgba(10, 14, 18, 0.28);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
-}
-.visio-drone-windows img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.8;
-  display: block;
-}
-.visio-drone-windows::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(118deg, rgba(255, 255, 255, 0.38), transparent 42%, rgba(255, 255, 255, 0.14) 70%, transparent);
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
 .visio-drone-head {
   position: absolute;
   z-index: 3;
@@ -1018,29 +988,54 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 @media (max-width: 768px) {
   .visio-drone-act { height: 360vh; }
   .visio-drone-card-slot {
-    inset-inline-start: 12px;
-    inset-inline-end: 12px;
+    inset-inline-start: 10px;
+    inset-inline-end: auto;
     top: auto;
-    bottom: 12px;
+    bottom: 10px;
     translate: none;
-    width: auto;
-    max-height: 46%;
+    width: min(220px, 56vw);
+    max-height: 36%;
   }
-  .visio-drone-card { max-height: 42vh; }
-  .visio-drone-price { font-size: 34px; }
-  .visio-drone-windows { gap: 2px; }
+  .visio-drone-card { max-height: 32vh; padding: 10px 12px 10px; }
+  .visio-drone-emblem { width: 40px; height: 40px; }
+  .visio-drone-name { font-size: 16px; margin: 6px 0 2px; }
+  .visio-drone-price { font-size: 26px; }
+  .visio-drone-note { display: none; }
+  .visio-drone-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .visio-drone-card .visio-drone-cta { margin-top: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .visio-drone-act { height: auto; background: #0c0e10; }
-  .visio-drone-live { display: none; }
-  .visio-drone-still {
-    display: block;
+  .visio-drone-stage {
     position: relative;
-    height: min(68vh, 560px);
-    overflow: hidden;
+    top: auto;
+    height: min(78vh, 720px);
+    overflow: visible;
   }
-  .visio-drone-still img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .visio-drone-card { animation: none; }
+  .visio-drone-card-slot {
+    position: absolute;
+    top: auto;
+    bottom: 12px;
+    inset-inline-start: 16px;
+    inset-inline-end: 16px;
+    translate: none;
+    width: auto;
+    max-height: 40%;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .visio-drone-card { animation: none; max-height: none; }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 768px) {
+  .visio-drone-card-slot { grid-template-columns: 1fr 1fr; }
 }
 
 /* Tour viewer and lightbox keep their own image sizing. */

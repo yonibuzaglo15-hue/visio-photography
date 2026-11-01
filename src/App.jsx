@@ -457,6 +457,22 @@ function PortfolioSection() {
   }, [company]);
 
   const openGallery = (gallery) => { setLightboxImgs(gallery); setLightboxIdx(0); };
+  const openGalleryRef = useRef(openGallery);
+  openGalleryRef.current = openGallery;
+  useEffect(() => {
+    const onOpen = (event) => {
+      const id = event.detail && event.detail.id;
+      const property = PORTFOLIO.find((item) => item.id === id);
+      if (!property) return;
+      const imgs = PROPERTY_IMAGES[property.id];
+      const gallery = property.gallery || (imgs && imgs.gallery) || [];
+      if (gallery.length) openGalleryRef.current(gallery);
+      const portfolio = document.getElementById("portfolio");
+      if (portfolio) portfolio.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    window.addEventListener("visio-open-work", onOpen);
+    return () => window.removeEventListener("visio-open-work", onOpen);
+  }, []);
   const nImgs = lightboxImgs.length;
   const stepGallery = useCallback((d) => setLightboxIdx(i => (i + d + nImgs) % nImgs), [nImgs]);
   const closeGallery = useCallback(() => setLightboxImgs([]), []);
