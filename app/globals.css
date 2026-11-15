@@ -258,6 +258,8 @@ button:hover { opacity: 0.85; }
 .visio-stats-wrap { padding: 28px 20px 0; max-width: 100%; }
 .visio-stat-num { direction: ltr; unicode-bidi: isolate; font-family: var(--pub-display); font-size: clamp(36px, 5vw, 52px); line-height: 1; color: var(--pub-ink); margin-bottom: 10px; }
 .visio-stat-figure { display: inline-block; direction: ltr; unicode-bidi: isolate; white-space: nowrap; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; font-weight: 500; letter-spacing: 0; }
+.visio-stat-video { display: flex; align-items: baseline; justify-content: center; gap: 0.18em; max-width: 100%; white-space: nowrap; }
+.visio-stat-word { font-size: 0.38em; font-weight: 500; letter-spacing: 0; line-height: 1; }
 .visio-stat .visio-kicker { letter-spacing: 0.04em; text-transform: none; line-height: 1.45; overflow-wrap: anywhere; }
 
 /* ── Section titles ── */
@@ -641,6 +643,8 @@ button:hover { opacity: 0.85; }
   .visio-cover { aspect-ratio: 4 / 5; min-height: 0; max-height: 78vh; }
   .visio-feature-grid { grid-template-columns: 1fr; gap: 32px; }
   .visio-stats { grid-template-columns: repeat(2, 1fr); }
+  .visio-stat-video .visio-stat-figure { font-size: 32px; }
+  .visio-stat-word { font-size: 13px; }
   .visio-portfolio-grid { grid-template-columns: repeat(2, 1fr); gap: 40px 20px; }
   .visio-pricing-grid { grid-template-columns: 1fr; }
   .visio-time-slots { grid-template-columns: repeat(2, 1fr); }

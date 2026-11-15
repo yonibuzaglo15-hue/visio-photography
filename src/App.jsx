@@ -67,7 +67,7 @@ function StoryImage({ id, title, eager = false }) {
 }
 
 /* Full figure, including the suffix, lives in one LTR isolate so RTL cannot
-   split "500+", "24H", "100%" or "12+12" across the stat cells. */
+   split "500+", "24H", "1+1" or "12+12" across the stat cells. */
 function StatFigure({ value, suffix = "", duration = 1200 }) {
   const ref = useRef(null);
   const [text, setText] = useState(`${value}${suffix}`);
@@ -430,8 +430,11 @@ function HomeSection({ onNav }) {
             <div className="visio-kicker muted">זמן אספקה</div>
           </div>
           <div className="visio-stat">
-            <div className="visio-stat-num"><StatFigure value={100} suffix="%" duration={1200} /></div>
-            <div className="visio-kicker muted">לקוחות מרוצים</div>
+            <div className="visio-stat-num visio-stat-video">
+              <span className="visio-stat-figure" dir="ltr" style={{ unicodeBidi: "isolate" }}>1+1</span>
+              <span className="visio-stat-word">סרטון</span>
+            </div>
+            <div className="visio-kicker muted">ממותג וללא מיתוג</div>
           </div>
           <div className="visio-stat">
             <div className="visio-stat-num"><span className="visio-stat-figure" dir="ltr" style={{ unicodeBidi: "isolate" }}>12+12</span></div>
