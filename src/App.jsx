@@ -319,20 +319,26 @@ function PortfolioFilter({ value, onChange }) {
 }
 
 const PARTNERS = [
-  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 600, height: 266 },
-  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 600, height: 364 },
-  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 461, height: 421 },
-  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 600, height: 743 },
+  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 1200, height: 528 },
+  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 1200, height: 725 },
+  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 1200, height: 1093 },
+  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 1200, height: 1536 },
 ];
 
 function PartnerLogos() {
+  const set = (copy) => PARTNERS.map((p) => (
+    <div key={`${p.id}-${copy}`} className={`visio-partner tone-${p.id}`} aria-hidden={copy === "b" ? "true" : undefined}>
+      <div className="visio-partner-card">
+        <img src={p.src} alt={copy === "b" ? "" : p.alt} width={p.width} height={p.height} draggable="false" />
+      </div>
+    </div>
+  ));
   return (
-    <div className="visio-partners">
-      {PARTNERS.map((p) => (
-        <div key={p.id} className="visio-partner">
-          <img src={p.src} alt={p.alt} width={p.width} height={p.height} />
-        </div>
-      ))}
+    <div className="visio-partners" aria-label="שותפים עסקיים">
+      <div className="visio-partner-track">
+        {set("a")}
+        {set("b")}
+      </div>
     </div>
   );
 }

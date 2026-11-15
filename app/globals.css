@@ -381,15 +381,113 @@ button:hover { opacity: 0.85; }
 .visio-about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-rule); border-bottom: 1px solid var(--pub-rule); margin-bottom: 48px; }
 .visio-about-grid > div { background: var(--pub-bg); padding: 28px 24px; min-width: 0; overflow-wrap: break-word; }
 .visio-about-num { font-family: var(--pub-display); font-size: 32px; color: var(--pub-ink); margin-bottom: 10px; }
-.visio-partners { display: flex; direction: rtl; justify-content: center; align-items: center; gap: clamp(48px, 6vw, 104px); padding: 40px clamp(24px, 4vw, 56px); background: #111; }
-.visio-partner { display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0; }
-.visio-partner img { height: 64px; width: auto; max-width: 200px; object-fit: contain; opacity: 0.9; transition: opacity .25s ease; }
-.visio-partner img:hover { opacity: 1; }
-@media (max-width: 768px) {
-  .visio-partners { display: grid; grid-template-columns: 1fr 1fr; justify-items: center; gap: 32px 20px; max-width: 420px; margin-inline: auto; padding: 32px 20px; }
-  .visio-partner img { height: 56px; max-width: 148px; }
+.visio-partners {
+  overflow: hidden;
+  background: transparent;
+  padding: 28px 0 36px;
+  perspective: 900px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
-@media (prefers-reduced-motion: reduce) { .visio-partner img { transition: none; } }
+.visio-partner-track {
+  display: flex;
+  direction: rtl;
+  align-items: center;
+  width: max-content;
+  animation: visio-partner-marquee 36s linear infinite;
+  will-change: transform;
+}
+.visio-partners:hover .visio-partner-track,
+.visio-partners:focus-within .visio-partner-track { animation-play-state: paused; }
+.visio-partner {
+  flex: 0 0 auto;
+  margin-inline: 11px;
+  animation: visio-partner-float 5.2s ease-in-out infinite;
+  will-change: transform;
+}
+.visio-partner:nth-child(4n + 2) { animation-delay: .7s; }
+.visio-partner:nth-child(4n + 3) { animation-delay: 1.4s; }
+.visio-partner:nth-child(4n + 4) { animation-delay: 2.1s; }
+.visio-partner-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 124px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #2c2c2c 0%, #161616 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .2) inset,
+    0 16px 28px rgba(17, 17, 17, .16),
+    0 2px 6px rgba(17, 17, 17, .08);
+  transform: rotateX(7deg) rotateY(-9deg);
+  transform-style: preserve-3d;
+  transition: transform .45s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.visio-partner:hover .visio-partner-card,
+.visio-partner:focus-within .visio-partner-card,
+.visio-partner:active .visio-partner-card {
+  transform: rotateX(3deg) rotateY(8deg) translateZ(14px);
+}
+.visio-partner img {
+  width: auto;
+  height: 78px;
+  max-width: 184px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+.visio-partner.tone-gabay .visio-partner-card { padding: 8px 10px; }
+.visio-partner.tone-gabay img { height: 108px; max-width: 200px; }
+[data-theme="dark"] .visio-partner-card {
+  background: linear-gradient(180deg, #3a3a3a 0%, #222 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .14) inset,
+    0 18px 34px rgba(0, 0, 0, .5);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .visio-partner-card {
+    background: linear-gradient(180deg, #3a3a3a 0%, #222 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, .14) inset,
+      0 18px 34px rgba(0, 0, 0, .5);
+  }
+}
+@media (max-width: 768px) {
+  .visio-partner { margin-inline: 7px; }
+  .visio-partner-card { width: 168px; height: 100px; padding: 12px 12px; border-radius: 16px; }
+  .visio-partner img { height: 62px; max-width: 142px; }
+  .visio-partner.tone-gabay .visio-partner-card { padding: 6px 8px; }
+  .visio-partner.tone-gabay img { height: 88px; max-width: 152px; }
+}
+@keyframes visio-partner-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes visio-partner-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visio-partners { overflow: visible; perspective: none; -webkit-mask-image: none; mask-image: none; }
+  .visio-partner-track {
+    animation: none;
+    transform: none;
+    width: 100%;
+    max-width: 980px;
+    margin-inline: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .visio-partner { animation: none; }
+  .visio-partner[aria-hidden="true"] { display: none; }
+  .visio-partner-card,
+  .visio-partner:hover .visio-partner-card,
+  .visio-partner:active .visio-partner-card { transform: none; transition: none; }
+}
 .visio-public .visio-cta .visio-cta-btn { background: #111111; color: #ffffff; border-color: #111111; }
 [data-theme="dark"] .visio-public .visio-cta .visio-cta-btn { background: #f4f4f4; color: #111111; border-color: #f4f4f4; }
 .visio-public .visio-cta .visio-cta-btn:hover { opacity: 1; }
