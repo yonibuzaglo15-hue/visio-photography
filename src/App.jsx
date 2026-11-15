@@ -319,11 +319,23 @@ function PortfolioFilter({ value, onChange }) {
 }
 
 const PARTNERS = [
-  { id: "remax", name: "RE/MAX", sub: "ישראל", desc: "רשת התיווך הגדולה בעולם" },
-  { id: "rehouse", name: "ReHouse", sub: 'נדל"ן', desc: 'חברת נדל"ן בוטיק' },
-  { id: "lbd", name: "L.B.D", sub: "Real Estate", desc: "נדל״ן יוקרה" },
-  { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
+  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 600, height: 266 },
+  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 600, height: 364 },
+  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 461, height: 421 },
+  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 600, height: 743 },
 ];
+
+function PartnerLogos() {
+  return (
+    <div className="visio-partners">
+      {PARTNERS.map((p) => (
+        <div key={p.id} className="visio-partner">
+          <img src={p.src} alt={p.alt} width={p.width} height={p.height} />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // Current offer (prices before VAT). `id` is what the booking form sends (kept stable for the backend).
 const PACKAGES = [
@@ -424,14 +436,7 @@ function HomeSection({ onNav }) {
 
       <section className="visio-section visio-partner-section" style={{ textAlign: "center" }} data-sc-in>
         <div className="visio-kicker muted" style={{ marginBottom: 36 }}>שותפים עסקיים</div>
-        <div className="visio-partners">
-          {PARTNERS.map(p => (
-            <div key={p.id} className="visio-partner">
-              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div className="visio-credit" style={{ marginTop: 8 }}><Bidi>{p.sub}</Bidi></div>
-            </div>
-          ))}
-        </div>
+        <PartnerLogos />
       </section>
 
       <section className="visio-section visio-wrap visio-cta" style={{ textAlign: "center", borderTop: `1px solid ${C.rule}` }} data-sc-in>
@@ -1029,13 +1034,8 @@ function AboutSection({ onNav }) {
         </div>
 
         <div className="visio-rule-head"><span className="visio-kicker">שותפים עסקיים</span></div>
-        <div className="visio-partners" style={{ marginBottom: 48 }}>
-          {PARTNERS.map(p => (
-            <div key={p.id} style={{ textAlign: "center" }}>
-              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div className="visio-copy" style={{ marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
-            </div>
-          ))}
+        <div style={{ marginBottom: 48 }}>
+          <PartnerLogos />
         </div>
 
         <div style={{ textAlign: "center" }}>
