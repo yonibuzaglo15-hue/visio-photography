@@ -326,13 +326,17 @@ const PARTNERS = [
 ];
 
 function PartnerLogos() {
-  const set = (copy) => PARTNERS.map((p) => (
-    <div key={`${p.id}-${copy}`} className={`visio-partner tone-${p.id}`} aria-hidden={copy === "b" ? "true" : undefined}>
-      <div className="visio-partner-card">
-        <img src={p.src} alt={copy === "b" ? "" : p.alt} width={p.width} height={p.height} draggable="false" />
-      </div>
+  const set = (copy) => (
+    <div className="visio-partner-set" aria-hidden={copy === "b" ? "true" : undefined}>
+      {PARTNERS.map((p) => (
+        <div key={`${p.id}-${copy}`} className={`visio-partner tone-${p.id}`}>
+          <div className="visio-partner-card">
+            <img src={p.src} alt={copy === "b" ? "" : p.alt} width={p.width} height={p.height} draggable="false" />
+          </div>
+        </div>
+      ))}
     </div>
-  ));
+  );
   return (
     <div className="visio-partners" aria-label="שותפים עסקיים">
       <div className="visio-partner-track">
