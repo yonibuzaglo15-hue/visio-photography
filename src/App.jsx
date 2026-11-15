@@ -373,7 +373,7 @@ function HomeSection({ onNav }) {
               <span><span>בצילום שמוכר.</span></span>
             </h1>
             <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
-            <div className="visio-cover-btns" data-sc-cue="0.28 0.78 0.35 0">
+            <div className="visio-cover-btns" data-sc-cue="0 0.78 0 0">
               <button className="visio-btn on-image" onClick={() => onNav("booking")}>הזמן צילום עכשיו</button>
               <button className="visio-btn on-image outline" onClick={() => onNav("portfolio")}>צפה בעבודות</button>
             </div>
@@ -665,7 +665,7 @@ function PricingSection({ onNav }) {
   return (
     <>
       <DroneFloors packages={PACKAGES} onNav={onNav} showVat={showVat} formatPrice={p} />
-      <section className="visio-section" aria-label="חבילות ומחירים">
+      <section id="pricing" className="visio-section" aria-label="חבילות ומחירים">
       {/* VAT toggle */}
       <div className="visio-switch">
         <span className="visio-credit" style={{ color: showVat ? C.muted : C.ink }}>ללא מע״מ</span>

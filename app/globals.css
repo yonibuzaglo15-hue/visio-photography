@@ -743,6 +743,11 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
 }
 .visio-hero-copy .visio-cover-sub { margin: 0 0 22px; max-width: none; }
 .visio-hero-copy .visio-cover-btns { justify-content: flex-start; }
+/* Present from the first pixel. A delayed cue leaves the first screen with no action. */
+.visio-hero-copy .visio-cover-btns {
+  opacity: 1 !important;
+  transform: none !important;
+}
 .visio-expose {
   position: absolute;
   z-index: 6;
@@ -1150,7 +1155,7 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
   .visio-filter-btn {
     min-height: 44px;
     min-width: 44px;
-    font-size: 14px;
+    font-size: 16px;
     letter-spacing: 0.06em;
     padding: 10px 14px;
   }
@@ -1225,6 +1230,10 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
     transform: none;
   }
   .nav-drawer {
+    width: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
     padding-top: calc(120px + env(safe-area-inset-top));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }

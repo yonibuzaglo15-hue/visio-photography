@@ -447,7 +447,7 @@ export default function DroneFloors({ packages, onNav, showVat, formatPrice }) {
   const cards = reduced ? packages : (pkg ? [pkg] : []);
 
   return (
-    <section id="pricing" className={`visio-drone-act${reduced ? " is-reduced" : ""}`} ref={actRef} aria-label="חבילות ומחירים">
+    <section className={`visio-drone-act${reduced ? " is-reduced" : ""}`} ref={actRef} aria-label="עליית רחפן">
       <div className="visio-drone-live">
         <div className="visio-drone-stage">
           <img className="visio-drone-poster" src="/drone/poster.webp" alt="" />
