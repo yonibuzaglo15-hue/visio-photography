@@ -236,6 +236,7 @@ export default function TourViewer({ tour }) {
           <a className="visio-tour-brand" href="/">VISIO</a>
           <h1 className="visio-tour-title">{heading}</h1>
           <div className="visio-tour-room">{room}</div>
+          <a className="visio-tour-alt" href="/#portfolio">גלריית תמונות</a>
         </div>
         <div className="visio-tour-ctl" dir="ltr">
           <button

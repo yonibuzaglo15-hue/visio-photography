@@ -5,11 +5,72 @@ import { createJob } from "@/lib/pipeline/store.js";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const MAX_FILE = 8 * 1024 * 1024;
+
+async function readUpload(value) {
+  if (!value || typeof value === "string" || typeof value.arrayBuffer !== "function") return null;
+  if (!value.size) return null;
+  if (value.size > MAX_FILE) {
+    const error = new Error("הקובץ גדול מדי");
+    error.status = 400;
+    throw error;
+  }
+  return {
+    filename: value.name || "upload",
+    type: value.type || "application/octet-stream",
+    buffer: Buffer.from(await value.arrayBuffer()),
+  };
+}
+
+async function readBooking(request) {
+  const contentType = request.headers.get("content-type") || "";
+  if (contentType.includes("multipart/form-data")) {
+    const form = await request.formData();
+    const field = (key) => {
+      const value = form.get(key);
+      return typeof value === "string" ? value : "";
+    };
+    return {
+      name: field("name"),
+      phone: field("phone"),
+      address: field("address"),
+      pkg: field("pkg"),
+      date: field("date"),
+      time: field("time"),
+      notes: field("notes"),
+      bookingRef: field("bookingRef"),
+      agentPhone: field("agentPhone"),
+      logo: await readUpload(form.get("logo")),
+      agentPhoto: await readUpload(form.get("agentPhoto")),
+    };
+  }
+  const body = await request.json();
+  return {
+    name: body.name || "",
+    phone: body.phone || "",
+    address: body.address || "",
+    pkg: body.pkg || "",
+    date: body.date || "",
+    time: body.time || "",
+    notes: body.notes || "",
+    bookingRef: body.bookingRef || "",
+    agentPhone: body.agentPhone || "",
+    logo: null,
+    agentPhoto: null,
+  };
+}
+
 export async function POST(request) {
-  const { name, phone, address, pkg, date, time, notes, bookingRef } = await request.json();
+  let booking;
+  try {
+    booking = await readBooking(request);
+  } catch (err) {
+    return NextResponse.json({ success: false, error: err.message || "בקשה לא תקינה" }, { status: err.status || 400 });
+  }
+  const { name, phone, address, pkg, date, time, notes, bookingRef, agentPhone, logo, agentPhoto } = booking;
 
   if (!name || !phone) {
-    return NextResponse.json({ error: "שם וטלפון נדרשים" }, { status: 400 });
+    return NextResponse.json({ success: false, error: "שם וטלפון נדרשים" }, { status: 400 });
   }
 
   const ref = bookingRef || `booking-${Date.now()}`;
@@ -24,6 +85,9 @@ export async function POST(request) {
       time: time || "",
       notes: notes || "",
       bookingRef: ref,
+      agentPhone: agentPhone || "",
+      logo,
+      agentPhoto,
     });
 
     // Create pipeline job server-side (create-job API is admin-only).
@@ -58,15 +122,24 @@ export async function POST(request) {
             pkg: pkg || "SIGNATURE",
           },
           notes: notes || "",
+          branding: {
+            agentPhone: agentPhone || "",
+            logoFilename: logo?.filename || "",
+            agentPhotoFilename: agentPhoto?.filename || "",
+          },
         },
       });
     } catch (jobErr) {
       console.error("book-appointment createJob:", jobErr.message);
     }
 
+    const delivered = Boolean(results.calendar || results.email);
+    if (!delivered) {
+      return NextResponse.json({ success: false, error: results.error || "השליחה נכשלה" }, { status: 502 });
+    }
     return NextResponse.json({ success: true, jobId: job?.id || null, ...results });
   } catch (err) {
     console.error("book-appointment error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
