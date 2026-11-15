@@ -31,7 +31,7 @@ const VAT = 0.18;
 // are isolated so neighbouring Hebrew punctuation and word order don't flip.
 const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
 
-// Pricing copy also isolates number runs (12+12, ₪40) so they never reorder neighbouring Hebrew.
+// Pricing copy also isolates number runs (12+12, ₪50) so they never reorder neighbouring Hebrew.
 const LATIN_OR_NUM_RUN = /₪?\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*|₪?\d+(?:\+\d+)?/g;
 function Bidi({ children: text, numbers = false }) {
   const parts = [];
@@ -319,11 +319,23 @@ function PortfolioFilter({ value, onChange }) {
 }
 
 const PARTNERS = [
-  { id: "remax", name: "RE/MAX", sub: "ישראל", desc: "רשת התיווך הגדולה בעולם" },
-  { id: "rehouse", name: "ReHouse", sub: 'נדל"ן', desc: 'חברת נדל"ן בוטיק' },
-  { id: "lbd", name: "L.B.D", sub: "Real Estate", desc: "נדל״ן יוקרה" },
-  { id: "agn", name: "א.ג.ן", sub: 'נדל"ן', desc: "סוכנות נדל״ן מובילה" },
+  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 600, height: 266 },
+  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 600, height: 364 },
+  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 461, height: 421 },
+  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 600, height: 743 },
 ];
+
+function PartnerLogos() {
+  return (
+    <div className="visio-partners">
+      {PARTNERS.map((p) => (
+        <div key={p.id} className="visio-partner">
+          <img src={p.src} alt={p.alt} width={p.width} height={p.height} />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // Current offer (prices before VAT). `id` is what the booking form sends (kept stable for the backend).
 const PACKAGES = [
@@ -333,7 +345,7 @@ const PACKAGES = [
     desc: "תמונות שמוכרות וסרטון שמספר: 12+12 תמונות ממותגות וסרטון שיווק שמציג את הנכס בתנועה, מוכן לרשתות ולמודעות." },
   { id: "FULL", tier: "signature", name: "VISIO Signature", price: 450, recommended: true,
     desc: "החבילה המלאה: 12+12 תמונות ממותגות, סרטון שיווק, צילומי רחפן DJI וסיור וירטואלי תלת-מימדי שמאפשר לקונים להתהלך בנכס מהבית.",
-    note: "הסיור כרוך במנוי חודשי של ₪40" },
+    note: "הסיור כרוך במנוי חודשי של ₪50" },
   { id: "INSTAGRAM", tier: "social", name: "VISIO Social", price: 120, unit: "לשעת עבודה",
     desc: "שיווק תוכן אורגני לאינסטגרם, בהתאמה אישית לסוכן או למשרד.",
     note: "רחפן בתוספת תשלום" },
@@ -424,14 +436,7 @@ function HomeSection({ onNav }) {
 
       <section className="visio-section visio-partner-section" style={{ textAlign: "center" }} data-sc-in>
         <div className="visio-kicker muted" style={{ marginBottom: 36 }}>שותפים עסקיים</div>
-        <div className="visio-partners">
-          {PARTNERS.map(p => (
-            <div key={p.id} className="visio-partner">
-              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div className="visio-credit" style={{ marginTop: 8 }}><Bidi>{p.sub}</Bidi></div>
-            </div>
-          ))}
-        </div>
+        <PartnerLogos />
       </section>
 
       <section className="visio-section visio-wrap visio-cta" style={{ textAlign: "center", borderTop: `1px solid ${C.rule}` }} data-sc-in>
@@ -972,7 +977,7 @@ function CharterSection() {
     { title: "אספקה", body: "כל הצילומים יסופקו ב-Google Drive תוך 24-48 שעות מהצילום." },
     { title: "שימוש", body: "הלקוח רשאי להשתמש בתמונות לצרכי שיווק הנכס בלבד." },
     { title: "פרטיות", body: "VISIO שומרת את הזכות לפרסם עבודות לצרכי תיק עבודות, אלא אם התבקשה אחרת." },
-    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪40 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
+    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪50 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
     { title: "אחריות", body: "VISIO אחראית לאיכות הצילום ולעמידה בלוחות הזמנים שסוכמו. שינויים לאחר הגשה ייגבו תוספת." },
     { title: "קניין רוחני", body: "כל זכויות היוצרים על התמונות והסרטונים שייכות ל-VISIO. הלקוח מקבל רישיון שימוש בלתי בלעדי." },
   ];
@@ -1029,13 +1034,8 @@ function AboutSection({ onNav }) {
         </div>
 
         <div className="visio-rule-head"><span className="visio-kicker">שותפים עסקיים</span></div>
-        <div className="visio-partners" style={{ marginBottom: 48 }}>
-          {PARTNERS.map(p => (
-            <div key={p.id} style={{ textAlign: "center" }}>
-              <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div className="visio-copy" style={{ marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
-            </div>
-          ))}
+        <div style={{ marginBottom: 48 }}>
+          <PartnerLogos />
         </div>
 
         <div style={{ textAlign: "center" }}>
