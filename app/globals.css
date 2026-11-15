@@ -1108,9 +1108,22 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 
 .visio-copy { font-size: 14px; line-height: 1.55; color: var(--pub-muted); }
 .visio-copy-soft { margin-top: 3px; }
-.visio-check-row {
+.visio-removal { margin: 36px auto 0; max-width: 720px; text-align: center; }
+.visio-removal a { color: var(--pub-ink); }
+.visio-fieldset { border: 0; margin: 8px 0 0; padding: 0; }
+.visio-choice { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.visio-choice label {
   display: flex;
   align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 16px;
+  color: var(--pub-text);
+}
+.visio-consent-input { width: 22px; height: 22px; margin: 4px 0 0; flex-shrink: 0; accent-color: var(--pub-ink); }
+.visio-check-row {
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
   width: 100%;
   min-height: 44px;

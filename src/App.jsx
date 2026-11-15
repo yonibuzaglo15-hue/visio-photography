@@ -7,6 +7,8 @@ import ThemeToggle from "./theme/ThemeToggle.jsx";
 import { useScrollCraft } from "./scroll/useScrollCraft.js";
 import DroneFloors from "./scroll/DroneFloors.jsx";
 import LampLobby from "./scroll/LampLobby.jsx";
+import { CUSTOMER_TYPES, OWNER_CONSENT_TEXT } from "../lib/booking-consent.js";
+import { PUBLIC_TERMS } from "./legal/terms.js";
 const PROPERTY_IMAGES = {
   1: { hero: "/home/1/hero.webp", gallery: ["/home/1/01.webp"] },
   2: { hero: "/home/2/hero.webp", gallery: ["/home/2/01.webp"] },
@@ -67,7 +69,7 @@ function StoryImage({ id, title, eager = false }) {
 }
 
 /* Full figure, including the suffix, lives in one LTR isolate so RTL cannot
-   split "500+", "24H", "100%" or "12+12" across the stat cells. */
+   split "500+", "24–48", "100%" or "12+12" across the stat cells. */
 function StatFigure({ value, suffix = "", duration = 1200 }) {
   const ref = useRef(null);
   const [text, setText] = useState(`${value}${suffix}`);
@@ -431,7 +433,7 @@ function HomeSection({ onNav }) {
 
       <section className="visio-section visio-wrap visio-cta" style={{ textAlign: "center", borderTop: `1px solid ${C.rule}` }} data-sc-in>
         <h2 className="visio-section-title">מוכן לשדרג את הנכס שלך?</h2>
-        <p className="visio-section-sub" style={{ marginBottom: 28 }}>קבל הצעת מחיר תוך 24 שעות · ללא התחייבות</p>
+        <p className="visio-section-sub" style={{ marginBottom: 28 }}>קבל הצעת מחיר תוך 24 עד 48 שעות · ללא התחייבות</p>
         <button className="visio-btn visio-cta-btn" onClick={() => onNav("booking")}>צרו קשר</button>
       </section>
     </>
@@ -553,9 +555,9 @@ function PortfolioSection() {
                   className="visio-btn on-image"
                   href={tourHref}
                   style={{ textDecoration: "none" }}
-                  {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                  {...(p.tour ? {} : { target: "_blank", rel: "noopener noreferrer", "aria-label": "סיור וירטואלי 3D, אתר חיצוני" })}
                 >
-                  ▶ סיור וירטואלי 3D
+                  {p.tour ? "▶ סיור וירטואלי 3D" : "▶ סיור וירטואלי 3D · אתר חיצוני"}
                 </a>
               )}
               {gallery.length > 0 && (
@@ -574,9 +576,9 @@ function PortfolioSection() {
                 className="visio-btn"
                 href={tourHref}
                 style={{ textDecoration: "none" }}
-                {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                {...(p.tour ? {} : { target: "_blank", rel: "noopener noreferrer", "aria-label": "סיור וירטואלי, אתר חיצוני" })}
               >
-                סיור וירטואלי
+                {p.tour ? "סיור וירטואלי" : "סיור וירטואלי · אתר חיצוני"}
               </a>
             )}
             {gallery.length > 0 && (
@@ -647,6 +649,11 @@ function PortfolioSection() {
           {shown.map(renderCard)}
         </div>
       )}
+      <p className="visio-copy visio-removal">
+        בעל נכס שמבקש להסיר את הנכס מתיק העבודות מוזמן לפנות בוואטסאפ{" "}
+        <a href="https://wa.me/972533523379">053-352-3379</a>
+        {" "}או ל-<a href="mailto:yoni@visioisrael.com">yoni@visioisrael.com</a>. נסיר בתוך 7 ימים.
+      </p>
     </section>
 </>
   );
@@ -707,6 +714,8 @@ function BookingSection() {
   const [selSlot, setSelSlot] = useState(null);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "FULL", notes: "" });
+  const [customerType, setCustomerType] = useState("");
+  const [ownerConsent, setOwnerConsent] = useState(false);
   const [done, setDone] = useState(false);
   const [wm, setWm] = useState({ agentPhone: "", logoFile: null, logoUrl: null, agentPhotoFile: null, agentPhotoUrl: null, wantAgentPhoto: false });
   const logoRef = useRef(null);
@@ -744,6 +753,8 @@ function BookingSection() {
     body.append("time", selSlot || "");
     body.append("notes", form.notes);
     body.append("agentPhone", wm.agentPhone || "");
+    body.append("customerType", customerType);
+    body.append("ownerConsent", ownerConsent ? "yes" : "");
     body.append("bookingRef", `booking-${Date.now()}`);
     if (wm.logoFile) body.append("logo", wm.logoFile);
     if (wm.wantAgentPhoto && wm.agentPhotoFile) body.append("agentPhoto", wm.agentPhotoFile);
@@ -770,10 +781,18 @@ function BookingSection() {
 
   const handleSubmitBooking = () => {
     if (!form.name || !form.phone || !form.address || !selDate || !selSlot) return;
+    if (customerType !== "business" && customerType !== "private") {
+      setSubmitError("יש לבחור אם המזמין עוסק או לקוח פרטי");
+      return;
+    }
+    if (!ownerConsent) {
+      setSubmitError("יש לאשר את הסכמת בעל הנכס");
+      return;
+    }
     completeBooking();
   };
 
-  const formIncomplete = !form.name || !form.phone || !form.address;
+  const formIncomplete = !form.name || !form.phone || !form.address || !customerType || !ownerConsent;
 
   if (done) return (
     <section className="visio-section" style={{ textAlign: "center" }}>
@@ -791,7 +810,7 @@ function BookingSection() {
           </div>
         ))}
       </div>
-      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); }}>
+      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); setCustomerType(""); setOwnerConsent(false); }}>
         ← קביעת צילום נוסף
       </button>
     </section>
@@ -918,7 +937,7 @@ function BookingSection() {
               </div>
             ))}
           </div>
-          <div className="visio-form-body">
+          <form className="visio-form-body" onSubmit={(event) => { event.preventDefault(); handleSubmitBooking(); }}>
             <h2 id="booking-step-form" className="visio-panel-title" tabIndex={-1}>פרטים</h2>
             {/* Package select */}
             <div>
@@ -1016,24 +1035,55 @@ function BookingSection() {
             </div>
 
             {(!selDate || !selSlot) && <div className="visio-notice">← גלול למעלה ובחר תאריך ושעה</div>}
-            {selDate && selSlot && formIncomplete && <div id="booking-missing" className="visio-notice" role="alert">מלא שם, טלפון וכתובת הנכס</div>}
+            {selDate && selSlot && formIncomplete && <div id="booking-missing" className="visio-notice" role="alert">מלאו שם, טלפון, כתובת, סוג מזמין והסכמת בעל הנכס</div>}
+            <fieldset className="visio-fieldset">
+              <legend className="visio-label">סוג המזמין *</legend>
+              <div className="visio-choice">
+                {Object.entries(CUSTOMER_TYPES).map(([value, label]) => (
+                  <label key={value} htmlFor={`booking-customer-${value}`}>
+                    <input
+                      id={`booking-customer-${value}`}
+                      type="radio"
+                      name="customerType"
+                      value={value}
+                      required
+                      checked={customerType === value}
+                      onChange={() => setCustomerType(value)}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             <p className="visio-copy">
               הפרטים שתמסור ישמשו לתיאום הצילום ולמתן השירות בלבד, ויישמרו אצל ספקי השירות שלנו (יומן, דואר ומסרים). אינך חייב על פי דין למסור אותם, אך בלעדיהם לא נוכל לתאם את הצילום. לפרטים: <a href="/privacy">מדיניות הפרטיות</a>
             </p>
             <p className="visio-copy">
               בלחיצה על אישור ההזמנה אני מאשר שקראתי את <a href="/terms">התקנון</a>
             </p>
+            <label className="visio-check-row" htmlFor="booking-owner-consent">
+              <input
+                id="booking-owner-consent"
+                className="visio-consent-input"
+                type="checkbox"
+                required
+                aria-required="true"
+                checked={ownerConsent}
+                onChange={(event) => setOwnerConsent(event.target.checked)}
+              />
+              <span className="visio-copy" style={{ color: C.text }}>{OWNER_CONSENT_TEXT}</span>
+            </label>
             {submitError && (
               <div id="booking-form-error" className="visio-notice" role="alert">
                 {submitError}{" "}
                 <a href="https://wa.me/972533523379">וואטסאפ</a>
               </div>
             )}
-            <button className="visio-btn block" onClick={handleSubmitBooking} disabled={bookingLoading}
+            <button className="visio-btn block" type="submit" disabled={bookingLoading}
               style={{ cursor: bookingLoading ? "wait" : "pointer", opacity: (formIncomplete || !selDate || !selSlot) ? 0.5 : 1 }}>
-              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : formIncomplete ? "מלא שם + טלפון + כתובת" : "אישור הזמנה →"}
+              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : formIncomplete ? "השלימו את הפרטים ואת ההסכמה" : "אישור הזמנה →"}
             </button>
-          </div>
+          </form>
         </div>
       )}
     </div>
@@ -1047,9 +1097,16 @@ function CharterSection() {
       <div data-sc-in>
         <SectionTitle sup="CHARTER" title="תנאי שירות" sub="שקיפות מלאה · תנאים ברורים" />
       </div>
-      <div className="visio-narrow" data-sc-in style={{ textAlign: "center" }}>
-        <p className="visio-copy">התקנון המלא, כולל ביטול ללקוח עסקי וללקוח פרטי, נמצא בעמוד נפרד.</p>
-        <a className="visio-btn" href="/terms" style={{ marginTop: 24, textDecoration: "none" }}>לתקנון</a>
+      <div className="visio-narrow" data-sc-in>
+        {PUBLIC_TERMS.map((term) => (
+          <section key={term.title} className="visio-term">
+            <h3 className="visio-term-title">{term.title}</h3>
+            <p>{term.body}</p>
+          </section>
+        ))}
+        <p className="visio-copy" style={{ marginTop: 24 }}>
+          אותו נוסח מופיע גם <a href="/terms">בעמוד התקנון</a>.
+        </p>
       </div>
     </section>
   );
@@ -1067,7 +1124,7 @@ function AboutSection({ onNav }) {
       <div className="visio-narrow visio-article" data-sc-in>
         <div className="visio-kicker" style={{ marginBottom: 16 }}>החזון שלנו</div>
         <p className="visio-about-lead">
-          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
+          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 עד 48 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
         </p>
       </div>
     </section>
@@ -1077,7 +1134,7 @@ function AboutSection({ onNav }) {
     <section className="visio-section">
       <div className="visio-narrow visio-article">
         <div className="visio-about-grid" data-sc-in data-sc-stagger="50">
-          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
+          {[["מהירות", "הספקה תוך 24 עד 48 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
@@ -1269,7 +1326,7 @@ export default function VisioApp() {
         <p className="visio-footer-business">VISIO – יונתן בוזגלו, עוסק מורשה 206586869, yoni@visioisrael.com, 053-352-3379</p>
         <p className="visio-footer-legal">
           <a href="https://wa.me/972533523379">וואטסאפ 053-352-3379</a>
-          <Bidi> · © 2026 VISIO – יונתן בוזגלו. כל הזכויות בתמונות, בסרטונים ובסיורים שמורות. אין להעתיק או לעשות בהם שימוש ללא אישור בכתב · </Bidi><a href="/admin/login">כניסת צוות</a>
+          {" · © 2026 VISIO – יונתן בוזגלו. כל הזכויות בתמונות, בסרטונים ובסיורים שמורות. אין להעתיק או להשתמש בהם ללא אישור בכתב"}
         </p>
       </footer>
     </div>

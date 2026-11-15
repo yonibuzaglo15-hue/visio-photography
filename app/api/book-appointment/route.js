@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { fulfillBooking } from "@/lib/fulfill-booking";
 import { createJob } from "@/lib/pipeline/store.js";
+import { parseBookingConsent } from "@/lib/booking-consent.js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,6 +41,8 @@ async function readBooking(request) {
       notes: field("notes"),
       bookingRef: field("bookingRef"),
       agentPhone: field("agentPhone"),
+      customerType: field("customerType"),
+      ownerConsent: field("ownerConsent"),
       logo: await readUpload(form.get("logo")),
       agentPhoto: await readUpload(form.get("agentPhoto")),
     };
@@ -55,6 +58,8 @@ async function readBooking(request) {
     notes: body.notes || "",
     bookingRef: body.bookingRef || "",
     agentPhone: body.agentPhone || "",
+    customerType: body.customerType || "",
+    ownerConsent: body.ownerConsent || "",
     logo: null,
     agentPhoto: null,
   };
@@ -68,6 +73,10 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: err.message || "בקשה לא תקינה" }, { status: err.status || 400 });
   }
   const { name, phone, address, pkg, date, time, notes, bookingRef, agentPhone, logo, agentPhoto } = booking;
+  const consent = parseBookingConsent(booking);
+  if (!consent.ok) {
+    return NextResponse.json({ success: false, error: consent.error }, { status: 400 });
+  }
 
   if (!name || !phone) {
     return NextResponse.json({ success: false, error: "שם וטלפון נדרשים" }, { status: 400 });
@@ -88,6 +97,10 @@ export async function POST(request) {
       agentPhone: agentPhone || "",
       logo,
       agentPhoto,
+      customerType: consent.customerType,
+      customerTypeLabel: consent.customerTypeLabel,
+      ownerConsentAt: consent.ownerConsentAt,
+      ownerConsentText: consent.ownerConsentText,
     });
 
     // Create pipeline job server-side (create-job API is admin-only).
@@ -122,6 +135,13 @@ export async function POST(request) {
             pkg: pkg || "SIGNATURE",
           },
           notes: notes || "",
+          consent: {
+            customerType: consent.customerType,
+            customerTypeLabel: consent.customerTypeLabel,
+            ownerConsent: true,
+            ownerConsentAt: consent.ownerConsentAt,
+            ownerConsentText: consent.ownerConsentText,
+          },
           branding: {
             agentPhone: agentPhone || "",
             logoFilename: logo?.filename || "",

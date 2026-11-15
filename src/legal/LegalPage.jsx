@@ -27,6 +27,7 @@ export default function LegalPage({ kicker, title, children }) {
           <a href={BUSINESS.whatsapp}>וואטסאפ {BUSINESS.phone}</a>
           {" · "}
           <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>
+          {" · © 2026 VISIO – "}{BUSINESS.name}{". כל הזכויות בתמונות, בסרטונים ובסיורים שמורות. אין להעתיק או להשתמש בהם ללא אישור בכתב"}
         </p>
       </footer>
     </div>

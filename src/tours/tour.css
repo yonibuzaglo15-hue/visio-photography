@@ -88,6 +88,14 @@ body:has(.visio-tour) {
   letter-spacing: 0;
 }
 
+.visio-tour-desc {
+  margin: 8px 0 0;
+  max-width: 40rem;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #fff;
+}
+
 .visio-tour-room {
   font-size: 13px;
   opacity: 0.85;
