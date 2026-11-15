@@ -178,7 +178,7 @@ button:hover { opacity: 0.85; }
 .visio-input { font-size: 16px; min-height: 48px; padding: 10px 14px; }
 
 /* ════════ Public site — editorial ════════ */
-.visio-public { min-height: 100vh; max-width: 100%; background: var(--pub-bg); color: var(--pub-text); font-family: var(--pub-sans); line-height: var(--pub-lh-body); direction: rtl; }
+.visio-public { min-height: 100vh; min-height: 100dvh; max-width: 100%; background: var(--pub-bg); color: var(--pub-text); font-family: var(--pub-sans); line-height: var(--pub-lh-body); direction: rtl; }
 .visio-public bdi[lang="en"], .visio-public [lang="en"][dir="ltr"] { unicode-bidi: isolate; }
 .visio-public :is(.visio-cover-title, .visio-section-title, .visio-section-sub, .visio-story-title, .visio-term-title, .visio-panel-title, .visio-pullquote) bdi[lang="en"] { font-family: var(--pub-display); }
 .visio-public .visio-theme-toggle { width: 36px; height: 36px; min-width: 36px; border-color: var(--pub-rule); color: var(--pub-ink); border-radius: 0; }
@@ -217,7 +217,7 @@ button:hover { opacity: 0.85; }
 .visio-nav-mini { display: none; background: none; border: none; cursor: pointer; font-family: var(--pub-display); font-weight: 500; font-size: 26px; letter-spacing: .04em; color: var(--pub-ink); }
 .nav-hamburger { display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--pub-ink); font-size: 22px; cursor: pointer; min-width: 44px; min-height: 44px; padding: 0; line-height: 1; }
 .nav-overlay { display: none; position: fixed; inset: 0; background: var(--pub-scrim); z-index: 150; }
-.nav-drawer { display: none; position: fixed; top: 0; right: 0; width: min(300px, 85vw); height: 100vh; background: var(--pub-bg); border-left: 1px solid var(--pub-rule); z-index: 200; flex-direction: column; padding: 24px 0; transform: translateX(100%); transition: transform .3s ease; overflow-y: auto; }
+.nav-drawer { display: none; position: fixed; top: 0; right: 0; width: min(300px, 85vw); height: 100vh; height: 100dvh; background: var(--pub-bg); border-left: 1px solid var(--pub-rule); z-index: 200; flex-direction: column; padding: 24px 0; transform: translateX(100%); transition: transform .3s ease; overflow-y: auto; overscroll-behavior: contain; }
 .nav-drawer.open { transform: translateX(0); }
 .nav-drawer-mark { font-family: var(--pub-display); font-weight: 500; font-size: 40px; letter-spacing: .04em; color: var(--pub-ink); text-align: center; padding: 0 24px 20px; border-bottom: 1px solid var(--pub-ink); margin-bottom: 8px; }
 .nav-drawer-btn { width: 100%; padding: 16px 24px; background: none; border: none; border-bottom: 1px solid var(--pub-rule); font-family: var(--pub-serif); font-size: 20px; color: var(--pub-ink); cursor: pointer; text-align: right; min-height: 52px; }
@@ -644,6 +644,7 @@ html:not(.sc-ready) .visio-public [data-sc-stagger] > * { opacity: 1; transform:
   display: block;
 }
 .visio-lamp-poster { object-fit: cover; }
+.visio-quote-stage picture { display: contents; }
 .visio-lamp-canvas { opacity: 0; }
 .visio-lamp-canvas.is-ready { opacity: 1; }
 
@@ -944,6 +945,8 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
   display: block;
 }
 .visio-drone-poster { object-fit: cover; }
+.visio-drone-canvas,
+.visio-lamp-canvas { touch-action: pan-y; }
 .visio-drone-canvas { opacity: 0; }
 .visio-drone-canvas.is-ready { opacity: 1; }
 .visio-drone-head {
@@ -1082,3 +1085,152 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 .psv-container img,
 .psv-container canvas,
 .visio-lightbox img { max-width: none; }
+
+.visio-copy { font-size: 14px; line-height: 1.55; color: var(--pub-muted); }
+.visio-copy-soft { margin-top: 3px; }
+.visio-check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  margin: 0 0 14px;
+  padding: 6px 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+}
+.visio-mobile-actions { display: none; }
+.visio-wa { display: none; }
+
+/* Phone comfort: iPhone 14 (390) and iPhone SE (375). Desktop rules stay above. */
+@media (max-width: 860px) {
+  .visio-public { font-size: 16px; overflow-x: clip; }
+  .visio-cover-sub,
+  .visio-hero-copy .visio-cover-sub,
+  .visio-price-features li,
+  .visio-price-desc,
+  .visio-price-note,
+  .visio-checklist li,
+  .visio-gear-line,
+  .visio-notice,
+  .visio-panel-foot,
+  .visio-footer-legal,
+  .visio-drone-desc,
+  .visio-drone-note,
+  .visio-drone-meta,
+  .visio-copy,
+  .visio-copy-soft {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .visio-public .visio-input,
+  .visio-public select,
+  .visio-public textarea {
+    font-size: 16px;
+  }
+  .visio-public .visio-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 8px;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+  .visio-btn { font-size: 16px; letter-spacing: 0.06em; padding: 12px 18px; }
+  .visio-public .visio-theme-toggle {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .visio-filter-btn {
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+  }
+  .visio-footer-nav { gap: 4px 8px; }
+  .visio-footer-nav button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 10px;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+  .visio-footer-legal a,
+  .visio-mail {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 4px;
+  }
+  .visio-switch-track { height: 44px; }
+  .visio-switch-track span { top: 50%; margin-top: -8px; }
+  .visio-hero-copy .visio-cover-btns {
+    margin: 0;
+    width: 100%;
+    max-width: calc(100% - 76px);
+  }
+  .visio-mobile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .visio-mobile-actions .visio-btn { width: 100%; }
+  .visio-wa {
+    display: grid;
+    place-items: center;
+    position: fixed;
+    z-index: 120;
+    width: 56px;
+    height: 56px;
+    inset-inline-end: max(16px, env(safe-area-inset-left));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    background: #128c7e;
+    color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+    text-decoration: none;
+  }
+  .visio-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .visio-booking-wrap { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .visio-hero-copy .visio-cover-title { font-size: 34px; }
+  .visio-hero-copy .visio-cover-sub { margin-bottom: 12px; }
+}
+
+@media (max-width: 768px) {
+  .visio-public { --visio-sticky: calc(60px + env(safe-area-inset-top)); }
+  .visio-nav { top: env(safe-area-inset-top); }
+  .visio-topbar-inner {
+    height: calc(48px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+  .visio-menu-open .visio-nav { z-index: 280; }
+  .visio-menu-open .nav-hamburger {
+    position: fixed;
+    z-index: 2;
+    top: calc(8px + env(safe-area-inset-top));
+    right: max(8px, env(safe-area-inset-right));
+    background: var(--pub-bg);
+    border: 1px solid var(--pub-rule);
+    transform: none;
+  }
+  .nav-drawer {
+    padding-top: calc(120px + env(safe-area-inset-top));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+  .visio-drone-card { max-height: none; overflow: visible; animation: none; }
+  .visio-drone-card-slot { max-height: none; }
+  .visio-drone-desc { -webkit-line-clamp: 1; }
+  .nav-overlay { touch-action: none; }
+  .visio-icon-btn { min-width: 44px; min-height: 44px; }
+}

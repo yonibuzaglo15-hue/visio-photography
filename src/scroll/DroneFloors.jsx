@@ -191,6 +191,8 @@ export default function DroneFloors({ packages, onNav, showVat, formatPrice }) {
       const h = Math.max(1, stage.clientHeight);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
     };
 
     const paint = () => {

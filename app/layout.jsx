@@ -8,6 +8,12 @@ export const metadata = {
   description: "צילום נדל״ן מקצועי · VISIO Photography",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="he" dir="rtl" suppressHydrationWarning>

@@ -62,6 +62,8 @@ export default function LampLobby() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(Math.max(1, stage.clientWidth) * dpr);
       canvas.height = Math.round(Math.max(1, stage.clientHeight) * dpr);
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
     };
 
     const paint = () => {
@@ -173,7 +175,10 @@ export default function LampLobby() {
     <section className="visio-quote-act" ref={actRef} aria-label="נדל״ן. בצילום שמוכר.">
       <div className="visio-lamp-live">
         <div className="visio-quote-stage">
-          <img className="visio-lamp-poster" src="/lamps/d/001.webp" alt="" />
+          <picture>
+            <source media="(max-width: 768px)" srcSet="/lamps/m/001.webp" />
+            <img className="visio-lamp-poster" src="/lamps/d/001.webp" alt="" />
+          </picture>
           <canvas ref={canvasRef} className="visio-lamp-canvas" aria-hidden="true" />
           <div className="visio-scene-scrim" aria-hidden="true" />
           <div className="visio-quote-copy">

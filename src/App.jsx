@@ -572,10 +572,30 @@ function PortfolioSection() {
           )}
         </div>
 
+        {(tourHref || gallery.length > 0) && (
+          <div className="visio-mobile-actions">
+            {tourHref && (
+              <a
+                className="visio-btn"
+                href={tourHref}
+                style={{ textDecoration: "none" }}
+                {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+              >
+                סיור וירטואלי
+              </a>
+            )}
+            {gallery.length > 0 && (
+              <button type="button" className="visio-btn outline" onClick={() => openGallery(gallery)}>
+                גלריה ({gallery.length})
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="visio-portfolio-meta">
           {p.tag && <div className="visio-kicker">{p.tag}</div>}
           <h3 className="visio-story-title">{p.title}</h3>
-          <p className="visio-story-dek" style={{ fontSize: 15 }}>{p.sub}</p>
+          <p className="visio-story-dek">{p.sub}</p>
           <div className="visio-credit">
             <Bidi>{cardTagLine(p)}</Bidi>
           </div>
@@ -752,8 +772,8 @@ function BookingSection() {
     <section className="visio-section" style={{ textAlign: "center" }}>
       <div className="visio-kicker"><Bidi>BOOKING CONFIRMED</Bidi></div>
       <h2 className="visio-section-title">הצילום נקבע ✓</h2>
-      <p style={{ fontSize: 14, color: C.muted, margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
-      <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0", fontSize: 14 }}>
+      <p className="visio-copy" style={{ margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
+      <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0" }}>
         התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
       </p>
       <div className="visio-done-grid">
@@ -827,8 +847,8 @@ function BookingSection() {
           <div className="visio-panel-head">
             <span className="visio-panel-title">בחר שעה</span>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <button className="visio-link" style={{ fontSize: 11 }} onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>← שנה</button>
-              <span style={{ fontSize: 12, color: C.ink }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
+              <button type="button" className="visio-link" onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>שנה תאריך</button>
+              <span className="visio-copy" style={{ color: C.ink }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
             </div>
           </div>
           <div className="visio-time-slots">
@@ -879,7 +899,7 @@ function BookingSection() {
             {/* Watermark section */}
             <div style={{ border: `1px solid ${C.rule}`, background: C.bg2, padding: "20px 18px" }}>
               <div className="visio-panel-title" style={{ marginBottom: 4 }}>בראנדינג על התמונות</div>
-              <div style={{ fontSize: 12, color: C.muted, marginBottom: 18 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · אופציונלי</div>
+              <div className="visio-copy" style={{ marginBottom: 18 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · אופציונלי</div>
 
               <div style={{ marginBottom: 16 }}>
                 <label className="visio-label">מספר טלפון על התמונה</label>
@@ -890,7 +910,7 @@ function BookingSection() {
                 <label className="visio-label">לוגו חברה / סוכנות</label>
                 <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("logoFile", "logoUrl", e)} />
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                  <button type="button" className="visio-btn outline" style={{ minHeight: 40, padding: "9px 18px", fontSize: 11 }} onClick={() => logoRef.current?.click()}>
+                  <button type="button" className="visio-btn outline" onClick={() => logoRef.current?.click()}>
                     {wm.logoUrl ? "← החלף לוגו" : "↑ העלה לוגו"}
                   </button>
                   {wm.logoUrl && <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -902,20 +922,20 @@ function BookingSection() {
 
               <div>
                 <label className="visio-label" style={{ marginBottom: 10 }}>תמונת גוף של הסוכן</label>
-                <div onClick={() => setWm(w => ({ ...w, wantAgentPhoto: !w.wantAgentPhoto }))} style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginBottom: 14 }}>
+                <button type="button" className="visio-check-row" onClick={() => setWm(w => ({ ...w, wantAgentPhoto: !w.wantAgentPhoto }))} aria-pressed={wm.wantAgentPhoto}>
                   <div className={`visio-checkbox${wm.wantAgentPhoto ? " checked" : ""}`}>
                     {wm.wantAgentPhoto ? "✓" : ""}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, color: C.text }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
-                    <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>הסוכן יוצב בפינה על כל תמונה</div>
+                    <div className="visio-copy" style={{ color: C.text }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
+                    <div className="visio-copy visio-copy-soft">הסוכן יוצב בפינה על כל תמונה</div>
                   </div>
-                </div>
+                </button>
 
                 {wm.wantAgentPhoto && (
                   <div style={{ padding: 16, background: C.bg, border: `1px solid ${C.rule}` }}>
                     <input ref={photoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("agentPhotoFile", "agentPhotoUrl", e)} />
-                    <button type="button" className="visio-btn outline" style={{ minHeight: 40, padding: "9px 18px", fontSize: 11 }} onClick={() => photoRef.current?.click()}>
+                    <button type="button" className="visio-btn outline" onClick={() => photoRef.current?.click()}>
                       {wm.agentPhotoUrl ? "← החלף תמונה" : "↑ העלה תמונת גוף"}
                     </button>
                     {wm.agentPhotoUrl && (
@@ -969,8 +989,8 @@ function CharterSection() {
             <p><Bidi>{t.body}</Bidi></p>
           </div>
         ))}
-        <p style={{ marginTop: 32, textAlign: "center", fontSize: 13, color: C.muted }}>
-          לשאלות ובירורים: <a href="mailto:yoni@visioisrael.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>yoni@visioisrael.com</a>
+        <p className="visio-copy" style={{ marginTop: 32, textAlign: "center" }}>
+          לשאלות ובירורים: <a className="visio-mail" href="mailto:yoni@visioisrael.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>yoni@visioisrael.com</a>
         </p>
       </div>
     </section>
@@ -1003,7 +1023,7 @@ function AboutSection({ onNav }) {
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
-              <div style={{ fontSize: 14, color: C.muted }}><Bidi>{desc}</Bidi></div>
+              <div className="visio-copy"><Bidi>{desc}</Bidi></div>
             </div>
           ))}
         </div>
@@ -1013,7 +1033,7 @@ function AboutSection({ onNav }) {
           {PARTNERS.map(p => (
             <div key={p.id} style={{ textAlign: "center" }}>
               <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
+              <div className="visio-copy" style={{ marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
             </div>
           ))}
         </div>
@@ -1047,7 +1067,21 @@ export default function VisioApp() {
   const [menuOpen, setMenuOpen] = useState(false);
   useScrollCraft();
 
+  const releaseMenuScroll = () => {
+    const body = document.body;
+    if (!body.classList.contains("visio-menu-open")) return;
+    const top = Math.abs(parseInt(body.style.top || "0", 10)) || 0;
+    body.classList.remove("visio-menu-open");
+    body.style.position = "";
+    body.style.top = "";
+    body.style.left = "";
+    body.style.right = "";
+    body.style.width = "";
+    window.scrollTo(0, top);
+  };
+
   const nav = (id) => {
+    releaseMenuScroll();
     setMenuOpen(false);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (id === "home") {
@@ -1060,6 +1094,29 @@ export default function VisioApp() {
     el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     setActive(id);
   };
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const y = window.scrollY;
+    const body = document.body;
+    body.classList.add("visio-menu-open");
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    return () => {
+      if (!body.classList.contains("visio-menu-open")) return;
+      const top = Math.abs(parseInt(body.style.top || "0", 10)) || 0;
+      body.classList.remove("visio-menu-open");
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      window.scrollTo(0, top);
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
     const ids = ["home", "portfolio", "pricing", "booking", "charter", "about"];
@@ -1098,7 +1155,7 @@ export default function VisioApp() {
       {/* ── NAVBAR ── */}
       <nav className="visio-nav">
         <div className="visio-nav-inner">
-          <button className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="תפריט">☰</button>
+          <button type="button" className="nav-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label={menuOpen ? "סגור תפריט" : "תפריט"} aria-expanded={menuOpen} aria-controls="visio-drawer">{menuOpen ? "✕" : "☰"}</button>
           <button className="visio-nav-mini" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
           <div className="nav-desktop">
             {NAV.map(n => (
@@ -1111,7 +1168,7 @@ export default function VisioApp() {
       </nav>
 
       {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
-      <aside className={`nav-drawer ${menuOpen ? "open" : ""}`}>
+      <aside id="visio-drawer" className={`nav-drawer ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
         <div className="nav-drawer-mark"><Bidi>VISIO</Bidi></div>
         {NAV.map(n => (
           <button key={n.id} className={`nav-drawer-btn ${active === n.id ? "active" : ""}`} onClick={() => nav(n.id)}>
@@ -1132,6 +1189,12 @@ export default function VisioApp() {
         <CharterSection />
         <AboutSection onNav={nav} />
       </main>
+
+      <a className="visio-wa" href="https://wa.me/972533523379" target="_blank" rel="noreferrer" aria-label="וואטסאפ 053-352-3379">
+        <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+          <path fill="currentColor" d="M12.04 2C6.58 2 2.15 6.4 2.15 11.83c0 1.74.46 3.44 1.34 4.94L2 22l5.39-1.41a10.1 10.1 0 0 0 4.65 1.12h.01c5.46 0 9.89-4.4 9.89-9.83C21.94 6.4 17.5 2 12.04 2zm5.76 14.15c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.12.1-1.81-.11-.41-.13-.95-.31-1.63-.61-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.16-1.54-1.16-2.94s.73-2.08 1-2.37c.24-.27.64-.39 1.02-.39.12 0 .23 0 .33.01.3.01.44.03.64.49.24.57.82 1.98.89 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.41.5-.14.14-.28.29-.12.56.16.27.71 1.17 1.52 1.89 1.05.93 1.93 1.22 2.2 1.36.28.14.44.12.6-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.46.21.53.32.07.12.07.68-.17 1.36z" />
+        </svg>
+      </a>
 
       {/* ── FOOTER ── */}
       <footer className="visio-footer">
