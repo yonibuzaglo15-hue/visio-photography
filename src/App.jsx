@@ -31,7 +31,7 @@ const VAT = 0.18;
 // are isolated so neighbouring Hebrew punctuation and word order don't flip.
 const LATIN_RUN = /\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*/g;
 
-// Pricing copy also isolates number runs (12+12, ₪40) so they never reorder neighbouring Hebrew.
+// Pricing copy also isolates number runs (12+12, ₪50) so they never reorder neighbouring Hebrew.
 const LATIN_OR_NUM_RUN = /₪?\d*[A-Za-z][A-Za-z0-9]*(?:[ ./&'+:-]+[A-Za-z0-9]+)*|₪?\d+(?:\+\d+)?/g;
 function Bidi({ children: text, numbers = false }) {
   const parts = [];
@@ -333,7 +333,7 @@ const PACKAGES = [
     desc: "תמונות שמוכרות וסרטון שמספר: 12+12 תמונות ממותגות וסרטון שיווק שמציג את הנכס בתנועה, מוכן לרשתות ולמודעות." },
   { id: "FULL", tier: "signature", name: "VISIO Signature", price: 450, recommended: true,
     desc: "החבילה המלאה: 12+12 תמונות ממותגות, סרטון שיווק, צילומי רחפן DJI וסיור וירטואלי תלת-מימדי שמאפשר לקונים להתהלך בנכס מהבית.",
-    note: "הסיור כרוך במנוי חודשי של ₪40" },
+    note: "הסיור כרוך במנוי חודשי של ₪50" },
   { id: "INSTAGRAM", tier: "social", name: "VISIO Social", price: 120, unit: "לשעת עבודה",
     desc: "שיווק תוכן אורגני לאינסטגרם, בהתאמה אישית לסוכן או למשרד.",
     note: "רחפן בתוספת תשלום" },
@@ -972,7 +972,7 @@ function CharterSection() {
     { title: "אספקה", body: "כל הצילומים יסופקו ב-Google Drive תוך 24-48 שעות מהצילום." },
     { title: "שימוש", body: "הלקוח רשאי להשתמש בתמונות לצרכי שיווק הנכס בלבד." },
     { title: "פרטיות", body: "VISIO שומרת את הזכות לפרסם עבודות לצרכי תיק עבודות, אלא אם התבקשה אחרת." },
-    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪40 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
+    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪50 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
     { title: "אחריות", body: "VISIO אחראית לאיכות הצילום ולעמידה בלוחות הזמנים שסוכמו. שינויים לאחר הגשה ייגבו תוספת." },
     { title: "קניין רוחני", body: "כל זכויות היוצרים על התמונות והסרטונים שייכות ל-VISIO. הלקוח מקבל רישיון שימוש בלתי בלעדי." },
   ];
