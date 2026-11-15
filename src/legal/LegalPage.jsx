@@ -1,4 +1,4 @@
-import { BUSINESS } from "./terms.js";
+import { BUSINESS, BUSINESS_LINE } from "./terms.js";
 
 export default function LegalPage({ kicker, title, children }) {
   return (
@@ -14,9 +14,7 @@ export default function LegalPage({ kicker, title, children }) {
       <footer className="visio-footer">
         <a className="visio-footer-mark" href="/" aria-label="VISIO — דף הבית">VISIO</a>
         <p className="visio-footer-tag">נדל״ן. בצילום שמוכר.</p>
-        <p className="visio-footer-business">
-          VISIO – {BUSINESS.name}, {BUSINESS.trade}, {BUSINESS.email}, {BUSINESS.phone}
-        </p>
+        <p className="visio-footer-business">{BUSINESS_LINE}</p>
         <div className="visio-footer-nav">
           <a href="/#booking">הזמן</a>
           <a href="/terms">תקנון</a>

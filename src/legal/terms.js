@@ -1,3 +1,5 @@
+import { OWNER_CONSENT_TEXT } from "../../lib/booking-consent.js";
+
 // On-site terms. The full PDF is optional: /terms shows a download only when
 // public/terms/visio-terms.pdf is present.
 export const PUBLIC_TERMS = [
@@ -15,7 +17,7 @@ export const PUBLIC_TERMS = [
   },
   {
     title: "הסכמת בעל הנכס",
-    body: "המזמין מצהיר שקיבל את הסכמת בעל הנכס והמחזיק בו לצילום, לפרסום התוצרים לשיווק הנכס, ולהטסת רחפן מעל הנכס אם הוזמן.",
+    body: OWNER_CONSENT_TEXT,
   },
   {
     title: "פרטיות",
@@ -37,8 +39,12 @@ export const PUBLIC_TERMS = [
 
 export const BUSINESS = {
   name: "יונתן בוזגלו",
+  brand: "VISIO",
   trade: "עוסק מורשה 206586869",
+  address: "החלוצים 9, אשדוד",
   email: "yoni@visioisrael.com",
   phone: "053-352-3379",
   whatsapp: "https://wa.me/972533523379",
 };
+
+export const BUSINESS_LINE = `${BUSINESS.name} (${BUSINESS.brand}), ${BUSINESS.trade}, ${BUSINESS.address}, ${BUSINESS.email}, וואטסאפ ${BUSINESS.phone}`;

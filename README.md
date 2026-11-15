@@ -22,9 +22,8 @@ public/tours/<slug>/
 
 ```json
 {
-  "title": "שבט לוי",
-  "location": "אשדוד",
-  "aliases": ["shevet-levi", "shevet-levi-11"],
+  "title": "אשדוד",
+  "location": "",
   "credit": "יונתן בוזגלו | VISIO",
   "matterportId": "Hkg7xrnXgoM",
   "firstScene": "p27",
@@ -50,10 +49,10 @@ public/tours/<slug>/
 Then, in the `PORTFOLIO` array in `src/App.jsx`, set `tour` on the property. The card button opens `/tours/<slug>` on this site. Leave `matterport` in place if you still want the original model id recorded. Cards without `tour` keep opening Matterport. A card can also set `hero` and `gallery` to stills in this folder when it has no entry in `PROPERTY_IMAGES`.
 
 ```js
-{ title: "שבט לוי · אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }
+{ title: "אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }
 ```
 
-`title` and `location` are joined in the tour header and the browser tab (`שבט לוי · אשדוד`). Optional `aliases` are extra slugs for the same folder. `/tours/shevet-levi` opens this apartment; the panoramas still load from `/tours/ashdod-apartment`. Older numbered URLs redirect here.
+`title` and `location` are joined in the tour header and the browser tab. Public captions use the neighbourhood and city, not the street. Older street-name URLs redirect to the current slug.
 
 Optional `assetBase` (`https://…`) loads panoramas and the plan from another host, such as Vercel Blob, instead of this folder. Local `pano/` files are then not required. The default is `/tours/<slug>`.
 
@@ -91,4 +90,4 @@ Pannellum 2.5.6 is vendored at `public/vendor/pannellum/` (MIT).
 
 ### This apartment
 
-`public/tours/ashdod-apartment/` is the 44-scene tour of the apartment at שבט לוי, אשדוד (Matterport `Hkg7xrnXgoM`), formerly hosted on `rehouse-tour.vercel.app`. `/tours/shevet-levi` is an alias of the same tour. The live source does not publish full-size `pNN.jpg` or a `/thumb/` directory (both 404). The player only requests `pano/<id>_m.jpg` and `pano/<id>_s.jpg`, 88 files, about 31MB, so those are what is in the repo. Hosting them here means the tour does not depend on the other Vercel project staying up, and adding the next tour is the same folder drop.
+`public/tours/ashdod-apartment/` is the 44-scene tour of an apartment in אשדוד (Matterport `Hkg7xrnXgoM`), formerly hosted on `rehouse-tour.vercel.app`. Older street-name URLs redirect here. The live source does not publish full-size `pNN.jpg` or a `/thumb/` directory (both 404). The player only requests `pano/<id>_m.jpg` and `pano/<id>_s.jpg`, 88 files, about 31MB, so those are what is in the repo. Hosting them here means the tour does not depend on the other Vercel project staying up, and adding the next tour is the same folder drop.
