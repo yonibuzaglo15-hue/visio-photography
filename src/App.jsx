@@ -679,6 +679,73 @@ function PortfolioSection() {
 function PricingSection({ onNav }) {
   const [showVat, setShowVat] = useState(false);
   const p = (base) => fmt(showVat ? base * (1 + VAT) : base);
+  const gridRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const equalize = () => {
+      const cards = [...grid.querySelectorAll(".visio-price-card")];
+      cards.forEach((card) => { card.style.minHeight = "0px"; });
+      const max = Math.max(...cards.map((card) => card.offsetHeight));
+      const next = `${Math.ceil(max)}px`;
+      cards.forEach((card) => { card.style.minHeight = next; });
+    };
+    equalize();
+    window.addEventListener("resize", equalize);
+    const fontsReady = document.fonts?.ready;
+    if (fontsReady) fontsReady.then(equalize);
+    return () => window.removeEventListener("resize", equalize);
+  }, [showVat]);
+
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const cards = [...grid.querySelectorAll(".visio-price-card")];
+    const settle = () => {
+      cards.forEach((card) => {
+        card.style.transitionDelay = "0s";
+        card.style.webkitTransitionDelay = "0s";
+      });
+      grid.classList.add("is-settled");
+    };
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      grid.classList.add("is-in");
+      settle();
+      return undefined;
+    }
+    let pending = cards.length;
+    const onEnd = (event) => {
+      if (event.propertyName !== "transform" && event.propertyName !== "-webkit-transform") return;
+      event.currentTarget.removeEventListener("transitionend", onEnd);
+      pending -= 1;
+      if (pending <= 0) settle();
+    };
+    cards.forEach((card) => card.addEventListener("transitionend", onEnd));
+    let fallback = 0;
+    const start = () => {
+      if (grid.classList.contains("is-in")) return;
+      grid.classList.add("is-in");
+      fallback = window.setTimeout(settle, 1400);
+    };
+    let observer;
+    if ("IntersectionObserver" in window) {
+      observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        start();
+        observer.disconnect();
+      }, { threshold: 0.2 });
+      observer.observe(grid);
+    } else {
+      start();
+    }
+    return () => {
+      window.clearTimeout(fallback);
+      cards.forEach((card) => card.removeEventListener("transitionend", onEnd));
+      observer?.disconnect();
+    };
+  }, []);
 
   return (
     <>
@@ -694,9 +761,9 @@ function PricingSection({ onNav }) {
       </div>
 
       {/* Cards */}
-      <div className="visio-pricing-grid" data-sc-in data-sc-stagger="70">
-        {PACKAGES.map(pkg => (
-          <div key={pkg.id} className={`visio-price-card metal-${pkg.tier}${pkg.recommended ? " featured" : ""}`} data-sc-tilt="5">
+      <div className="visio-pricing-grid" ref={gridRef}>
+        {PACKAGES.map((pkg, index) => (
+          <div key={pkg.id} className={`visio-price-card metal-${pkg.tier}${pkg.recommended ? " featured" : ""}`} style={{ "--price-i": index }}>
             {pkg.recommended && <div className="visio-badge">מומלץ</div>}
             <img className={`visio-pkg-logo metal-${pkg.tier}`} src={`/packages/visio-${pkg.tier}.svg`} alt={pkg.name} width="96" height="96" loading="lazy" />
             <div className="visio-price-name visio-price-name-en" dir="ltr">{pkg.name}</div>
