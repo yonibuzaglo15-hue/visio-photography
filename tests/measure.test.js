@@ -75,8 +75,8 @@ describe("measure projection", () => {
 
 describe("floor calibration", () => {
   it("gives חסידא and יהויכין one scale, and refuses שבט זבולון", () => {
-    const chasida = loadTour("chasida-17");
-    const yehoyakin = loadTour("yehoyakin-11");
+    const chasida = loadTour("chasida");
+    const yehoyakin = loadTour("yehoyakin");
     const zevulun = loadTour("shevet-zevulun");
     expect(chasida.measure.mode).toBe("floor");
     expect(yehoyakin.measure.mode).toBe("floor");
@@ -86,8 +86,8 @@ describe("floor calibration", () => {
   });
 
   it("lands a floor click on the neighbouring sweep", () => {
-    const tour = loadTour("chasida-17");
-    const size = jpegSize("public/tours/chasida-17/plan.jpg");
+    const tour = loadTour("chasida");
+    const size = jpegSize("public/tours/chasida/plan.jpg");
     const model = calibrateFloorModel(tour, size.width, size.height);
     const scene = tour.scenes.find((item) => item.hotspots.some((h) => h.pitch < -20 && h.pitch > -50));
     const hotspot = scene.hotspots.find((h) => h.pitch < -20 && h.pitch > -50);
@@ -103,7 +103,7 @@ describe("floor calibration", () => {
 });
 
 describe("שבט לוי surfaces", () => {
-  const tour = loadTour("shevet-levi-11");
+  const tour = loadTour("shevet-levi");
   const model = tour.measure;
   const triangles = buildWallTriangles(model.walls, -0.2, model.ceilingZ);
 

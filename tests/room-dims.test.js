@@ -103,7 +103,7 @@ describe("room dimensions", () => {
 });
 
 describe("שבט לוי automatic rooms", () => {
-  const tour = loadTour("shevet-levi-11");
+  const tour = loadTour("shevet-levi");
 
   it("has a room for the salon and a bedroom, and none invented elsewhere", () => {
     expect(tour.measure.rooms?.length).toBeGreaterThan(3);
@@ -118,8 +118,8 @@ describe("שבט לוי automatic rooms", () => {
     expect(bedroom.width).toBeGreaterThan(3);
     expect(bedroom.width).toBeLessThan(4.2);
     expect(salon.zones.join(" ")).toMatch(/סלון/);
-    expect(loadTour("chasida-17").measure.rooms).toBeUndefined();
-    expect(loadTour("yehoyakin-11").measure.rooms).toBeUndefined();
+    expect(loadTour("chasida").measure.rooms).toBeUndefined();
+    expect(loadTour("yehoyakin").measure.rooms).toBeUndefined();
     expect(loadTour("shevet-zevulun").measure).toBeNull();
   });
 });
