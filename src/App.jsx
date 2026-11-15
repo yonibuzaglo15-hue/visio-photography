@@ -67,7 +67,7 @@ function StoryImage({ id, title, eager = false }) {
 }
 
 /* Full figure, including the suffix, lives in one LTR isolate so RTL cannot
-   split "500+", "24H", "100%" or "12+12" across the stat cells. */
+   split "150+", "24H", "1+1" or "12+12" across the stat cells. */
 function StatFigure({ value, suffix = "", duration = 1200 }) {
   const ref = useRef(null);
   const [text, setText] = useState(`${value}${suffix}`);
@@ -319,20 +319,30 @@ function PortfolioFilter({ value, onChange }) {
 }
 
 const PARTNERS = [
-  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 600, height: 266 },
-  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 600, height: 364 },
-  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 461, height: 421 },
-  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 600, height: 743 },
+  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 1200, height: 528 },
+  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 1200, height: 725 },
+  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 1200, height: 1093 },
+  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 1200, height: 1536 },
 ];
 
 function PartnerLogos() {
-  return (
-    <div className="visio-partners">
+  const set = (copy) => (
+    <div className="visio-partner-set" aria-hidden={copy === "b" ? "true" : undefined}>
       {PARTNERS.map((p) => (
-        <div key={p.id} className="visio-partner">
-          <img src={p.src} alt={p.alt} width={p.width} height={p.height} />
+        <div key={`${p.id}-${copy}`} className={`visio-partner tone-${p.id}`}>
+          <div className="visio-partner-card">
+            <img src={p.src} alt={copy === "b" ? "" : p.alt} width={p.width} height={p.height} draggable="false" />
+          </div>
         </div>
       ))}
+    </div>
+  );
+  return (
+    <div className="visio-partners" aria-label="שותפים עסקיים">
+      <div className="visio-partner-track">
+        {set("a")}
+        {set("b")}
+      </div>
     </div>
   );
 }
@@ -416,7 +426,7 @@ function HomeSection({ onNav }) {
       <div className="visio-stats-wrap">
         <div className="visio-stats">
           <div className="visio-stat">
-            <div className="visio-stat-num"><StatFigure value={500} suffix="+" duration={1300} /></div>
+            <div className="visio-stat-num"><StatFigure value={150} suffix="+" duration={1300} /></div>
             <div className="visio-kicker muted">נכסים צולמו</div>
           </div>
           <div className="visio-stat">
@@ -424,8 +434,11 @@ function HomeSection({ onNav }) {
             <div className="visio-kicker muted">זמן אספקה</div>
           </div>
           <div className="visio-stat">
-            <div className="visio-stat-num"><StatFigure value={100} suffix="%" duration={1200} /></div>
-            <div className="visio-kicker muted">לקוחות מרוצים</div>
+            <div className="visio-stat-num visio-stat-video">
+              <span className="visio-stat-figure" dir="ltr" style={{ unicodeBidi: "isolate" }}>1+1</span>
+              <span className="visio-stat-word">סרטון</span>
+            </div>
+            <div className="visio-kicker muted">ממותג וללא מיתוג</div>
           </div>
           <div className="visio-stat">
             <div className="visio-stat-num"><span className="visio-stat-figure" dir="ltr" style={{ unicodeBidi: "isolate" }}>12+12</span></div>
@@ -666,6 +679,73 @@ function PortfolioSection() {
 function PricingSection({ onNav }) {
   const [showVat, setShowVat] = useState(false);
   const p = (base) => fmt(showVat ? base * (1 + VAT) : base);
+  const gridRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const equalize = () => {
+      const cards = [...grid.querySelectorAll(".visio-price-card")];
+      cards.forEach((card) => { card.style.minHeight = "0px"; });
+      const max = Math.max(...cards.map((card) => card.offsetHeight));
+      const next = `${Math.ceil(max)}px`;
+      cards.forEach((card) => { card.style.minHeight = next; });
+    };
+    equalize();
+    window.addEventListener("resize", equalize);
+    const fontsReady = document.fonts?.ready;
+    if (fontsReady) fontsReady.then(equalize);
+    return () => window.removeEventListener("resize", equalize);
+  }, [showVat]);
+
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const cards = [...grid.querySelectorAll(".visio-price-card")];
+    const settle = () => {
+      cards.forEach((card) => {
+        card.style.transitionDelay = "0s";
+        card.style.webkitTransitionDelay = "0s";
+      });
+      grid.classList.add("is-settled");
+    };
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      grid.classList.add("is-in");
+      settle();
+      return undefined;
+    }
+    let pending = cards.length;
+    const onEnd = (event) => {
+      if (event.propertyName !== "transform" && event.propertyName !== "-webkit-transform") return;
+      event.currentTarget.removeEventListener("transitionend", onEnd);
+      pending -= 1;
+      if (pending <= 0) settle();
+    };
+    cards.forEach((card) => card.addEventListener("transitionend", onEnd));
+    let fallback = 0;
+    const start = () => {
+      if (grid.classList.contains("is-in")) return;
+      grid.classList.add("is-in");
+      fallback = window.setTimeout(settle, 1400);
+    };
+    let observer;
+    if ("IntersectionObserver" in window) {
+      observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        start();
+        observer.disconnect();
+      }, { threshold: 0.2 });
+      observer.observe(grid);
+    } else {
+      start();
+    }
+    return () => {
+      window.clearTimeout(fallback);
+      cards.forEach((card) => card.removeEventListener("transitionend", onEnd));
+      observer?.disconnect();
+    };
+  }, []);
 
   return (
     <>
@@ -681,9 +761,9 @@ function PricingSection({ onNav }) {
       </div>
 
       {/* Cards */}
-      <div className="visio-pricing-grid" data-sc-in data-sc-stagger="70">
-        {PACKAGES.map(pkg => (
-          <div key={pkg.id} className={`visio-price-card metal-${pkg.tier}${pkg.recommended ? " featured" : ""}`} data-sc-tilt="5">
+      <div className="visio-pricing-grid" ref={gridRef}>
+        {PACKAGES.map((pkg, index) => (
+          <div key={pkg.id} className={`visio-price-card metal-${pkg.tier}${pkg.recommended ? " featured" : ""}`} style={{ "--price-i": index }}>
             {pkg.recommended && <div className="visio-badge">מומלץ</div>}
             <img className={`visio-pkg-logo metal-${pkg.tier}`} src={`/packages/visio-${pkg.tier}.svg`} alt={pkg.name} width="96" height="96" loading="lazy" />
             <div className="visio-price-name visio-price-name-en" dir="ltr">{pkg.name}</div>

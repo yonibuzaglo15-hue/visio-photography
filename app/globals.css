@@ -258,6 +258,8 @@ button:hover { opacity: 0.85; }
 .visio-stats-wrap { padding: 28px 20px 0; max-width: 100%; }
 .visio-stat-num { direction: ltr; unicode-bidi: isolate; font-family: var(--pub-display); font-size: clamp(36px, 5vw, 52px); line-height: 1; color: var(--pub-ink); margin-bottom: 10px; }
 .visio-stat-figure { display: inline-block; direction: ltr; unicode-bidi: isolate; white-space: nowrap; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; font-weight: 500; letter-spacing: 0; }
+.visio-stat-video { display: flex; align-items: baseline; justify-content: center; gap: 0.18em; max-width: 100%; white-space: nowrap; }
+.visio-stat-word { font-size: 0.38em; font-weight: 500; letter-spacing: 0; line-height: 1; }
 .visio-stat .visio-kicker { letter-spacing: 0.04em; text-transform: none; line-height: 1.45; overflow-wrap: anywhere; }
 
 /* ── Section titles ── */
@@ -313,9 +315,8 @@ button:hover { opacity: 0.85; }
 .visio-switch { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 40px; }
 .visio-switch-track { width: 44px; height: 24px; border: 1px solid var(--pub-ink); position: relative; cursor: pointer; background: none; padding: 0; }
 .visio-switch-track span { position: absolute; top: 3px; width: 16px; height: 16px; background: var(--pub-ink); transition: left .2s; }
-.visio-pricing-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-rule); }
+.visio-pricing-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-ink); border-bottom: 1px solid var(--pub-rule); align-items: stretch; }
 .visio-price-card { background: var(--pub-bg); padding: 40px 24px 28px; position: relative; display: flex; flex-direction: column; }
-.visio-price-card.featured { background: var(--pub-bg-2); }
 .visio-badge { position: absolute; top: 0; right: 24px; background: var(--pub-ink); color: var(--pub-on-ink); padding: 5px 12px; font-size: 10px; font-weight: 600; letter-spacing: .2em; }
 .visio-price-name { font-family: var(--pub-display); font-weight: 500; font-size: 24px; letter-spacing: .1em; color: var(--pub-ink); margin: 6px 0 18px; }
 .visio-price { font-family: var(--pub-display); font-size: 56px; line-height: 1; color: var(--pub-ink); }
@@ -381,15 +382,147 @@ button:hover { opacity: 0.85; }
 .visio-about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--pub-rule); border-top: 1px solid var(--pub-rule); border-bottom: 1px solid var(--pub-rule); margin-bottom: 48px; }
 .visio-about-grid > div { background: var(--pub-bg); padding: 28px 24px; min-width: 0; overflow-wrap: break-word; }
 .visio-about-num { font-family: var(--pub-display); font-size: 32px; color: var(--pub-ink); margin-bottom: 10px; }
-.visio-partners { display: flex; direction: rtl; justify-content: center; align-items: center; gap: clamp(48px, 6vw, 104px); padding: 40px clamp(24px, 4vw, 56px); background: #111; }
-.visio-partner { display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0; }
-.visio-partner img { height: 64px; width: auto; max-width: 200px; object-fit: contain; opacity: 0.9; transition: opacity .25s ease; }
-.visio-partner img:hover { opacity: 1; }
-@media (max-width: 768px) {
-  .visio-partners { display: grid; grid-template-columns: 1fr 1fr; justify-items: center; gap: 32px 20px; max-width: 420px; margin-inline: auto; padding: 32px 20px; }
-  .visio-partner img { height: 56px; max-width: 148px; }
+.visio-partner-section,
+.visio-partners {
+  background: var(--pub-bg);
+  background-color: var(--pub-bg);
 }
-@media (prefers-reduced-motion: reduce) { .visio-partner img { transition: none; } }
+.visio-partners {
+  direction: ltr;
+  overflow: hidden;
+  padding: 28px 0 36px;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  -webkit-perspective: 900px;
+  perspective: 900px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.visio-partner-track {
+  display: flex;
+  direction: ltr;
+  align-items: center;
+  width: max-content;
+  -webkit-animation: visio-partner-marquee 36s linear infinite;
+  animation: visio-partner-marquee 36s linear infinite;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.visio-partner-set {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-inline-end: 28px;
+}
+.visio-partners:hover .visio-partner-track,
+.visio-partners:focus-within .visio-partner-track { -webkit-animation-play-state: paused; animation-play-state: paused; }
+.visio-partner {
+  flex: 0 0 auto;
+  -webkit-animation: visio-partner-float 5.2s ease-in-out infinite;
+  animation: visio-partner-float 5.2s ease-in-out infinite;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.visio-partner:nth-child(2) { -webkit-animation-delay: .7s; animation-delay: .7s; }
+.visio-partner:nth-child(3) { -webkit-animation-delay: 1.4s; animation-delay: 1.4s; }
+.visio-partner:nth-child(4) { -webkit-animation-delay: 2.1s; animation-delay: 2.1s; }
+.visio-partner-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 124px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #1a1a1a;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .2) inset,
+    0 16px 28px rgba(17, 17, 17, .16),
+    0 2px 6px rgba(17, 17, 17, .08);
+  -webkit-transform: rotateX(7deg) rotateY(-9deg);
+  transform: rotateX(7deg) rotateY(-9deg);
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transition: -webkit-transform .45s ease;
+  transition: transform .45s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.visio-partner:hover .visio-partner-card,
+.visio-partner:focus-within .visio-partner-card,
+.visio-partner:active .visio-partner-card {
+  -webkit-transform: rotateX(3deg) rotateY(8deg) translateZ(14px);
+  transform: rotateX(3deg) rotateY(8deg) translateZ(14px);
+}
+.visio-partner img {
+  width: auto;
+  height: 78px;
+  max-width: 184px;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.visio-partner.tone-gabay .visio-partner-card { padding: 8px 10px; }
+.visio-partner.tone-gabay img { height: 108px; max-width: 200px; }
+[data-theme="dark"] .visio-partner-card,
+html[data-theme="dark"] .visio-partner-card {
+  background: var(--pub-bg);
+  box-shadow: none;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .visio-partner-card {
+    background: var(--pub-bg);
+    box-shadow: none;
+  }
+}
+@media (max-width: 768px) {
+  .visio-partner-set { gap: 16px; padding-inline-end: 16px; }
+  .visio-partner-card { width: 168px; height: 100px; padding: 12px 12px; border-radius: 16px; }
+  .visio-partner img { height: 62px; max-width: 142px; }
+  .visio-partner.tone-gabay .visio-partner-card { padding: 6px 8px; }
+  .visio-partner.tone-gabay img { height: 88px; max-width: 152px; }
+}
+@-webkit-keyframes visio-partner-marquee {
+  from { -webkit-transform: translate3d(-50%, 0, 0); }
+  to { -webkit-transform: translate3d(0, 0, 0); }
+}
+@keyframes visio-partner-marquee {
+  from { -webkit-transform: translate3d(-50%, 0, 0); transform: translate3d(-50%, 0, 0); }
+  to { -webkit-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0); }
+}
+@-webkit-keyframes visio-partner-float {
+  0%, 100% { -webkit-transform: translate3d(0, 0, 0); }
+  50% { -webkit-transform: translate3d(0, -10px, 0); }
+}
+@keyframes visio-partner-float {
+  0%, 100% { -webkit-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0); }
+  50% { -webkit-transform: translate3d(0, -10px, 0); transform: translate3d(0, -10px, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visio-partners { overflow: visible; -webkit-perspective: none; perspective: none; -webkit-mask-image: none; mask-image: none; }
+  .visio-partner-track {
+    -webkit-animation: none;
+    animation: none;
+    -webkit-transform: none;
+    transform: none;
+    width: 100%;
+    max-width: 980px;
+    margin-inline: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .visio-partner-set { padding-inline-end: 0; flex-wrap: wrap; justify-content: center; }
+  .visio-partner { -webkit-animation: none; animation: none; }
+  .visio-partner-set[aria-hidden="true"] { display: none; }
+  .visio-partner-card,
+  .visio-partner:hover .visio-partner-card,
+  .visio-partner:active .visio-partner-card { -webkit-transform: none; transform: none; -webkit-transition: none; transition: none; }
+}
 .visio-public .visio-cta .visio-cta-btn { background: #111111; color: #ffffff; border-color: #111111; }
 [data-theme="dark"] .visio-public .visio-cta .visio-cta-btn { background: #f4f4f4; color: #111111; border-color: #f4f4f4; }
 .visio-public .visio-cta .visio-cta-btn:hover { opacity: 1; }
@@ -543,6 +676,8 @@ button:hover { opacity: 0.85; }
   .visio-cover { aspect-ratio: 4 / 5; min-height: 0; max-height: 78vh; }
   .visio-feature-grid { grid-template-columns: 1fr; gap: 32px; }
   .visio-stats { grid-template-columns: repeat(2, 1fr); }
+  .visio-stat-video .visio-stat-figure { font-size: 32px; }
+  .visio-stat-word { font-size: 13px; }
   .visio-portfolio-grid { grid-template-columns: repeat(2, 1fr); gap: 40px 20px; }
   .visio-pricing-grid { grid-template-columns: 1fr; }
   .visio-time-slots { grid-template-columns: repeat(2, 1fr); }
@@ -576,19 +711,73 @@ button:hover { opacity: 0.85; }
   .visio-booking-wrap { max-width: 800px; }
 }
 
-/* ─── Package tiers: metallic emblems + accent rule (Essential silver · Motion copper · Signature gold · Social black) ─── */
-.visio-price-card { --metal: linear-gradient(90deg, #6d7279, #e9ecef 45%, #8a9097); }
-.visio-price-card.metal-motion { --metal: linear-gradient(90deg, #6a3216, #e8a77c 45%, #8f4724); }
-.visio-price-card.metal-signature { --metal: linear-gradient(90deg, #7a5517, #f6e3a1 45%, #a87b28); }
-.visio-price-card.metal-social { --metal: linear-gradient(90deg, #000, #4a4a4a 45%, #0d0d0d); }
-.visio-price-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--metal); }
+/* Package cards share one entrance, one hover, and one border. The מומלץ badge is the only Signature mark. */
+.visio-pricing-grid > .visio-price-card {
+  opacity: 0;
+  border: 1px solid var(--pub-rule);
+  border-top: 2px solid var(--pub-ink);
+  box-shadow: none;
+  -webkit-transform: translate3d(0, 16px, 0);
+  transform: translate3d(0, 16px, 0);
+  -webkit-transition:
+    opacity 700ms ease,
+    -webkit-transform 700ms ease,
+    transform 700ms ease,
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+  transition:
+    opacity 700ms ease,
+    transform 700ms ease,
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+  -webkit-transition-delay: calc(var(--price-i, 0) * 80ms);
+  transition-delay: calc(var(--price-i, 0) * 80ms);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.visio-pricing-grid.is-in > .visio-price-card,
+.visio-pricing-grid.is-settled > .visio-price-card {
+  opacity: 1;
+  -webkit-transform: none;
+  transform: none;
+}
+.visio-price-card .visio-btn {
+  -webkit-transform: none;
+  transform: none;
+  -webkit-transition: background-color 280ms ease, color 280ms ease, border-color 280ms ease, opacity 280ms ease;
+  transition: background-color 280ms ease, color 280ms ease, border-color 280ms ease, opacity 280ms ease;
+}
+.visio-price-card .visio-btn:hover,
+.visio-price-card .visio-btn:focus-visible { opacity: .92; }
+@media (hover: hover) and (pointer: fine) {
+  .visio-pricing-grid.is-settled > .visio-price-card:hover {
+    -webkit-transform: translate3d(0, -6px, 0);
+    transform: translate3d(0, -6px, 0);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .16);
+    border-color: var(--pub-ink);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visio-pricing-grid > .visio-price-card,
+  .visio-pricing-grid.is-in > .visio-price-card,
+  .visio-pricing-grid.is-settled > .visio-price-card,
+  .visio-pricing-grid.is-settled > .visio-price-card:hover {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transition: none;
+    transition: none;
+    -webkit-animation: none;
+    animation: none;
+    box-shadow: none;
+  }
+}
 .visio-price-card.featured .visio-badge { top: 2px; }
 .visio-pkg-logo { display: block; width: 96px; height: 96px; margin: 4px 0 18px; }
 .visio-price-name-en { font-family: var(--pub-display); font-size: 22px; letter-spacing: .06em; text-align: right; margin: 0 0 18px; }
 .visio-price-desc { font-size: 14px; line-height: 1.7; color: var(--pub-text); margin: 20px 0 22px; padding-top: 20px; border-top: 1px solid var(--pub-rule); text-align: right; }
 .visio-price-card .visio-price-note { margin: -8px 0 24px; }
 [data-theme="dark"] .visio-pkg-logo.metal-social { filter: drop-shadow(0 0 .6px rgba(255,255,255,.55)); }
-[data-theme="dark"] .visio-price-card.metal-social { --metal: linear-gradient(90deg, #1a1a1a, #6a6a6a 45%, #222); }
 @media (max-width: 768px) { .visio-pkg-logo { width: 84px; height: 84px; } }
 
 /* ════════════════════════════════════════════════════════════
@@ -883,8 +1072,6 @@ html:not(.sc-ready) .visio-assemble > span > span { transform: none; }
 }
 .visio-portfolio-card { animation: none; }
 .visio-portfolio-img-wrap .visio-img-label { z-index: 2; }
-
-.visio-price-card[data-sc-tilt] { transform-style: preserve-3d; }
 
 @media (max-width: 860px) {
   .visio-hero-act .visio-cover-text.visio-hero-copy { width: calc(100% - 24px); inset-inline-start: 12px; }
