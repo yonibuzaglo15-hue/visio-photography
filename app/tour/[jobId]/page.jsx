@@ -13,13 +13,14 @@ export async function generateMetadata({ params }) {
       robots: { index: false, follow: false },
     };
   }
+  const description = `${data.pageTitle}. סיור וירטואלי 360° עם מעבר בין נקודות הצילום בתוך הנכס.`;
   return {
     title: data.pageTitle,
-    description: data.pageTitle,
+    description,
     robots: { index: false, follow: false },
     openGraph: {
       title: data.pageTitle,
-      description: "סיור וירטואלי 360° — VISIO Photography",
+      description,
       type: "website",
       ...(data.ogImage
         ? { images: [{ url: data.ogImage, width: 4096, height: 2048 }] }
@@ -37,5 +38,6 @@ export default async function PublicTourPage({ params }) {
   const data = await loadPublicTour(params.jobId);
   if (!data) notFound();
 
-  return <TourViewerClient config={data.config} />;
+  const description = `${data.pageTitle}. סיור וירטואלי 360° עם מעבר בין נקודות הצילום בתוך הנכס.`;
+  return <TourViewerClient config={data.config} description={description} />;
 }

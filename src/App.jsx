@@ -7,6 +7,8 @@ import ThemeToggle from "./theme/ThemeToggle.jsx";
 import { useScrollCraft } from "./scroll/useScrollCraft.js";
 import DroneFloors from "./scroll/DroneFloors.jsx";
 import LampLobby from "./scroll/LampLobby.jsx";
+import { CUSTOMER_TYPES, OWNER_CONSENT_TEXT } from "../lib/booking-consent.js";
+import { PUBLIC_TERMS } from "./legal/terms.js";
 const PROPERTY_IMAGES = {
   1: { hero: "/home/1/hero.webp", gallery: ["/home/1/01.webp"] },
   2: { hero: "/home/2/hero.webp", gallery: ["/home/2/01.webp"] },
@@ -67,7 +69,7 @@ function StoryImage({ id, title, eager = false }) {
 }
 
 /* Full figure, including the suffix, lives in one LTR isolate so RTL cannot
-   split "500+", "24H", "100%" or "12+12" across the stat cells. */
+   split "500+", "24–48", "100%" or "12+12" across the stat cells. */
 function StatFigure({ value, suffix = "", duration = 1200 }) {
   const ref = useRef(null);
   const [text, setText] = useState(`${value}${suffix}`);
@@ -218,36 +220,36 @@ const KineticTitle = memo(function KineticTitle({ as: Tag = "h2", className, cue
 
 /* ─── DATA ─── */
 const PORTFOLIO = [
-  { id: 1, title: "וילה · אשדוד", sub: "דקר 72 · בריכה פרטית · דק עץ", city: "אשדוד", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
-  { id: 2, title: "שבט לוי 1 · אשדוד", sub: "מרפסת פינורמית · נוף ים", city: "אשדוד", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
-  { id: 3, title: "נחל שניר 21 · אשדוד", sub: "קיר שיש · פרקט אירופאי", city: "אשדוד", tag: "בוטיק", partner: "ReHouse", company: "rehouse", hero: "/portfolio/nahal-snir-21/01.jpg", gallery: ["/portfolio/nahal-snir-21/01.jpg", "/portfolio/nahal-snir-21/02.jpg", "/portfolio/nahal-snir-21/03.jpg", "/portfolio/nahal-snir-21/04.jpg", "/portfolio/nahal-snir-21/05.jpg", "/portfolio/nahal-snir-21/06.jpg", "/portfolio/nahal-snir-21/07.jpg", "/portfolio/nahal-snir-21/08.jpg", "/portfolio/nahal-snir-21/09.jpg", "/portfolio/nahal-snir-21/10.jpg"], tags: ["קיר שיש","פרקט","בוטיק"] },
-  { id: 4, title: "בלפור 7 · אשדוד", sub: "לובי יוקרה · שיש איטלקי", city: "אשדוד", tag: "לובי יוקרה", partner: "ReHouse", company: "rehouse", matterport: "9YJGFmX8KbJ", hero: "/portfolio/balfour-7/01.jpg", gallery: ["/portfolio/balfour-7/01.jpg", "/portfolio/balfour-7/02.jpg", "/portfolio/balfour-7/03.jpg", "/portfolio/balfour-7/04.jpg", "/portfolio/balfour-7/05.jpg", "/portfolio/balfour-7/06.jpg", "/portfolio/balfour-7/07.jpg", "/portfolio/balfour-7/08.jpg", "/portfolio/balfour-7/09.jpg", "/portfolio/balfour-7/10.jpg"], tags: ["לובי יוקרה","שיש"] },
-  { id: 5, title: "הפטל 17 · יבנה", sub: "גינה · פרגולה · עצי לימון", city: "יבנה", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
-  { id: 6, title: "המשוט 8 · אשדוד", sub: "גינה · שיש · סלון מרווח", city: "אשדוד", tag: "דירת גן", partner: "ReHouse", company: "rehouse", hero: "/portfolio/hamashot-8/01.jpg", gallery: ["/portfolio/hamashot-8/01.jpg", "/portfolio/hamashot-8/02.jpg", "/portfolio/hamashot-8/03.jpg", "/portfolio/hamashot-8/04.jpg", "/portfolio/hamashot-8/05.jpg", "/portfolio/hamashot-8/06.jpg", "/portfolio/hamashot-8/07.jpg", "/portfolio/hamashot-8/08.jpg", "/portfolio/hamashot-8/09.jpg"], tags: ["גינה","שיש","סלון"] },
-  { id: 7, title: "אבות ישורון 18 · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", city: "אשדוד", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
-  { id: 8, title: "קרן היסוד 43 · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", city: "אשדוד", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
-  { id: 9, title: "הגלים 11 · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", city: "אשדוד", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
-  { id: 10, title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi-11/16.jpg", gallery: ["/portfolio/shevet-levi-11/16.jpg", "/portfolio/shevet-levi-11/17.jpg", "/portfolio/shevet-levi-11/18.jpg", "/portfolio/shevet-levi-11/19.jpg", "/portfolio/shevet-levi-11/20.jpg", "/portfolio/shevet-levi-11/21.jpg", "/portfolio/shevet-levi-11/13.jpg", "/portfolio/shevet-levi-11/14.jpg", "/portfolio/shevet-levi-11/15.jpg", "/portfolio/shevet-levi-11/09.jpg", "/portfolio/shevet-levi-11/10.jpg", "/portfolio/shevet-levi-11/11.jpg", "/portfolio/shevet-levi-11/12.jpg", "/portfolio/shevet-levi-11/01.jpg", "/portfolio/shevet-levi-11/02.jpg", "/portfolio/shevet-levi-11/03.jpg", "/portfolio/shevet-levi-11/04.jpg", "/portfolio/shevet-levi-11/05.jpg", "/portfolio/shevet-levi-11/06.jpg", "/portfolio/shevet-levi-11/07.jpg", "/portfolio/shevet-levi-11/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
-  { id: 11, title: "רוטשילד 23 · אשדוד", sub: "רובע ט״ו", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/rothschild-23/01.jpg", gallery: ["/portfolio/rothschild-23/01.jpg", "/portfolio/rothschild-23/02.jpg", "/portfolio/rothschild-23/03.jpg", "/portfolio/rothschild-23/04.jpg", "/portfolio/rothschild-23/05.jpg", "/portfolio/rothschild-23/06.jpg", "/portfolio/rothschild-23/07.jpg", "/portfolio/rothschild-23/08.jpg", "/portfolio/rothschild-23/09.jpg"], tags: ["סלון","מרפסת","מטבח"] },
-  { id: 12, title: "נחל לכיש 45 · אשדוד", sub: "רובע י״א", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/nahal-lachish-45/01.jpg", gallery: ["/portfolio/nahal-lachish-45/01.jpg", "/portfolio/nahal-lachish-45/02.jpg", "/portfolio/nahal-lachish-45/03.jpg", "/portfolio/nahal-lachish-45/04.jpg", "/portfolio/nahal-lachish-45/05.jpg", "/portfolio/nahal-lachish-45/06.jpg", "/portfolio/nahal-lachish-45/07.jpg", "/portfolio/nahal-lachish-45/08.jpg", "/portfolio/nahal-lachish-45/09.jpg", "/portfolio/nahal-lachish-45/10.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
-  { id: 13, title: "יהויכין 11 · אשדוד", sub: "רובע י״ג · סלון · מרפסת · 35 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "yehoyakin-11", hero: "/portfolio/yehoyachin-11/01.jpg", gallery: ["/portfolio/yehoyachin-11/01.jpg", "/portfolio/yehoyachin-11/02.jpg", "/portfolio/yehoyachin-11/03.jpg", "/portfolio/yehoyachin-11/04.jpg", "/portfolio/yehoyachin-11/05.jpg", "/portfolio/yehoyachin-11/06.jpg", "/portfolio/yehoyachin-11/07.jpg", "/portfolio/yehoyachin-11/08.jpg", "/portfolio/yehoyachin-11/09.jpg"], tags: ["סלון","מרפסת","סיור וירטואלי 3D"] },
-  { id: 14, title: "ביאליק 46 · אשדוד", sub: "רובע ה׳", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/bialik-46/01.jpg", gallery: ["/portfolio/bialik-46/01.jpg", "/portfolio/bialik-46/02.jpg", "/portfolio/bialik-46/03.jpg", "/portfolio/bialik-46/04.jpg", "/portfolio/bialik-46/05.jpg", "/portfolio/bialik-46/06.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
-  { id: 15, title: "חסידא 17 · אשדוד", sub: "רובע ז׳ · מטבח · פינת אוכל · 54 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "chasida-17", hero: "/portfolio/chasida-17/01.jpg", gallery: ["/portfolio/chasida-17/01.jpg", "/portfolio/chasida-17/02.jpg", "/portfolio/chasida-17/03.jpg", "/portfolio/chasida-17/04.jpg", "/portfolio/chasida-17/05.jpg", "/portfolio/chasida-17/06.jpg", "/portfolio/chasida-17/07.jpg", "/portfolio/chasida-17/08.jpg", "/portfolio/chasida-17/09.jpg", "/portfolio/chasida-17/10.jpg"], tags: ["מטבח","פינת אוכל","סיור וירטואלי 3D"] },
-  { id: 16, title: "שבט זבולון 5 - גיא רוזן", sub: "רובע י״ב · מרפסת · סלון · מטבח · 32 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "shevet-zevulun", hero: "/portfolio/shevet-zevulun/cover.jpg", gallery: ["/portfolio/shevet-zevulun/01.jpg", "/portfolio/shevet-zevulun/02.jpg", "/portfolio/shevet-zevulun/03.jpg", "/portfolio/shevet-zevulun/04.jpg", "/portfolio/shevet-zevulun/05.jpg", "/portfolio/shevet-zevulun/06.jpg", "/portfolio/shevet-zevulun/07.jpg", "/portfolio/shevet-zevulun/08.jpg", "/portfolio/shevet-zevulun/09.jpg", "/portfolio/shevet-zevulun/10.jpg", "/portfolio/shevet-zevulun/11.jpg", "/portfolio/shevet-zevulun/12.jpg", "/portfolio/shevet-zevulun/13.jpg", "/portfolio/shevet-zevulun/14.jpg", "/portfolio/shevet-zevulun/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
-  { id: 17, title: "שבט לוי 4 - יאן שינדלמן", sub: "רובע י״ב · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/shevet-levi-4/cover.jpg", gallery: ["/portfolio/shevet-levi-4/01.jpg", "/portfolio/shevet-levi-4/02.jpg", "/portfolio/shevet-levi-4/03.jpg", "/portfolio/shevet-levi-4/04.jpg", "/portfolio/shevet-levi-4/05.jpg", "/portfolio/shevet-levi-4/06.jpg", "/portfolio/shevet-levi-4/07.jpg", "/portfolio/shevet-levi-4/08.jpg", "/portfolio/shevet-levi-4/09.jpg", "/portfolio/shevet-levi-4/10.jpg", "/portfolio/shevet-levi-4/11.jpg", "/portfolio/shevet-levi-4/12.jpg", "/portfolio/shevet-levi-4/13.jpg", "/portfolio/shevet-levi-4/14.jpg"], tags: ["מרפסת","נוף","מטבח"] },
-  { id: 18, title: "העצמאות 21 - יאן שינדלמן", sub: "סיטי · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/atzmaut-21/cover.jpg", gallery: ["/portfolio/atzmaut-21/01.jpg", "/portfolio/atzmaut-21/02.jpg", "/portfolio/atzmaut-21/03.jpg", "/portfolio/atzmaut-21/04.jpg", "/portfolio/atzmaut-21/05.jpg", "/portfolio/atzmaut-21/06.jpg", "/portfolio/atzmaut-21/07.jpg", "/portfolio/atzmaut-21/08.jpg", "/portfolio/atzmaut-21/09.jpg", "/portfolio/atzmaut-21/10.jpg", "/portfolio/atzmaut-21/11.jpg", "/portfolio/atzmaut-21/12.jpg", "/portfolio/atzmaut-21/13.jpg", "/portfolio/atzmaut-21/14.jpg", "/portfolio/atzmaut-21/15.jpg", "/portfolio/atzmaut-21/16.jpg", "/portfolio/atzmaut-21/17.jpg", "/portfolio/atzmaut-21/18.jpg"], tags: ["מרפסת","סלון","מטבח"] },
-  { id: 19, title: "הציונות 55 - יאן שינדלמן", sub: "סיטי · אשדוד", city: "אשדוד", tag: "פנטהאוז", partner: "ReHouse", company: "rehouse", hero: "/portfolio/tzionut-55/cover.jpg", gallery: ["/portfolio/tzionut-55/01.jpg", "/portfolio/tzionut-55/02.jpg", "/portfolio/tzionut-55/03.jpg", "/portfolio/tzionut-55/04.jpg", "/portfolio/tzionut-55/05.jpg", "/portfolio/tzionut-55/06.jpg", "/portfolio/tzionut-55/07.jpg", "/portfolio/tzionut-55/08.jpg", "/portfolio/tzionut-55/09.jpg", "/portfolio/tzionut-55/10.jpg", "/portfolio/tzionut-55/11.jpg", "/portfolio/tzionut-55/12.jpg", "/portfolio/tzionut-55/13.jpg", "/portfolio/tzionut-55/14.jpg"], tags: ["פנטהאוז","בריכה","מרפסת גג","נוף"] },
-  { id: 20, title: "הכלנית 7א - יאן שינדלמן", sub: "רובע ח׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/kalanit-7a/cover.jpg", gallery: ["/portfolio/kalanit-7a/01.jpg", "/portfolio/kalanit-7a/02.jpg", "/portfolio/kalanit-7a/03.jpg", "/portfolio/kalanit-7a/04.jpg", "/portfolio/kalanit-7a/05.jpg", "/portfolio/kalanit-7a/06.jpg", "/portfolio/kalanit-7a/07.jpg", "/portfolio/kalanit-7a/08.jpg", "/portfolio/kalanit-7a/09.jpg", "/portfolio/kalanit-7a/10.jpg", "/portfolio/kalanit-7a/11.jpg", "/portfolio/kalanit-7a/12.jpg", "/portfolio/kalanit-7a/13.jpg", "/portfolio/kalanit-7a/14.jpg", "/portfolio/kalanit-7a/15.jpg", "/portfolio/kalanit-7a/16.jpg", "/portfolio/kalanit-7a/17.jpg", "/portfolio/kalanit-7a/18.jpg", "/portfolio/kalanit-7a/19.jpg"], tags: ["מרפסת","סלון","מטבח"] },
-  { id: 21, title: "אוסישקין 21 - יאן שינדלמן", sub: "רובע ט״ו · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/ussishkin-21/cover.jpg", gallery: ["/portfolio/ussishkin-21/01.jpg", "/portfolio/ussishkin-21/02.jpg", "/portfolio/ussishkin-21/03.jpg", "/portfolio/ussishkin-21/04.jpg", "/portfolio/ussishkin-21/05.jpg", "/portfolio/ussishkin-21/06.jpg", "/portfolio/ussishkin-21/07.jpg", "/portfolio/ussishkin-21/08.jpg", "/portfolio/ussishkin-21/09.jpg", "/portfolio/ussishkin-21/10.jpg", "/portfolio/ussishkin-21/11.jpg", "/portfolio/ussishkin-21/12.jpg"], tags: ["מרפסת","סלון","מטבח"] },
-  { id: 22, title: "פתח תקווה 9 - יאן שינדלמן", sub: "רובע ט׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/petah-tikva-9/cover.jpg", gallery: ["/portfolio/petah-tikva-9/01.jpg", "/portfolio/petah-tikva-9/02.jpg", "/portfolio/petah-tikva-9/03.jpg", "/portfolio/petah-tikva-9/04.jpg", "/portfolio/petah-tikva-9/05.jpg", "/portfolio/petah-tikva-9/06.jpg", "/portfolio/petah-tikva-9/07.jpg", "/portfolio/petah-tikva-9/08.jpg", "/portfolio/petah-tikva-9/09.jpg", "/portfolio/petah-tikva-9/10.jpg", "/portfolio/petah-tikva-9/11.jpg", "/portfolio/petah-tikva-9/12.jpg", "/portfolio/petah-tikva-9/13.jpg", "/portfolio/petah-tikva-9/14.jpg", "/portfolio/petah-tikva-9/15.jpg", "/portfolio/petah-tikva-9/16.jpg", "/portfolio/petah-tikva-9/17.jpg"], tags: ["מרפסת גג","סלון","מטבח"] },
-  { id: 23, title: "שי עגנון 21 - יאן שינדלמן", sub: "עתיקות · אשקלון", city: "אשקלון", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "JN6a8HHqRpX", hero: "/portfolio/agnon-21/cover.jpg", gallery: ["/portfolio/agnon-21/01.jpg", "/portfolio/agnon-21/02.jpg", "/portfolio/agnon-21/03.jpg", "/portfolio/agnon-21/04.jpg", "/portfolio/agnon-21/05.jpg", "/portfolio/agnon-21/06.jpg", "/portfolio/agnon-21/07.jpg", "/portfolio/agnon-21/08.jpg", "/portfolio/agnon-21/09.jpg", "/portfolio/agnon-21/10.jpg", "/portfolio/agnon-21/11.jpg"], tags: ["סלון","מטבח","סיור וירטואלי 3D"] },
-  { id: 24, title: "נחל שניר 9 - יאן שינדלמן", sub: "רובע י״א · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "mDADwNnNKtD", hero: "/portfolio/nahal-snir-9/cover.jpg", gallery: ["/portfolio/nahal-snir-9/01.jpg", "/portfolio/nahal-snir-9/02.jpg", "/portfolio/nahal-snir-9/03.jpg", "/portfolio/nahal-snir-9/04.jpg", "/portfolio/nahal-snir-9/05.jpg", "/portfolio/nahal-snir-9/06.jpg", "/portfolio/nahal-snir-9/07.jpg", "/portfolio/nahal-snir-9/08.jpg", "/portfolio/nahal-snir-9/09.jpg", "/portfolio/nahal-snir-9/10.jpg", "/portfolio/nahal-snir-9/11.jpg", "/portfolio/nahal-snir-9/12.jpg", "/portfolio/nahal-snir-9/13.jpg"], tags: ["סלון","מטבח","מרפסת","סיור וירטואלי 3D"] },
-  { id: 25, title: "מיכה הנביא 13 - יאן שינדלמן", sub: "רובע י׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/micha-hanavi-13/cover.jpg", gallery: ["/portfolio/micha-hanavi-13/01.jpg", "/portfolio/micha-hanavi-13/02.jpg", "/portfolio/micha-hanavi-13/03.jpg", "/portfolio/micha-hanavi-13/04.jpg", "/portfolio/micha-hanavi-13/05.jpg", "/portfolio/micha-hanavi-13/06.jpg", "/portfolio/micha-hanavi-13/07.jpg", "/portfolio/micha-hanavi-13/08.jpg", "/portfolio/micha-hanavi-13/09.jpg", "/portfolio/micha-hanavi-13/10.jpg", "/portfolio/micha-hanavi-13/11.jpg", "/portfolio/micha-hanavi-13/12.jpg", "/portfolio/micha-hanavi-13/13.jpg", "/portfolio/micha-hanavi-13/14.jpg"], tags: ["סלון","מטבח"] },
-  { id: 26, title: "הרב קוק 19 - יאן שינדלמן", sub: "רובע ב׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/harav-kook-19/cover.jpg", gallery: ["/portfolio/harav-kook-19/01.jpg", "/portfolio/harav-kook-19/02.jpg", "/portfolio/harav-kook-19/03.jpg", "/portfolio/harav-kook-19/04.jpg", "/portfolio/harav-kook-19/05.jpg", "/portfolio/harav-kook-19/06.jpg", "/portfolio/harav-kook-19/07.jpg", "/portfolio/harav-kook-19/08.jpg", "/portfolio/harav-kook-19/09.jpg", "/portfolio/harav-kook-19/10.jpg", "/portfolio/harav-kook-19/11.jpg", "/portfolio/harav-kook-19/12.jpg", "/portfolio/harav-kook-19/13.jpg", "/portfolio/harav-kook-19/14.jpg", "/portfolio/harav-kook-19/15.jpg", "/portfolio/harav-kook-19/16.jpg"], tags: ["סלון","מטבח"] },
-  { id: 27, title: "האשכול 8 - יאן שינדלמן", sub: "רובע א׳ · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "mWxuq2zaKdZ", hero: "/portfolio/haeshkol-8/cover.jpg", gallery: ["/portfolio/haeshkol-8/01.jpg", "/portfolio/haeshkol-8/02.jpg", "/portfolio/haeshkol-8/03.jpg", "/portfolio/haeshkol-8/04.jpg", "/portfolio/haeshkol-8/05.jpg", "/portfolio/haeshkol-8/06.jpg", "/portfolio/haeshkol-8/07.jpg", "/portfolio/haeshkol-8/08.jpg", "/portfolio/haeshkol-8/09.jpg", "/portfolio/haeshkol-8/10.jpg", "/portfolio/haeshkol-8/11.jpg", "/portfolio/haeshkol-8/12.jpg", "/portfolio/haeshkol-8/13.jpg", "/portfolio/haeshkol-8/14.jpg", "/portfolio/haeshkol-8/15.jpg", "/portfolio/haeshkol-8/16.jpg"], tags: ["נוף","מטבח","סלון","סיור וירטואלי 3D"] },
-  { id: 28, title: "מילמן 2 - יאן שינדלמן", sub: "רובע ו׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/milman-2/cover.jpg", gallery: ["/portfolio/milman-2/01.jpg", "/portfolio/milman-2/02.jpg", "/portfolio/milman-2/03.jpg", "/portfolio/milman-2/04.jpg", "/portfolio/milman-2/05.jpg", "/portfolio/milman-2/06.jpg", "/portfolio/milman-2/07.jpg", "/portfolio/milman-2/08.jpg", "/portfolio/milman-2/09.jpg", "/portfolio/milman-2/10.jpg", "/portfolio/milman-2/11.jpg", "/portfolio/milman-2/12.jpg", "/portfolio/milman-2/13.jpg", "/portfolio/milman-2/14.jpg", "/portfolio/milman-2/15.jpg", "/portfolio/milman-2/16.jpg", "/portfolio/milman-2/17.jpg", "/portfolio/milman-2/18.jpg", "/portfolio/milman-2/19.jpg"], tags: ["סלון","מטבח","מרפסת"] },
-  { id: 29, title: "חשוון 7 - גיא רוזן", sub: "רובע י״ב · מרפסת · סלון · מטבח", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "idnfQzzt684", hero: "/portfolio/cheshvan-7/cover.jpg", gallery: ["/portfolio/cheshvan-7/01.jpg", "/portfolio/cheshvan-7/02.jpg", "/portfolio/cheshvan-7/03.jpg", "/portfolio/cheshvan-7/04.jpg", "/portfolio/cheshvan-7/05.jpg", "/portfolio/cheshvan-7/06.jpg", "/portfolio/cheshvan-7/07.jpg", "/portfolio/cheshvan-7/08.jpg", "/portfolio/cheshvan-7/09.jpg", "/portfolio/cheshvan-7/10.jpg", "/portfolio/cheshvan-7/11.jpg", "/portfolio/cheshvan-7/12.jpg", "/portfolio/cheshvan-7/13.jpg", "/portfolio/cheshvan-7/14.jpg", "/portfolio/cheshvan-7/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
-  { id: 30, title: "האשכולית 3 - גיא רוזן", sub: "רובע ט״ז · מרפסת · סלון · מטבח", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "eo6fpaEEiA9", hero: "/portfolio/eshkolit-3/cover.jpg", gallery: ["/portfolio/eshkolit-3/01.jpg", "/portfolio/eshkolit-3/02.jpg", "/portfolio/eshkolit-3/03.jpg", "/portfolio/eshkolit-3/04.jpg", "/portfolio/eshkolit-3/05.jpg", "/portfolio/eshkolit-3/06.jpg", "/portfolio/eshkolit-3/07.jpg", "/portfolio/eshkolit-3/08.jpg", "/portfolio/eshkolit-3/09.jpg", "/portfolio/eshkolit-3/10.jpg", "/portfolio/eshkolit-3/11.jpg", "/portfolio/eshkolit-3/12.jpg", "/portfolio/eshkolit-3/13.jpg", "/portfolio/eshkolit-3/14.jpg", "/portfolio/eshkolit-3/15.jpg", "/portfolio/eshkolit-3/16.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 1, title: "דקר · אשדוד", sub: "בריכה פרטית · דק עץ", city: "אשדוד", tag: "רחפן + סיור וירטואלי", partner: "ReHouse", matterport: "ooDYEMx6TCr", tags: ["בריכה","דק עץ","סיור וירטואלי"] },
+  { id: 2, title: "שבט לוי · אשדוד", sub: "מרפסת פינורמית · נוף ים", city: "אשדוד", partner: "ReHouse", matterport: "g1C8Upb3G6q", tags: ["מרפסת"] },
+  { id: 3, title: "נחל שניר · אשדוד", sub: "קיר שיש · פרקט אירופאי", city: "אשדוד", tag: "בוטיק", partner: "ReHouse", company: "rehouse", hero: "/portfolio/nahal-snir-boutique/01.jpg", gallery: ["/portfolio/nahal-snir-boutique/01.jpg", "/portfolio/nahal-snir-boutique/02.jpg", "/portfolio/nahal-snir-boutique/03.jpg", "/portfolio/nahal-snir-boutique/04.jpg", "/portfolio/nahal-snir-boutique/05.jpg", "/portfolio/nahal-snir-boutique/06.jpg", "/portfolio/nahal-snir-boutique/07.jpg", "/portfolio/nahal-snir-boutique/08.jpg", "/portfolio/nahal-snir-boutique/09.jpg", "/portfolio/nahal-snir-boutique/10.jpg"], tags: ["קיר שיש","פרקט","בוטיק"] },
+  { id: 4, title: "בלפור · אשדוד", sub: "לובי יוקרה · שיש איטלקי", city: "אשדוד", tag: "לובי יוקרה", partner: "ReHouse", company: "rehouse", matterport: "9YJGFmX8KbJ", hero: "/portfolio/balfour/01.jpg", gallery: ["/portfolio/balfour/01.jpg", "/portfolio/balfour/02.jpg", "/portfolio/balfour/03.jpg", "/portfolio/balfour/04.jpg", "/portfolio/balfour/05.jpg", "/portfolio/balfour/06.jpg", "/portfolio/balfour/07.jpg", "/portfolio/balfour/08.jpg", "/portfolio/balfour/09.jpg", "/portfolio/balfour/10.jpg"], tags: ["לובי יוקרה","שיש"] },
+  { id: 5, title: "הפטל · יבנה", sub: "גינה · פרגולה · עצי לימון", city: "יבנה", tag: "דירת גן", partner: "ReHouse", matterport: "AF18oBWVfrm", tags: ["גינה","פרגולה","עצי לימון"] },
+  { id: 6, title: "המשוט · אשדוד", sub: "גינה · שיש · סלון מרווח", city: "אשדוד", tag: "דירת גן", partner: "ReHouse", company: "rehouse", hero: "/portfolio/hamashot/01.jpg", gallery: ["/portfolio/hamashot/01.jpg", "/portfolio/hamashot/02.jpg", "/portfolio/hamashot/03.jpg", "/portfolio/hamashot/04.jpg", "/portfolio/hamashot/05.jpg", "/portfolio/hamashot/06.jpg", "/portfolio/hamashot/07.jpg", "/portfolio/hamashot/08.jpg", "/portfolio/hamashot/09.jpg"], tags: ["גינה","שיש","סלון"] },
+  { id: 7, title: "אבות ישורון · אשדוד", sub: "דירת גן · 2 גינות · פרגולה · סלון מעוצב", city: "אשדוד", tag: "דירת גן + פרגולה", partner: "ReHouse", tags: ["דירת גן","גינה","פרגולה","סלון מרווח"] },
+  { id: 8, title: "קרן היסוד · אשדוד", sub: "פנטהאוז · גג יוקרתי · בר + מטבח חיצוני", city: "אשדוד", tag: "פנטהאוז + גג", partner: "ReHouse", matterport: "so6PszZrxgx", tags: ["פנטהאוז","גג מעוצב","בר","סיור וירטואלי"] },
+  { id: 9, title: "הגלים · אשדוד", sub: "וילה פרטית · גינה מטופחת · חדר הורים מפנק", city: "אשדוד", tag: "וילה", partner: "ReHouse", tags: ["וילה","גינה","חדר הורים","מרוהטת"] },
+  { id: 10, title: "שבט לוי · אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment", fit: "contain", hero: "/portfolio/shevet-levi/16.jpg", gallery: ["/portfolio/shevet-levi/16.jpg", "/portfolio/shevet-levi/17.jpg", "/portfolio/shevet-levi/18.jpg", "/portfolio/shevet-levi/19.jpg", "/portfolio/shevet-levi/20.jpg", "/portfolio/shevet-levi/21.jpg", "/portfolio/shevet-levi/13.jpg", "/portfolio/shevet-levi/14.jpg", "/portfolio/shevet-levi/15.jpg", "/portfolio/shevet-levi/09.jpg", "/portfolio/shevet-levi/10.jpg", "/portfolio/shevet-levi/11.jpg", "/portfolio/shevet-levi/12.jpg", "/portfolio/shevet-levi/01.jpg", "/portfolio/shevet-levi/02.jpg", "/portfolio/shevet-levi/03.jpg", "/portfolio/shevet-levi/04.jpg", "/portfolio/shevet-levi/05.jpg", "/portfolio/shevet-levi/06.jpg", "/portfolio/shevet-levi/07.jpg", "/portfolio/shevet-levi/08.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי"] },
+  { id: 11, title: "רוטשילד · אשדוד", sub: "רובע ט״ו", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/rothschild/01.jpg", gallery: ["/portfolio/rothschild/01.jpg", "/portfolio/rothschild/02.jpg", "/portfolio/rothschild/03.jpg", "/portfolio/rothschild/04.jpg", "/portfolio/rothschild/05.jpg", "/portfolio/rothschild/06.jpg", "/portfolio/rothschild/07.jpg", "/portfolio/rothschild/08.jpg", "/portfolio/rothschild/09.jpg"], tags: ["סלון","מרפסת","מטבח"] },
+  { id: 12, title: "נחל לכיש · אשדוד", sub: "רובע י״א", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/nahal-lachish/01.jpg", gallery: ["/portfolio/nahal-lachish/01.jpg", "/portfolio/nahal-lachish/02.jpg", "/portfolio/nahal-lachish/03.jpg", "/portfolio/nahal-lachish/04.jpg", "/portfolio/nahal-lachish/05.jpg", "/portfolio/nahal-lachish/06.jpg", "/portfolio/nahal-lachish/07.jpg", "/portfolio/nahal-lachish/08.jpg", "/portfolio/nahal-lachish/09.jpg", "/portfolio/nahal-lachish/10.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
+  { id: 13, title: "יהויכין · אשדוד", sub: "רובע י״ג · סלון · מרפסת · 35 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "yehoyakin", hero: "/portfolio/yehoyachin/01.jpg", gallery: ["/portfolio/yehoyachin/01.jpg", "/portfolio/yehoyachin/02.jpg", "/portfolio/yehoyachin/03.jpg", "/portfolio/yehoyachin/04.jpg", "/portfolio/yehoyachin/05.jpg", "/portfolio/yehoyachin/06.jpg", "/portfolio/yehoyachin/07.jpg", "/portfolio/yehoyachin/08.jpg", "/portfolio/yehoyachin/09.jpg"], tags: ["סלון","מרפסת","סיור וירטואלי 3D"] },
+  { id: 14, title: "ביאליק · אשדוד", sub: "רובע ה׳", city: "אשדוד", tag: "דירה", partner: "RE/MAX", company: "remax", hero: "/portfolio/bialik/01.jpg", gallery: ["/portfolio/bialik/01.jpg", "/portfolio/bialik/02.jpg", "/portfolio/bialik/03.jpg", "/portfolio/bialik/04.jpg", "/portfolio/bialik/05.jpg", "/portfolio/bialik/06.jpg"], tags: ["סלון","מטבח","פינת אוכל"] },
+  { id: 15, title: "חסידא · אשדוד", sub: "רובע ז׳ · מטבח · פינת אוכל · 54 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "chasida", hero: "/portfolio/chasida/01.jpg", gallery: ["/portfolio/chasida/01.jpg", "/portfolio/chasida/02.jpg", "/portfolio/chasida/03.jpg", "/portfolio/chasida/04.jpg", "/portfolio/chasida/05.jpg", "/portfolio/chasida/06.jpg", "/portfolio/chasida/07.jpg", "/portfolio/chasida/08.jpg", "/portfolio/chasida/09.jpg", "/portfolio/chasida/10.jpg"], tags: ["מטבח","פינת אוכל","סיור וירטואלי 3D"] },
+  { id: 16, title: "שבט זבולון · אשדוד", sub: "רובע י״ב · מרפסת · סלון · מטבח · 32 נקודות", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", tour: "shevet-zevulun", hero: "/portfolio/shevet-zevulun/cover.jpg", gallery: ["/portfolio/shevet-zevulun/01.jpg", "/portfolio/shevet-zevulun/02.jpg", "/portfolio/shevet-zevulun/03.jpg", "/portfolio/shevet-zevulun/04.jpg", "/portfolio/shevet-zevulun/05.jpg", "/portfolio/shevet-zevulun/06.jpg", "/portfolio/shevet-zevulun/07.jpg", "/portfolio/shevet-zevulun/08.jpg", "/portfolio/shevet-zevulun/09.jpg", "/portfolio/shevet-zevulun/10.jpg", "/portfolio/shevet-zevulun/11.jpg", "/portfolio/shevet-zevulun/12.jpg", "/portfolio/shevet-zevulun/13.jpg", "/portfolio/shevet-zevulun/14.jpg", "/portfolio/shevet-zevulun/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 17, title: "שבט לוי · אשדוד", sub: "רובע י״ב · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/shevet-levi-b/cover.jpg", gallery: ["/portfolio/shevet-levi-b/01.jpg", "/portfolio/shevet-levi-b/02.jpg", "/portfolio/shevet-levi-b/03.jpg", "/portfolio/shevet-levi-b/04.jpg", "/portfolio/shevet-levi-b/05.jpg", "/portfolio/shevet-levi-b/06.jpg", "/portfolio/shevet-levi-b/07.jpg", "/portfolio/shevet-levi-b/08.jpg", "/portfolio/shevet-levi-b/09.jpg", "/portfolio/shevet-levi-b/10.jpg", "/portfolio/shevet-levi-b/11.jpg", "/portfolio/shevet-levi-b/12.jpg", "/portfolio/shevet-levi-b/13.jpg", "/portfolio/shevet-levi-b/14.jpg"], tags: ["מרפסת","נוף","מטבח"] },
+  { id: 18, title: "העצמאות · אשדוד", sub: "סיטי · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/atzmaut/cover.jpg", gallery: ["/portfolio/atzmaut/01.jpg", "/portfolio/atzmaut/02.jpg", "/portfolio/atzmaut/03.jpg", "/portfolio/atzmaut/04.jpg", "/portfolio/atzmaut/05.jpg", "/portfolio/atzmaut/06.jpg", "/portfolio/atzmaut/07.jpg", "/portfolio/atzmaut/08.jpg", "/portfolio/atzmaut/09.jpg", "/portfolio/atzmaut/10.jpg", "/portfolio/atzmaut/11.jpg", "/portfolio/atzmaut/12.jpg", "/portfolio/atzmaut/13.jpg", "/portfolio/atzmaut/14.jpg", "/portfolio/atzmaut/15.jpg", "/portfolio/atzmaut/16.jpg", "/portfolio/atzmaut/17.jpg", "/portfolio/atzmaut/18.jpg"], tags: ["מרפסת","סלון","מטבח"] },
+  { id: 19, title: "הציונות · אשדוד", sub: "סיטי · אשדוד", city: "אשדוד", tag: "פנטהאוז", partner: "ReHouse", company: "rehouse", hero: "/portfolio/tzionut/cover.jpg", gallery: ["/portfolio/tzionut/01.jpg", "/portfolio/tzionut/02.jpg", "/portfolio/tzionut/03.jpg", "/portfolio/tzionut/04.jpg", "/portfolio/tzionut/05.jpg", "/portfolio/tzionut/06.jpg", "/portfolio/tzionut/07.jpg", "/portfolio/tzionut/08.jpg", "/portfolio/tzionut/09.jpg", "/portfolio/tzionut/10.jpg", "/portfolio/tzionut/11.jpg", "/portfolio/tzionut/12.jpg", "/portfolio/tzionut/13.jpg", "/portfolio/tzionut/14.jpg"], tags: ["פנטהאוז","בריכה","מרפסת גג","נוף"] },
+  { id: 20, title: "הכלנית · אשדוד", sub: "רובע ח׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/kalanit/cover.jpg", gallery: ["/portfolio/kalanit/01.jpg", "/portfolio/kalanit/02.jpg", "/portfolio/kalanit/03.jpg", "/portfolio/kalanit/04.jpg", "/portfolio/kalanit/05.jpg", "/portfolio/kalanit/06.jpg", "/portfolio/kalanit/07.jpg", "/portfolio/kalanit/08.jpg", "/portfolio/kalanit/09.jpg", "/portfolio/kalanit/10.jpg", "/portfolio/kalanit/11.jpg", "/portfolio/kalanit/12.jpg", "/portfolio/kalanit/13.jpg", "/portfolio/kalanit/14.jpg", "/portfolio/kalanit/15.jpg", "/portfolio/kalanit/16.jpg", "/portfolio/kalanit/17.jpg", "/portfolio/kalanit/18.jpg", "/portfolio/kalanit/19.jpg"], tags: ["מרפסת","סלון","מטבח"] },
+  { id: 21, title: "אוסישקין · אשדוד", sub: "רובע ט״ו · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/ussishkin/cover.jpg", gallery: ["/portfolio/ussishkin/01.jpg", "/portfolio/ussishkin/02.jpg", "/portfolio/ussishkin/03.jpg", "/portfolio/ussishkin/04.jpg", "/portfolio/ussishkin/05.jpg", "/portfolio/ussishkin/06.jpg", "/portfolio/ussishkin/07.jpg", "/portfolio/ussishkin/08.jpg", "/portfolio/ussishkin/09.jpg", "/portfolio/ussishkin/10.jpg", "/portfolio/ussishkin/11.jpg", "/portfolio/ussishkin/12.jpg"], tags: ["מרפסת","סלון","מטבח"] },
+  { id: 22, title: "פתח תקווה · אשדוד", sub: "רובע ט׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/petah-tikva/cover.jpg", gallery: ["/portfolio/petah-tikva/01.jpg", "/portfolio/petah-tikva/02.jpg", "/portfolio/petah-tikva/03.jpg", "/portfolio/petah-tikva/04.jpg", "/portfolio/petah-tikva/05.jpg", "/portfolio/petah-tikva/06.jpg", "/portfolio/petah-tikva/07.jpg", "/portfolio/petah-tikva/08.jpg", "/portfolio/petah-tikva/09.jpg", "/portfolio/petah-tikva/10.jpg", "/portfolio/petah-tikva/11.jpg", "/portfolio/petah-tikva/12.jpg", "/portfolio/petah-tikva/13.jpg", "/portfolio/petah-tikva/14.jpg", "/portfolio/petah-tikva/15.jpg", "/portfolio/petah-tikva/16.jpg", "/portfolio/petah-tikva/17.jpg"], tags: ["מרפסת גג","סלון","מטבח"] },
+  { id: 23, title: "שי עגנון · אשקלון", sub: "עתיקות · אשקלון", city: "אשקלון", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "JN6a8HHqRpX", hero: "/portfolio/agnon/cover.jpg", gallery: ["/portfolio/agnon/01.jpg", "/portfolio/agnon/02.jpg", "/portfolio/agnon/03.jpg", "/portfolio/agnon/04.jpg", "/portfolio/agnon/05.jpg", "/portfolio/agnon/06.jpg", "/portfolio/agnon/07.jpg", "/portfolio/agnon/08.jpg", "/portfolio/agnon/09.jpg", "/portfolio/agnon/10.jpg", "/portfolio/agnon/11.jpg"], tags: ["סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 24, title: "נחל שניר · אשדוד", sub: "רובע י״א · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "mDADwNnNKtD", hero: "/portfolio/nahal-snir/cover.jpg", gallery: ["/portfolio/nahal-snir/01.jpg", "/portfolio/nahal-snir/02.jpg", "/portfolio/nahal-snir/03.jpg", "/portfolio/nahal-snir/04.jpg", "/portfolio/nahal-snir/05.jpg", "/portfolio/nahal-snir/06.jpg", "/portfolio/nahal-snir/07.jpg", "/portfolio/nahal-snir/08.jpg", "/portfolio/nahal-snir/09.jpg", "/portfolio/nahal-snir/10.jpg", "/portfolio/nahal-snir/11.jpg", "/portfolio/nahal-snir/12.jpg", "/portfolio/nahal-snir/13.jpg"], tags: ["סלון","מטבח","מרפסת","סיור וירטואלי 3D"] },
+  { id: 25, title: "מיכה הנביא · אשדוד", sub: "רובע י׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/micha-hanavi/cover.jpg", gallery: ["/portfolio/micha-hanavi/01.jpg", "/portfolio/micha-hanavi/02.jpg", "/portfolio/micha-hanavi/03.jpg", "/portfolio/micha-hanavi/04.jpg", "/portfolio/micha-hanavi/05.jpg", "/portfolio/micha-hanavi/06.jpg", "/portfolio/micha-hanavi/07.jpg", "/portfolio/micha-hanavi/08.jpg", "/portfolio/micha-hanavi/09.jpg", "/portfolio/micha-hanavi/10.jpg", "/portfolio/micha-hanavi/11.jpg", "/portfolio/micha-hanavi/12.jpg", "/portfolio/micha-hanavi/13.jpg", "/portfolio/micha-hanavi/14.jpg"], tags: ["סלון","מטבח"] },
+  { id: 26, title: "הרב קוק · אשדוד", sub: "רובע ב׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/harav-kook/cover.jpg", gallery: ["/portfolio/harav-kook/01.jpg", "/portfolio/harav-kook/02.jpg", "/portfolio/harav-kook/03.jpg", "/portfolio/harav-kook/04.jpg", "/portfolio/harav-kook/05.jpg", "/portfolio/harav-kook/06.jpg", "/portfolio/harav-kook/07.jpg", "/portfolio/harav-kook/08.jpg", "/portfolio/harav-kook/09.jpg", "/portfolio/harav-kook/10.jpg", "/portfolio/harav-kook/11.jpg", "/portfolio/harav-kook/12.jpg", "/portfolio/harav-kook/13.jpg", "/portfolio/harav-kook/14.jpg", "/portfolio/harav-kook/15.jpg", "/portfolio/harav-kook/16.jpg"], tags: ["סלון","מטבח"] },
+  { id: 27, title: "האשכול · אשדוד", sub: "רובע א׳ · אשדוד", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "ReHouse", company: "rehouse", matterport: "mWxuq2zaKdZ", hero: "/portfolio/haeshkol/cover.jpg", gallery: ["/portfolio/haeshkol/01.jpg", "/portfolio/haeshkol/02.jpg", "/portfolio/haeshkol/03.jpg", "/portfolio/haeshkol/04.jpg", "/portfolio/haeshkol/05.jpg", "/portfolio/haeshkol/06.jpg", "/portfolio/haeshkol/07.jpg", "/portfolio/haeshkol/08.jpg", "/portfolio/haeshkol/09.jpg", "/portfolio/haeshkol/10.jpg", "/portfolio/haeshkol/11.jpg", "/portfolio/haeshkol/12.jpg", "/portfolio/haeshkol/13.jpg", "/portfolio/haeshkol/14.jpg", "/portfolio/haeshkol/15.jpg", "/portfolio/haeshkol/16.jpg"], tags: ["נוף","מטבח","סלון","סיור וירטואלי 3D"] },
+  { id: 28, title: "מילמן · אשדוד", sub: "רובע ו׳ · אשדוד", city: "אשדוד", tag: "דירה", partner: "ReHouse", company: "rehouse", hero: "/portfolio/milman/cover.jpg", gallery: ["/portfolio/milman/01.jpg", "/portfolio/milman/02.jpg", "/portfolio/milman/03.jpg", "/portfolio/milman/04.jpg", "/portfolio/milman/05.jpg", "/portfolio/milman/06.jpg", "/portfolio/milman/07.jpg", "/portfolio/milman/08.jpg", "/portfolio/milman/09.jpg", "/portfolio/milman/10.jpg", "/portfolio/milman/11.jpg", "/portfolio/milman/12.jpg", "/portfolio/milman/13.jpg", "/portfolio/milman/14.jpg", "/portfolio/milman/15.jpg", "/portfolio/milman/16.jpg", "/portfolio/milman/17.jpg", "/portfolio/milman/18.jpg", "/portfolio/milman/19.jpg"], tags: ["סלון","מטבח","מרפסת"] },
+  { id: 29, title: "חשוון · אשדוד", sub: "רובע י״ב · מרפסת · סלון · מטבח", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "idnfQzzt684", hero: "/portfolio/cheshvan/cover.jpg", gallery: ["/portfolio/cheshvan/01.jpg", "/portfolio/cheshvan/02.jpg", "/portfolio/cheshvan/03.jpg", "/portfolio/cheshvan/04.jpg", "/portfolio/cheshvan/05.jpg", "/portfolio/cheshvan/06.jpg", "/portfolio/cheshvan/07.jpg", "/portfolio/cheshvan/08.jpg", "/portfolio/cheshvan/09.jpg", "/portfolio/cheshvan/10.jpg", "/portfolio/cheshvan/11.jpg", "/portfolio/cheshvan/12.jpg", "/portfolio/cheshvan/13.jpg", "/portfolio/cheshvan/14.jpg", "/portfolio/cheshvan/15.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
+  { id: 30, title: "האשכולית · אשדוד", sub: "רובע ט״ז · מרפסת · סלון · מטבח", city: "אשדוד", tag: "דירה + סיור וירטואלי", partner: "RE/MAX", company: "remax", matterport: "eo6fpaEEiA9", hero: "/portfolio/eshkolit/cover.jpg", gallery: ["/portfolio/eshkolit/01.jpg", "/portfolio/eshkolit/02.jpg", "/portfolio/eshkolit/03.jpg", "/portfolio/eshkolit/04.jpg", "/portfolio/eshkolit/05.jpg", "/portfolio/eshkolit/06.jpg", "/portfolio/eshkolit/07.jpg", "/portfolio/eshkolit/08.jpg", "/portfolio/eshkolit/09.jpg", "/portfolio/eshkolit/10.jpg", "/portfolio/eshkolit/11.jpg", "/portfolio/eshkolit/12.jpg", "/portfolio/eshkolit/13.jpg", "/portfolio/eshkolit/14.jpg", "/portfolio/eshkolit/15.jpg", "/portfolio/eshkolit/16.jpg"], tags: ["מרפסת","סלון","מטבח","סיור וירטואלי 3D"] },
 ];
 
 const COVER_ID = 8;
@@ -372,7 +374,7 @@ function HomeSection({ onNav }) {
               <span><span>נדל״ן.</span></span>
               <span><span>בצילום שמוכר.</span></span>
             </h1>
-            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח ב-24 שעות</Bidi></p>
+            <p className="visio-cover-sub"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים · משלוח תמונות תוך 24 עד 48 שעות</Bidi></p>
             <div className="visio-cover-btns" data-sc-cue="0 0.78 0 0">
               <button className="visio-btn on-image" onClick={() => onNav("booking")}>הזמן צילום עכשיו</button>
               <button className="visio-btn on-image outline" onClick={() => onNav("portfolio")}>צפה בעבודות</button>
@@ -408,12 +410,8 @@ function HomeSection({ onNav }) {
             <div className="visio-kicker muted">נכסים צולמו</div>
           </div>
           <div className="visio-stat">
-            <div className="visio-stat-num"><StatFigure value={24} suffix="H" duration={1100} /></div>
-            <div className="visio-kicker muted">זמן אספקה</div>
-          </div>
-          <div className="visio-stat">
-            <div className="visio-stat-num"><StatFigure value={100} suffix="%" duration={1200} /></div>
-            <div className="visio-kicker muted">לקוחות מרוצים</div>
+            <div className="visio-stat-num"><span className="visio-stat-figure" dir="ltr" style={{ unicodeBidi: "isolate" }}>24–48</span></div>
+            <div className="visio-kicker muted">שעות לתמונות</div>
           </div>
           <div className="visio-stat">
             <div className="visio-stat-num"><span className="visio-stat-figure" dir="ltr" style={{ unicodeBidi: "isolate" }}>12+12</span></div>
@@ -428,7 +426,6 @@ function HomeSection({ onNav }) {
           {PARTNERS.map(p => (
             <div key={p.id} className="visio-partner">
               <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div className="visio-credit" style={{ marginTop: 8 }}><Bidi>{p.sub}</Bidi></div>
             </div>
           ))}
         </div>
@@ -436,7 +433,7 @@ function HomeSection({ onNav }) {
 
       <section className="visio-section visio-wrap visio-cta" style={{ textAlign: "center", borderTop: `1px solid ${C.rule}` }} data-sc-in>
         <h2 className="visio-section-title">מוכן לשדרג את הנכס שלך?</h2>
-        <p className="visio-section-sub" style={{ marginBottom: 28 }}>קבל הצעת מחיר תוך 24 שעות · ללא התחייבות</p>
+        <p className="visio-section-sub" style={{ marginBottom: 28 }}>קבל הצעת מחיר תוך 24 עד 48 שעות · ללא התחייבות</p>
         <button className="visio-btn visio-cta-btn" onClick={() => onNav("booking")}>צרו קשר</button>
       </section>
     </>
@@ -558,9 +555,9 @@ function PortfolioSection() {
                   className="visio-btn on-image"
                   href={tourHref}
                   style={{ textDecoration: "none" }}
-                  {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                  {...(p.tour ? {} : { target: "_blank", rel: "noopener noreferrer", "aria-label": "סיור וירטואלי 3D, אתר חיצוני" })}
                 >
-                  ▶ סיור וירטואלי 3D
+                  {p.tour ? "▶ סיור וירטואלי 3D" : "▶ סיור וירטואלי 3D · אתר חיצוני"}
                 </a>
               )}
               {gallery.length > 0 && (
@@ -579,9 +576,9 @@ function PortfolioSection() {
                 className="visio-btn"
                 href={tourHref}
                 style={{ textDecoration: "none" }}
-                {...(p.tour ? {} : { target: "_blank", rel: "noreferrer" })}
+                {...(p.tour ? {} : { target: "_blank", rel: "noopener noreferrer", "aria-label": "סיור וירטואלי, אתר חיצוני" })}
               >
-                סיור וירטואלי
+                {p.tour ? "סיור וירטואלי" : "סיור וירטואלי · אתר חיצוני"}
               </a>
             )}
             {gallery.length > 0 && (
@@ -652,6 +649,11 @@ function PortfolioSection() {
           {shown.map(renderCard)}
         </div>
       )}
+      <p className="visio-copy visio-removal">
+        בעל נכס שמבקש להסיר את הנכס מתיק העבודות מוזמן לפנות בוואטסאפ{" "}
+        <a href="https://wa.me/972533523379">053-352-3379</a>
+        {" "}או ל-<a href="mailto:yoni@visioisrael.com">yoni@visioisrael.com</a>. נסיר בתוך 7 ימים.
+      </p>
     </section>
 </>
   );
@@ -712,11 +714,14 @@ function BookingSection() {
   const [selSlot, setSelSlot] = useState(null);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "FULL", notes: "" });
+  const [customerType, setCustomerType] = useState("");
+  const [ownerConsent, setOwnerConsent] = useState(false);
   const [done, setDone] = useState(false);
   const [wm, setWm] = useState({ agentPhone: "", logoFile: null, logoUrl: null, agentPhotoFile: null, agentPhotoUrl: null, wantAgentPhoto: false });
   const logoRef = useRef(null);
   const photoRef = useRef(null);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleFile = (field, urlField, e) => {
     const file = e.target.files[0];
@@ -738,41 +743,62 @@ function BookingSection() {
 
   const completeBooking = async () => {
     setBookingLoading(true);
-    const payload = {
-      name: form.name,
-      phone: form.phone,
-      address: form.address,
-      pkg: form.pkg,
-      date: selDate,
-      time: selSlot,
-      notes: form.notes,
-    };
+    setSubmitError("");
+    const body = new FormData();
+    body.append("name", form.name);
+    body.append("phone", form.phone);
+    body.append("address", form.address);
+    body.append("pkg", form.pkg);
+    body.append("date", selDate || "");
+    body.append("time", selSlot || "");
+    body.append("notes", form.notes);
+    body.append("agentPhone", wm.agentPhone || "");
+    body.append("customerType", customerType);
+    body.append("ownerConsent", ownerConsent ? "yes" : "");
+    body.append("bookingRef", `booking-${Date.now()}`);
+    if (wm.logoFile) body.append("logo", wm.logoFile);
+    if (wm.wantAgentPhoto && wm.agentPhotoFile) body.append("agentPhoto", wm.agentPhotoFile);
     try {
-      await fetch("/api/book-appointment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, bookingRef: `booking-${Date.now()}` }),
-      });
-    } catch (e) {
-      console.error("Booking API error:", e);
+      const res = await fetch("/api/book-appointment", { method: "POST", body });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        setSubmitError(data.error || "לא הצלחנו לשלוח את הבקשה.");
+        return;
+      }
+      setDone(true);
+    } catch {
+      setSubmitError("לא הצלחנו לשלוח את הבקשה.");
+    } finally {
+      setBookingLoading(false);
     }
-    // pipeline job created server-side in /api/book-appointment
-    setDone(true);
-    setBookingLoading(false);
   };
+
+  useEffect(() => {
+    if (step < 2) return;
+    const id = step === 2 ? "booking-step-time" : "booking-step-form";
+    document.getElementById(id)?.focus();
+  }, [step]);
 
   const handleSubmitBooking = () => {
     if (!form.name || !form.phone || !form.address || !selDate || !selSlot) return;
+    if (customerType !== "business" && customerType !== "private") {
+      setSubmitError("יש לבחור אם המזמין עוסק או לקוח פרטי");
+      return;
+    }
+    if (!ownerConsent) {
+      setSubmitError("יש לאשר את הסכמת בעל הנכס");
+      return;
+    }
     completeBooking();
   };
 
-  const formIncomplete = !form.name || !form.phone || !form.address;
+  const formIncomplete = !form.name || !form.phone || !form.address || !customerType || !ownerConsent;
 
   if (done) return (
     <section className="visio-section" style={{ textAlign: "center" }}>
       <div className="visio-kicker"><Bidi>BOOKING CONFIRMED</Bidi></div>
-      <h2 className="visio-section-title">הצילום נקבע ✓</h2>
-      <p className="visio-copy" style={{ margin: 0 }}>ההזמנה אושרה · הצלם יקבל עדכון · הודעה תישלח ל-{form.phone}</p>
+      <h2 className="visio-section-title">בקשת ההזמנה התקבלה</h2>
+      <p className="visio-copy" style={{ margin: 0 }}>נאשר את המועד בוואטסאפ בהקדם</p>
       <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0" }}>
         התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
       </p>
@@ -784,7 +810,7 @@ function BookingSection() {
           </div>
         ))}
       </div>
-      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); }}>
+      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); setCustomerType(""); setOwnerConsent(false); }}>
         ← קביעת צילום נוסף
       </button>
     </section>
@@ -821,20 +847,58 @@ function BookingSection() {
         <div className="visio-cal-dow">
           {LAT_DAYS.map((d, i) => <div key={d} style={i >= 5 ? { color: C.faint } : undefined}><Bidi>{d}</Bidi></div>)}
         </div>
-        <div className="visio-cal-grid">
-          {Array(first).fill(null).map((_, i) => <div key={`e${i}`} className="visio-calendar-day" />)}
-          {Array(dim).fill(null).map((_, i) => {
-            const day = i + 1, key = toKey(yr, mo, day);
-            const avail = !isWknd(yr, mo, day) && !isPast(yr, mo, day), sel = selDate === key;
-            const isT = key === toKey(today.getFullYear(), today.getMonth(), today.getDate());
-            const cls = ["visio-calendar-day", avail ? "available" : "blocked", isT && "today", sel && "selected"].filter(Boolean).join(" ");
-            return (
-              <div key={day} className={cls} onClick={() => { if (!avail) return; setSelDate(key); setStep(2); }}>
-                <span className="num">{day}</span>
-                <span className="heb">{getHebDate(yr, mo, day)}</span>
-              </div>
-            );
-          })}
+        <div className="visio-cal-grid" role="grid" aria-label="לוח תאריכים">
+          {Array.from({ length: Math.ceil((first + dim) / 7) }, (_, week) => (
+            <div key={week} role="row" style={{ display: "contents" }}>
+              {Array.from({ length: 7 }, (_, col) => {
+                const index = week * 7 + col;
+                if (index < first || index >= first + dim) {
+                  return <div key={col} role="gridcell" className="visio-calendar-day" />;
+                }
+                const day = index - first + 1;
+                const key = toKey(yr, mo, day);
+                const avail = !isWknd(yr, mo, day) && !isPast(yr, mo, day);
+                const sel = selDate === key;
+                const isT = key === toKey(today.getFullYear(), today.getMonth(), today.getDate());
+                const cls = ["visio-calendar-day", avail ? "available" : "blocked", isT && "today", sel && "selected"].filter(Boolean).join(" ");
+                const weekday = HEB_DAYS[new Date(yr, mo, day).getDay()];
+                const onKeyDown = (event) => {
+                  const stepBy = { ArrowLeft: 1, ArrowRight: -1, ArrowDown: 7, ArrowUp: -7 };
+                  const delta = stepBy[event.key];
+                  if (!delta) return;
+                  event.preventDefault();
+                  const dir = Math.sign(delta);
+                  let next = day + delta;
+                  while (next >= 1 && next <= dim) {
+                    const target = document.querySelector(`[data-cal-day="${yr}-${mo}-${next}"]`);
+                    if (target && !target.disabled) {
+                      target.focus();
+                      return;
+                    }
+                    next += dir;
+                  }
+                };
+                return (
+                  <div key={day} role="gridcell">
+                    <button
+                      type="button"
+                      className={cls}
+                      data-cal-day={`${yr}-${mo}-${day}`}
+                      disabled={!avail}
+                      aria-disabled={!avail}
+                      aria-pressed={sel}
+                      aria-label={`יום ${weekday} ${day} ב${HEB_MONTHS[mo]} ${yr}, ${avail ? "פנוי" : "חסום"}`}
+                      onClick={() => { setSelDate(key); setStep(2); }}
+                      onKeyDown={onKeyDown}
+                    >
+                      <span className="num">{day}</span>
+                      <span className="heb">{getHebDate(yr, mo, day)}</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
         <div className="visio-panel-foot">
           <Bidi>● זמינות מסונכרנת עם Google Calendar · שישי-שבת חסומים</Bidi>
@@ -845,7 +909,7 @@ function BookingSection() {
       {step >= 2 && (
         <div className="visio-panel">
           <div className="visio-panel-head">
-            <span className="visio-panel-title">בחר שעה</span>
+            <h2 id="booking-step-time" className="visio-panel-title" tabIndex={-1}>בחר שעה</h2>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <button type="button" className="visio-link" onClick={() => { setStep(1); setSelDate(null); setSelSlot(null); }}>שנה תאריך</button>
               <span className="visio-copy" style={{ color: C.ink }}>יום {sd && HEB_DAYS[new Date(sy, sm - 1, sd).getDay()]} · {sd} {sm && HEB_MONTHS[sm - 1]}</span>
@@ -873,11 +937,12 @@ function BookingSection() {
               </div>
             ))}
           </div>
-          <div className="visio-form-body">
+          <form className="visio-form-body" onSubmit={(event) => { event.preventDefault(); handleSubmitBooking(); }}>
+            <h2 id="booking-step-form" className="visio-panel-title" tabIndex={-1}>פרטים</h2>
             {/* Package select */}
             <div>
-              <label className="visio-label">חבילה</label>
-              <select className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
+              <label className="visio-label" htmlFor="booking-pkg">חבילה</label>
+              <select id="booking-pkg" className="visio-input" value={form.pkg} onChange={e => setForm(f => ({ ...f, pkg: e.target.value }))}>
                 <option value="CONSULTATION">ייעוץ טלפוני — חינם</option>
                 <option value="PHOTOS">VISIO Essential — ₪365 + מע״מ</option>
                 <option value="PHOTOS_VIDEO">VISIO Motion — ₪400 + מע״מ</option>
@@ -885,15 +950,31 @@ function BookingSection() {
                 <option value="INSTAGRAM">VISIO Social — ₪120 לשעת עבודה + מע״מ</option>
               </select>
             </div>
-            {[["שם מלא *", "name", "שם פרטי + משפחה", "rtl"], ["טלפון *", "phone", "05X-XXXXXXX", "ltr"], ["כתובת הנכס *", "address", "רחוב, מספר, עיר", "rtl"]].map(([lbl, key, ph, dir]) => (
-              <div key={key}>
-                <label className="visio-label">{lbl}</label>
-                <input className="visio-input" placeholder={ph} dir={dir} value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
+            {[
+              { id: "booking-name", key: "name", label: "שם מלא", ph: "שם פרטי + משפחה", dir: "rtl", auto: "name", type: "text" },
+              { id: "booking-phone", key: "phone", label: "טלפון", ph: "05X-XXXXXXX", dir: "ltr", auto: "tel", type: "tel" },
+              { id: "booking-address", key: "address", label: "כתובת הנכס", ph: "רחוב, מספר, עיר", dir: "rtl", auto: "street-address", type: "text" },
+            ].map((field) => (
+              <div key={field.key}>
+                <label className="visio-label" htmlFor={field.id}>{field.label} *</label>
+                <input
+                  id={field.id}
+                  className="visio-input"
+                  type={field.type}
+                  placeholder={field.ph}
+                  dir={field.dir}
+                  autoComplete={field.auto}
+                  required
+                  aria-required="true"
+                  aria-describedby={submitError ? "booking-form-error" : undefined}
+                  value={form[field.key]}
+                  onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+                />
               </div>
             ))}
             <div>
-              <label className="visio-label">הערות לצלם</label>
-              <textarea className="visio-input" rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+              <label className="visio-label" htmlFor="booking-notes">הערות לצלם</label>
+              <textarea id="booking-notes" className="visio-input" rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
             </div>
 
             {/* Watermark section */}
@@ -902,13 +983,13 @@ function BookingSection() {
               <div className="visio-copy" style={{ marginBottom: 18 }}>לוגו + טלפון + תמונת סוכן — יופיעו על כל תמונה · אופציונלי</div>
 
               <div style={{ marginBottom: 16 }}>
-                <label className="visio-label">מספר טלפון על התמונה</label>
-                <input className="visio-input" placeholder="05X-XXXXXXX" dir="ltr" value={wm.agentPhone} onChange={e => setWm(w => ({ ...w, agentPhone: e.target.value }))} />
+                <label className="visio-label" htmlFor="booking-agent-phone">מספר טלפון על התמונה</label>
+                <input id="booking-agent-phone" className="visio-input" type="tel" autoComplete="tel" placeholder="05X-XXXXXXX" dir="ltr" value={wm.agentPhone} onChange={e => setWm(w => ({ ...w, agentPhone: e.target.value }))} />
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label className="visio-label">לוגו חברה / סוכנות</label>
-                <input ref={logoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("logoFile", "logoUrl", e)} />
+                <label className="visio-label" htmlFor="booking-logo">לוגו חברה / סוכנות (אופציונלי)</label>
+                <input id="booking-logo" ref={logoRef} className="visio-file-input" type="file" accept="image/*" onChange={e => handleFile("logoFile", "logoUrl", e)} />
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                   <button type="button" className="visio-btn outline" onClick={() => logoRef.current?.click()}>
                     {wm.logoUrl ? "← החלף לוגו" : "↑ העלה לוגו"}
@@ -928,13 +1009,14 @@ function BookingSection() {
                   </div>
                   <div>
                     <div className="visio-copy" style={{ color: C.text }}>אני מעוניין שתמונת הסוכן תופיע על התמונות</div>
-                    <div className="visio-copy visio-copy-soft">הסוכן יוצב בפינה על כל תמונה</div>
+                    <div className="visio-copy visio-copy-soft">אופציונלית. תשמש רק לבאנר על התמונות.</div>
                   </div>
                 </button>
 
                 {wm.wantAgentPhoto && (
                   <div style={{ padding: 16, background: C.bg, border: `1px solid ${C.rule}` }}>
-                    <input ref={photoRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleFile("agentPhotoFile", "agentPhotoUrl", e)} />
+                    <label className="visio-label" htmlFor="booking-agent-photo">תמונת הסוכן</label>
+                    <input id="booking-agent-photo" ref={photoRef} className="visio-file-input" type="file" accept="image/*" onChange={e => handleFile("agentPhotoFile", "agentPhotoUrl", e)} />
                     <button type="button" className="visio-btn outline" onClick={() => photoRef.current?.click()}>
                       {wm.agentPhotoUrl ? "← החלף תמונה" : "↑ העלה תמונת גוף"}
                     </button>
@@ -953,12 +1035,55 @@ function BookingSection() {
             </div>
 
             {(!selDate || !selSlot) && <div className="visio-notice">← גלול למעלה ובחר תאריך ושעה</div>}
-            {selDate && selSlot && formIncomplete && <div className="visio-notice">מלא שם, טלפון וכתובת הנכס</div>}
-            <button className="visio-btn block" onClick={handleSubmitBooking} disabled={bookingLoading}
+            {selDate && selSlot && formIncomplete && <div id="booking-missing" className="visio-notice" role="alert">מלאו שם, טלפון, כתובת, סוג מזמין והסכמת בעל הנכס</div>}
+            <fieldset className="visio-fieldset">
+              <legend className="visio-label">סוג המזמין *</legend>
+              <div className="visio-choice">
+                {Object.entries(CUSTOMER_TYPES).map(([value, label]) => (
+                  <label key={value} htmlFor={`booking-customer-${value}`}>
+                    <input
+                      id={`booking-customer-${value}`}
+                      type="radio"
+                      name="customerType"
+                      value={value}
+                      required
+                      checked={customerType === value}
+                      onChange={() => setCustomerType(value)}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <p className="visio-copy">
+              הפרטים שתמסור ישמשו לתיאום הצילום ולמתן השירות בלבד, ויישמרו אצל ספקי השירות שלנו (יומן, דואר ומסרים). אינך חייב על פי דין למסור אותם, אך בלעדיהם לא נוכל לתאם את הצילום. לפרטים: <a href="/privacy">מדיניות הפרטיות</a>
+            </p>
+            <p className="visio-copy">
+              בלחיצה על אישור ההזמנה אני מאשר שקראתי את <a href="/terms">התקנון</a>
+            </p>
+            <label className="visio-check-row" htmlFor="booking-owner-consent">
+              <input
+                id="booking-owner-consent"
+                className="visio-consent-input"
+                type="checkbox"
+                required
+                aria-required="true"
+                checked={ownerConsent}
+                onChange={(event) => setOwnerConsent(event.target.checked)}
+              />
+              <span className="visio-copy" style={{ color: C.text }}>{OWNER_CONSENT_TEXT}</span>
+            </label>
+            {submitError && (
+              <div id="booking-form-error" className="visio-notice" role="alert">
+                {submitError}{" "}
+                <a href="https://wa.me/972533523379">וואטסאפ</a>
+              </div>
+            )}
+            <button className="visio-btn block" type="submit" disabled={bookingLoading}
               style={{ cursor: bookingLoading ? "wait" : "pointer", opacity: (formIncomplete || !selDate || !selSlot) ? 0.5 : 1 }}>
-              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : formIncomplete ? "מלא שם + טלפון + כתובת" : "אישור הזמנה →"}
+              {bookingLoading ? "שומר הזמנה..." : (!selDate || !selSlot) ? "בחר תאריך ושעה תחילה" : formIncomplete ? "השלימו את הפרטים ואת ההסכמה" : "אישור הזמנה →"}
             </button>
-          </div>
+          </form>
         </div>
       )}
     </div>
@@ -967,30 +1092,20 @@ function BookingSection() {
 
 /* ─── CHARTER ─── */
 function CharterSection() {
-  const publicTerms = [
-    { title: "ביטול", body: "ביטול 48 שעות ומעלה — החזר מלא. ביטול 24-48 שעות — 50%. פחות מ-24 שעות — ללא החזר." },
-    { title: "אספקה", body: "כל הצילומים יסופקו ב-Google Drive תוך 24-48 שעות מהצילום." },
-    { title: "שימוש", body: "הלקוח רשאי להשתמש בתמונות לצרכי שיווק הנכס בלבד." },
-    { title: "פרטיות", body: "VISIO שומרת את הזכות לפרסם עבודות לצרכי תיק עבודות, אלא אם התבקשה אחרת." },
-    { title: "סיור וירטואלי", body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪40 לחודש). ניתן לבטל בכל עת עם הודעה מוקדמת." },
-    { title: "אחריות", body: "VISIO אחראית לאיכות הצילום ולעמידה בלוחות הזמנים שסוכמו. שינויים לאחר הגשה ייגבו תוספת." },
-    { title: "קניין רוחני", body: "כל זכויות היוצרים על התמונות והסרטונים שייכות ל-VISIO. הלקוח מקבל רישיון שימוש בלתי בלעדי." },
-  ];
-
   return (
     <section id="charter" className="visio-section">
       <div data-sc-in>
         <SectionTitle sup="CHARTER" title="תנאי שירות" sub="שקיפות מלאה · תנאים ברורים" />
       </div>
-      <div className="visio-narrow" data-sc-in data-sc-stagger="45">
-        {publicTerms.map(t => (
-          <div key={t.title} className="visio-term">
-            <div className="visio-term-title">{t.title}</div>
-            <p><Bidi>{t.body}</Bidi></p>
-          </div>
+      <div className="visio-narrow" data-sc-in>
+        {PUBLIC_TERMS.map((term) => (
+          <section key={term.title} className="visio-term">
+            <h3 className="visio-term-title">{term.title}</h3>
+            <p>{term.body}</p>
+          </section>
         ))}
-        <p className="visio-copy" style={{ marginTop: 32, textAlign: "center" }}>
-          לשאלות ובירורים: <a className="visio-mail" href="mailto:yoni@visioisrael.com" lang="en" dir="ltr" style={{ color: C.ink, unicodeBidi: "isolate" }}>yoni@visioisrael.com</a>
+        <p className="visio-copy" style={{ marginTop: 24 }}>
+          אותו נוסח מופיע גם <a href="/terms">בעמוד התקנון</a>.
         </p>
       </div>
     </section>
@@ -1009,7 +1124,7 @@ function AboutSection({ onNav }) {
       <div className="visio-narrow visio-article" data-sc-in>
         <div className="visio-kicker" style={{ marginBottom: 16 }}>החזון שלנו</div>
         <p className="visio-about-lead">
-          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
+          בנינו את <span lang="en" dir="ltr">VISIO</span> לסוכנים שעובדים מהר. מזמינים בהודעה אחת, מתאמים מועד שנוח לכם ולבעלי הנכס, ומקבלים תמונות מוכנות לפרסום תוך 24 עד 48 שעות. צילום מקצועי, עיבוד מדויק, ונכס שמושך יותר פניות.
         </p>
       </div>
     </section>
@@ -1019,7 +1134,7 @@ function AboutSection({ onNav }) {
     <section className="visio-section">
       <div className="visio-narrow visio-article">
         <div className="visio-about-grid" data-sc-in data-sc-stagger="50">
-          {[["מהירות", "הספקה ב-24 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
+          {[["מהירות", "הספקה תוך 24 עד 48 שעות מהצילום לתיקיית Drive"], ["דיוק", "כל תמונה מעובדת ידנית בנוסף ל-AI"], ["טכנולוגיה", "מצלמת Insta360 X4 · רחפן DJI · סיור וירטואלי 3D"], ["שותפות", "עובדים עם סוכנויות המובילות בדרום"]].map(([title, desc], i) => (
             <div key={title}>
               <div className="visio-about-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="visio-term-title" style={{ marginBottom: 8 }}>{title}</div>
@@ -1033,7 +1148,6 @@ function AboutSection({ onNav }) {
           {PARTNERS.map(p => (
             <div key={p.id} style={{ textAlign: "center" }}>
               <div className="visio-partner-name"><Bidi>{p.name}</Bidi></div>
-              <div className="visio-copy" style={{ marginTop: 4 }}><Bidi>{p.desc}</Bidi></div>
             </div>
           ))}
         </div>
@@ -1055,7 +1169,7 @@ const NAV = [
   { id: "portfolio", label: "עבודות" },
   { id: "pricing", label: "חבילות" },
   { id: "booking", label: "הזמן" },
-  { id: "charter", label: "תקנון" },
+  { id: "charter", label: "תקנון", href: "/terms" },
   { id: "about", label: "אודות" },
 ];
 
@@ -1159,21 +1273,21 @@ export default function VisioApp() {
           <button className="visio-nav-mini" onClick={() => nav("home")} aria-label="VISIO — דף הבית"><Bidi>VISIO</Bidi></button>
           <div className="nav-desktop">
             {NAV.map(n => (
-              <button key={n.id} className={`visio-nav-link${active === n.id ? " active" : ""}`} onClick={() => nav(n.id)}>
-                {n.label}
-              </button>
+              n.href
+                ? <a key={n.id} className="visio-nav-link" href={n.href}>{n.label}</a>
+                : <button key={n.id} type="button" className={`visio-nav-link${active === n.id ? " active" : ""}`} onClick={() => nav(n.id)}>{n.label}</button>
             ))}
           </div>
         </div>
       </nav>
 
       {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
-      <aside id="visio-drawer" className={`nav-drawer ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
+      <aside id="visio-drawer" className={`nav-drawer ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen} inert={menuOpen ? undefined : ""}>
         <div className="nav-drawer-mark"><Bidi>VISIO</Bidi></div>
         {NAV.map(n => (
-          <button key={n.id} className={`nav-drawer-btn ${active === n.id ? "active" : ""}`} onClick={() => nav(n.id)}>
-            {n.label}
-          </button>
+          n.href
+            ? <a key={n.id} className="nav-drawer-btn" href={n.href}>{n.label}</a>
+            : <button key={n.id} type="button" className={`nav-drawer-btn ${active === n.id ? "active" : ""}`} onClick={() => nav(n.id)}>{n.label}</button>
         ))}
         <div style={{ padding: 24 }}>
           <button className="visio-btn block" onClick={() => nav("booking")}>הזמן צילום</button>
@@ -1202,12 +1316,17 @@ export default function VisioApp() {
         <p className="visio-footer-tag">נדל״ן. בצילום שמוכר.</p>
         <div className="visio-footer-nav">
           {NAV.map(n => (
-            <button key={n.id} onClick={() => nav(n.id)}>{n.label}</button>
+            n.href
+              ? <a key={n.id} href={n.href}>{n.label}</a>
+              : <button key={n.id} type="button" onClick={() => nav(n.id)}>{n.label}</button>
           ))}
+          <a href="/privacy">מדיניות פרטיות</a>
+          <a href="/accessibility">הצהרת נגישות</a>
         </div>
+        <p className="visio-footer-business">VISIO – יונתן בוזגלו, עוסק מורשה 206586869, yoni@visioisrael.com, 053-352-3379</p>
         <p className="visio-footer-legal">
           <a href="https://wa.me/972533523379">וואטסאפ 053-352-3379</a>
-          <Bidi> · © 2025 VISIO Photography · כל הזכויות שמורות · </Bidi><a href="/admin/login">כניסת צוות</a>
+          {" · © 2026 VISIO – יונתן בוזגלו. כל הזכויות בתמונות, בסרטונים ובסיורים שמורות. אין להעתיק או להשתמש בהם ללא אישור בכתב"}
         </p>
       </footer>
     </div>

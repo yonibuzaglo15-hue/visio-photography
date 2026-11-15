@@ -22,9 +22,9 @@ public/tours/<slug>/
 
 ```json
 {
-  "title": "דירה · אשדוד",
-  "location": "שבט לוי 11",
-  "aliases": ["shevet-levi-11"],
+  "title": "שבט לוי",
+  "location": "אשדוד",
+  "aliases": ["shevet-levi", "shevet-levi-11"],
   "credit": "יונתן בוזגלו | VISIO",
   "matterportId": "Hkg7xrnXgoM",
   "firstScene": "p27",
@@ -50,10 +50,10 @@ public/tours/<slug>/
 Then, in the `PORTFOLIO` array in `src/App.jsx`, set `tour` on the property. The card button opens `/tours/<slug>` on this site. Leave `matterport` in place if you still want the original model id recorded. Cards without `tour` keep opening Matterport. A card can also set `hero` and `gallery` to stills in this folder when it has no entry in `PROPERTY_IMAGES`.
 
 ```js
-{ title: "דירה · אשדוד", sub: "שבט לוי 11 · מרפסת · סלון · מטבח · 44 נקודות", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }
+{ title: "שבט לוי · אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }
 ```
 
-`title` and `location` are joined in the tour header and the browser tab (`דירה · אשדוד · שבט לוי 11`). Optional `aliases` are extra slugs for the same folder. `/tours/shevet-levi-11` opens this apartment; the panoramas still load from `/tours/ashdod-apartment`.
+`title` and `location` are joined in the tour header and the browser tab (`שבט לוי · אשדוד`). Optional `aliases` are extra slugs for the same folder. `/tours/shevet-levi` opens this apartment; the panoramas still load from `/tours/ashdod-apartment`. Older numbered URLs redirect here.
 
 Optional `assetBase` (`https://…`) loads panoramas and the plan from another host, such as Vercel Blob, instead of this folder. Local `pano/` files are then not required. The default is `/tours/<slug>`.
 
@@ -82,7 +82,7 @@ What is still missing on the tours that do not show automatic dimensions:
 
 | Tour | Missing |
 | --- | --- |
-| חסידא 17, יהויכין 11 | No `matterportId`. Floor-ring headings share a scale, so the manual ruler works on the floor only (lens height assumed 1.27 m, the שבט לוי camera). Add the model id and run the script for real room sizes. |
+| חסידא, יהויכין | No `matterportId`. Floor-ring headings share a scale, so the manual ruler works on the floor only (lens height assumed 1.27 m, the שבט לוי camera). Add the model id and run the script for real room sizes. |
 | שבט זבולון | No `matterportId`, and the floor rings do not share one scale, so there is no ruler at all. Same fix: model id, then the script. |
 
 There is no depth mesh in the repo. Furniture and open doorways are not solid.
@@ -91,4 +91,4 @@ Pannellum 2.5.6 is vendored at `public/vendor/pannellum/` (MIT).
 
 ### This apartment
 
-`public/tours/ashdod-apartment/` is the 44-scene tour of the apartment at שבט לוי 11, אשדוד (Matterport `Hkg7xrnXgoM`), formerly hosted on `rehouse-tour.vercel.app`. `/tours/shevet-levi-11` is an alias of the same tour. The live source does not publish full-size `pNN.jpg` or a `/thumb/` directory (both 404). The player only requests `pano/<id>_m.jpg` and `pano/<id>_s.jpg`, 88 files, about 31MB, so those are what is in the repo. Hosting them here means the tour does not depend on the other Vercel project staying up, and adding the next tour is the same folder drop.
+`public/tours/ashdod-apartment/` is the 44-scene tour of the apartment at שבט לוי, אשדוד (Matterport `Hkg7xrnXgoM`), formerly hosted on `rehouse-tour.vercel.app`. `/tours/shevet-levi` is an alias of the same tour. The live source does not publish full-size `pNN.jpg` or a `/thumb/` directory (both 404). The player only requests `pano/<id>_m.jpg` and `pano/<id>_s.jpg`, 88 files, about 31MB, so those are what is in the repo. Hosting them here means the tour does not depend on the other Vercel project staying up, and adding the next tour is the same folder drop.
