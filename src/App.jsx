@@ -67,7 +67,7 @@ function StoryImage({ id, title, eager = false }) {
 }
 
 /* Full figure, including the suffix, lives in one LTR isolate so RTL cannot
-   split "500+", "24H", "1+1" or "12+12" across the stat cells. */
+   split "150+", "24H", "1+1" or "12+12" across the stat cells. */
 function StatFigure({ value, suffix = "", duration = 1200 }) {
   const ref = useRef(null);
   const [text, setText] = useState(`${value}${suffix}`);
@@ -422,7 +422,7 @@ function HomeSection({ onNav }) {
       <div className="visio-stats-wrap">
         <div className="visio-stats">
           <div className="visio-stat">
-            <div className="visio-stat-num"><StatFigure value={500} suffix="+" duration={1300} /></div>
+            <div className="visio-stat-num"><StatFigure value={150} suffix="+" duration={1300} /></div>
             <div className="visio-kicker muted">נכסים צולמו</div>
           </div>
           <div className="visio-stat">
