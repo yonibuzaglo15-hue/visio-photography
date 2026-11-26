@@ -2,6 +2,8 @@ import Script from "next/script";
 import "../src/vendor/scrollcraft/scrollcraft.css";
 import "./globals.css";
 import { THEME_BOOTSTRAP_SCRIPT } from "../src/theme/bootstrap.js";
+import AccessibilityWidget from "../src/site/AccessibilityWidget";
+import CookieConsent from "../src/site/CookieConsent";
 
 export const metadata = {
   title: "VISIO Photography",
@@ -23,7 +25,10 @@ export default function RootLayout({ children }) {
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
         />
+        <a className="visio-skip" href="#main">דלג לתוכן</a>
         {children}
+        <AccessibilityWidget />
+        <CookieConsent />
       </body>
     </html>
   );

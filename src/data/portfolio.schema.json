@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visioisrael.com/schema/portfolio.json",
+  "title": "VISIO portfolio",
+  "description": "Public works, newest first. Captions name a neighbourhood or area and a city. They do not include a street or a house number. Agent names may stay in the title.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "title", "sub", "city", "partner", "company"],
+    "properties": {
+      "id": { "type": "integer", "minimum": 1 },
+      "title": { "type": "string", "description": "Neighbourhood or area, then city. Example: רובע ה׳, אשדוד. No street." },
+      "sub": { "type": "string", "description": "Short feature line, such as מרפסת · סלון · מטבח." },
+      "city": { "enum": ["אשדוד", "אשקלון", "יבנה"] },
+      "tag": { "type": "string" },
+      "tags": { "type": "array", "items": { "type": "string" } },
+      "partner": { "enum": ["ReHouse", "RE/MAX"], "description": "Stored for filtering only. Never rendered on a card." },
+      "company": { "enum": ["rehouse", "remax"] },
+      "hero": { "type": "string", "description": "Public path of the card image, usually /portfolio/<slug>/cover.jpg." },
+      "gallery": { "type": "array", "items": { "type": "string" } },
+      "matterport": { "type": "string", "description": "Matterport model id. Omitted when the card opens a tour hosted on this site." },
+      "tour": { "type": "string", "description": "Slug under public/tours/. The card opens /tours/<slug>." },
+      "fit": { "enum": ["contain"], "description": "Use contain when the still has a banner that must not be cropped." }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import fs from "fs";
 import { describe, expect, it } from "vitest";
 import { listTourSlugs, loadTour } from "../lib/tours/loadTour.js";
+import { cardTagLine, cityOf, groupByCity, companyOf } from "../src/data/portfolio.js";
 
 const KEPT_MATTERPORT = {
   1: "ooDYEMx6TCr",
@@ -25,12 +26,7 @@ function jpegSize(file) {
 }
 
 function portfolioFromApp() {
-  const src = fs.readFileSync("src/App.jsx", "utf8");
-  const start = src.indexOf("const PORTFOLIO = [");
-  const end = src.indexOf("\n];", start);
-  if (start < 0 || end < 0) throw new Error("PORTFOLIO array not found");
-  const literal = src.slice(start + "const PORTFOLIO = ".length, end + 2);
-  return Function(`"use strict"; return (${literal});`)();
+  return JSON.parse(fs.readFileSync("src/data/portfolio.json", "utf8"));
 }
 
 describe("hosted tours", () => {
@@ -42,30 +38,30 @@ describe("hosted tours", () => {
     expect(tour.scenes).toHaveLength(44);
     expect(tour.firstScene).toBe("p27");
     expect(tour.assetBase).toBe("/tours/ashdod-apartment");
-    expect(tour.title).toBe("דירה · אשדוד");
-    expect(tour.location).toBe("שבט לוי 11");
+    expect(tour.title).toBe("אשדוד");
+    expect(tour.location).toBe("");
     expect(tour.scenes[0].hotspots.length).toBeGreaterThan(0);
     expect(tour.scenes.every((scene) => typeof scene.map.x === "number")).toBe(true);
   });
 
-  it("serves /tours/shevet-levi-11 as an alias of the same apartment", () => {
-    expect(listTourSlugs()).toContain("shevet-levi-11");
-    const tour = loadTour("shevet-levi-11");
+  it("does not publish a street-name alias for the Ashdod apartment", () => {
+    expect(listTourSlugs()).not.toContain("shevet-levi");
+    const tour = loadTour("ashdod-apartment");
     expect(tour.slug).toBe("ashdod-apartment");
-    expect(tour.location).toBe("שבט לוי 11");
+    expect(tour.location).toBe("");
     expect(tour.scenes).toHaveLength(44);
     expect(tour.assetBase).toBe("/tours/ashdod-apartment");
   });
 
   it("loads the self-hosted שבט זבולון tour", () => {
-    expect(listTourSlugs()).toContain("shevet-zevulun");
-    const tour = loadTour("shevet-zevulun");
+    expect(listTourSlugs()).toContain("rova-12");
+    const tour = loadTour("rova-12");
     expect(tour).toBeTruthy();
     expect(tour.scenes).toHaveLength(32);
     expect(tour.firstScene).toBe("z21");
-    expect(tour.assetBase).toBe("/tours/shevet-zevulun");
-    expect(tour.title).toBe("שבט זבולון 5 - גיא רוזן");
-    expect(tour.location).toBe("רובע י״ב · אשדוד");
+    expect(tour.assetBase).toBe("/tours/rova-12");
+    expect(tour.title).toBe("רובע י״ב, אשדוד - גיא רוזן");
+    expect(tour.location).toBe("");
     const ids = new Set(tour.scenes.map((scene) => scene.id));
     for (const scene of tour.scenes) {
       expect(scene.hotspots.length).toBeGreaterThan(0);
@@ -78,9 +74,9 @@ describe("hosted tours", () => {
   });
 
   it("places every שבט זבולון point on the Matterport-derived plan with a heading", () => {
-    const tour = loadTour("shevet-zevulun");
+    const tour = loadTour("rova-12");
     expect(tour.plan).toBe("plan.jpg");
-    expect(jpegSize("public/tours/shevet-zevulun/plan.jpg")).toEqual({ width: 1442, height: 1380 });
+    expect(jpegSize("public/tours/rova-12/plan.jpg")).toEqual({ width: 1442, height: 1380 });
     const seen = new Set();
     for (const scene of tour.scenes) {
       const { x, y, heading } = scene.map;
@@ -97,13 +93,13 @@ describe("hosted tours", () => {
     expect(loadTour("ashdod-apartment").scenes.some((scene) => "heading" in scene.map)).toBe(false);
   });
 
-  it("loads the self-hosted חסידא 17 tour with every Matterport point on the plan", () => {
-    expect(listTourSlugs()).toContain("chasida-17");
-    const tour = loadTour("chasida-17");
+  it("loads the self-hosted חסידא tour with every Matterport point on the plan", () => {
+    expect(listTourSlugs()).toContain("rova-7");
+    const tour = loadTour("rova-7");
     expect(tour).toBeTruthy();
     expect(tour.scenes).toHaveLength(54);
     expect(tour.firstScene).toBe("c18");
-    expect(tour.assetBase).toBe("/tours/chasida-17");
+    expect(tour.assetBase).toBe("/tours/rova-7");
     expect(tour.credit).toBe("יונתן בוזגלו | VISIO");
     expect(tour.plan).toBe("plan.jpg");
     for (const text of [tour.title, tour.location, tour.note]) {
@@ -129,17 +125,17 @@ describe("hosted tours", () => {
       expect(Number.isFinite(heading)).toBe(true);
       expect(seen.has(`${x},${y}`)).toBe(false);
       seen.add(`${x},${y}`);
-      expect(jpegSize(`public/tours/chasida-17/pano/${scene.id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
+      expect(jpegSize(`public/tours/rova-7/pano/${scene.id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
     }
   });
 
   it("loads the self-hosted יהויכין 11 tour with every Matterport point on the plan", () => {
-    expect(listTourSlugs()).toContain("yehoyakin-11");
-    const tour = loadTour("yehoyakin-11");
+    expect(listTourSlugs()).toContain("rova-13");
+    const tour = loadTour("rova-13");
     expect(tour).toBeTruthy();
     expect(tour.scenes).toHaveLength(35);
     expect(tour.firstScene).toBe("y19");
-    expect(tour.assetBase).toBe("/tours/yehoyakin-11");
+    expect(tour.assetBase).toBe("/tours/rova-13");
     expect(tour.credit).toBe("יונתן בוזגלו | VISIO");
     expect(tour.plan).toBe("plan.jpg");
     for (const text of [tour.title, tour.location, tour.note]) {
@@ -165,7 +161,7 @@ describe("hosted tours", () => {
       expect(Number.isFinite(heading)).toBe(true);
       expect(seen.has(`${x},${y}`)).toBe(false);
       seen.add(`${x},${y}`);
-      expect(jpegSize(`public/tours/yehoyakin-11/pano/${scene.id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
+      expect(jpegSize(`public/tours/rova-13/pano/${scene.id}_m.jpg`)).toEqual({ width: 4096, height: 2048 });
     }
   });
 
@@ -199,13 +195,13 @@ describe("portfolio tour wiring", () => {
 
   it("points the Ashdod apartment card at the hosted tour", () => {
     const card = portfolio.find((item) => item.matterport === "Hkg7xrnXgoM");
-    expect(card?.title).toBe("דירה · אשדוד");
-    expect(card?.sub.startsWith("שבט לוי 11")).toBe(true);
+    expect(card?.title).toBe("אשדוד");
+    expect(card?.sub).toBe("מרפסת · סלון · מטבח · 44 נקודות");
     expect(card?.tour).toBe("ashdod-apartment");
     const order = ["16", "17", "18", "19", "20", "21", "13", "14", "15", "09", "10", "11", "12", "01", "02", "03", "04", "05", "06", "07", "08"];
     expect(card?.fit).toBe("contain");
-    expect(card?.hero).toBe("/portfolio/shevet-levi-11/16.jpg");
-    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-levi-11/${n}.jpg`));
+    expect(card?.hero).toBe("/portfolio/ashdod-10/16.jpg");
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/ashdod-10/${n}.jpg`));
     expect(card?.gallery.join(" ")).not.toMatch(/card\.jpg|stills\//);
     const css = fs.readFileSync("app/globals.css", "utf8");
     expect(css).toMatch(/\.visio-portfolio-img-wrap\.contain img \{ object-fit: contain/);
@@ -213,30 +209,30 @@ describe("portfolio tour wiring", () => {
   });
 
   it("points the שבט זבולון card at its hosted tour with the edited stills gallery", () => {
-    const card = portfolio.find((item) => item.tour === "shevet-zevulun");
-    expect(card?.title).toBe("שבט זבולון 5 - גיא רוזן");
+    const card = portfolio.find((item) => item.tour === "rova-12");
+    expect(card?.title).toBe("רובע י״ב, אשדוד - גיא רוזן");
     expect(card?.company).toBe("remax");
-    expect(card?.tour).toBe("shevet-zevulun");
+    expect(card?.tour).toBe("rova-12");
     const order = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, "0"));
     // card cover is a separate logo-free still; the gallery keeps the branded 01..15
-    expect(card?.hero).toBe("/portfolio/shevet-zevulun/cover.jpg");
+    expect(card?.hero).toBe("/portfolio/rova-12-16/cover.jpg");
     expect(card?.gallery).not.toContain(card?.hero);
-    expect(jpegSize("public/portfolio/shevet-zevulun/cover.jpg")).toEqual({ width: 2560, height: 1440 });
+    expect(jpegSize("public/portfolio/rova-12-16/cover.jpg")).toEqual({ width: 2560, height: 1440 });
     expect(card?.gallery).toHaveLength(15);
-    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/shevet-zevulun/${n}.jpg`));
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/rova-12-16/${n}.jpg`));
     expect(card?.gallery.join(" ")).not.toMatch(/cover\.jpg|stills\//);
     for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
     // sequential 01..15 only, no leftovers from the previous set; every still is 2560x1440
-    const files = fs.readdirSync("public/portfolio/shevet-zevulun").sort();
+    const files = fs.readdirSync("public/portfolio/rova-12-16").sort();
     expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
-    for (const f of files) expect(jpegSize(`public/portfolio/shevet-zevulun/${f}`)).toEqual({ width: 2560, height: 1440 });
+    for (const f of files) expect(jpegSize(`public/portfolio/rova-12-16/${f}`)).toEqual({ width: 2560, height: 1440 });
   });
 
   it("points the חשוון 7 card at the external Matterport tour with a stills gallery", () => {
     const card = portfolio.find((item) => item.id === 29);
-    expect(card?.title).toBe("חשוון 7 - גיא רוזן");
+    expect(card?.title).toBe("רובע י״ב, אשדוד - גיא רוזן");
     expect(card?.city).toBe("אשדוד");
-    expect(card?.sub).toBe("רובע י״ב · מרפסת · סלון · מטבח");
+    expect(card?.sub).toBe("מרפסת · סלון · מטבח");
     expect(card?.company).toBe("remax");
     expect(card?.partner).toBe("RE/MAX");
     expect(card?.tag).toBe("דירה + סיור וירטואלי");
@@ -245,15 +241,15 @@ describe("portfolio tour wiring", () => {
     expect(card?.tour).toBeUndefined();
     expect(card?.matterport).toBe("idnfQzzt684");
     const order = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, "0"));
-    expect(card?.hero).toBe("/portfolio/cheshvan-7/cover.jpg");
+    expect(card?.hero).toBe("/portfolio/rova-12-29/cover.jpg");
     expect(card?.gallery).not.toContain(card?.hero);
-    expect(jpegSize("public/portfolio/cheshvan-7/cover.jpg")).toEqual({ width: 2560, height: 1440 });
+    expect(jpegSize("public/portfolio/rova-12-29/cover.jpg")).toEqual({ width: 2560, height: 1440 });
     expect(card?.gallery).toHaveLength(15);
-    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/cheshvan-7/${n}.jpg`));
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/rova-12-29/${n}.jpg`));
     for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
-    const files = fs.readdirSync("public/portfolio/cheshvan-7").sort();
+    const files = fs.readdirSync("public/portfolio/rova-12-29").sort();
     expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
-    for (const f of files) expect(jpegSize(`public/portfolio/cheshvan-7/${f}`)).toEqual({ width: 2560, height: 1440 });
+    for (const f of files) expect(jpegSize(`public/portfolio/rova-12-29/${f}`)).toEqual({ width: 2560, height: 1440 });
     const src = fs.readFileSync("src/App.jsx", "utf8");
     expect(src).toContain("https://my.matterport.com/show/?m=${p.matterport}");
     expect(src).toContain('target: "_blank"');
@@ -261,9 +257,9 @@ describe("portfolio tour wiring", () => {
 
   it("points the האשכולית 3 card at the external Matterport tour with a stills gallery", () => {
     const card = portfolio.find((item) => item.id === 30);
-    expect(card?.title).toBe("האשכולית 3 - גיא רוזן");
+    expect(card?.title).toBe("רובע ט״ז, אשדוד - גיא רוזן");
     expect(card?.city).toBe("אשדוד");
-    expect(card?.sub).toBe("רובע ט״ז · מרפסת · סלון · מטבח");
+    expect(card?.sub).toBe("מרפסת · סלון · מטבח");
     expect(card?.company).toBe("remax");
     expect(card?.partner).toBe("RE/MAX");
     expect(card?.tag).toBe("דירה + סיור וירטואלי");
@@ -272,38 +268,38 @@ describe("portfolio tour wiring", () => {
     expect(card?.tour).toBeUndefined();
     expect(card?.matterport).toBe("eo6fpaEEiA9");
     const order = Array.from({ length: 16 }, (_, i) => String(i + 1).padStart(2, "0"));
-    expect(card?.hero).toBe("/portfolio/eshkolit-3/cover.jpg");
+    expect(card?.hero).toBe("/portfolio/rova-16/cover.jpg");
     expect(card?.gallery).not.toContain(card?.hero);
-    expect(jpegSize("public/portfolio/eshkolit-3/cover.jpg")).toEqual({ width: 2560, height: 1440 });
+    expect(jpegSize("public/portfolio/rova-16/cover.jpg")).toEqual({ width: 2560, height: 1440 });
     expect(card?.gallery).toHaveLength(16);
-    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/eshkolit-3/${n}.jpg`));
+    expect(card?.gallery).toEqual(order.map((n) => `/portfolio/rova-16/${n}.jpg`));
     for (const src of card.gallery) expect(fs.existsSync(`public${src}`)).toBe(true);
-    const files = fs.readdirSync("public/portfolio/eshkolit-3").sort();
+    const files = fs.readdirSync("public/portfolio/rova-16").sort();
     expect(files).toEqual([...order.map((n) => `${n}.jpg`), "cover.jpg"]);
-    for (const f of files) expect(jpegSize(`public/portfolio/eshkolit-3/${f}`)).toEqual({ width: 2560, height: 1440 });
+    for (const f of files) expect(jpegSize(`public/portfolio/rova-16/${f}`)).toEqual({ width: 2560, height: 1440 });
     const src = fs.readFileSync("src/App.jsx", "utf8");
     expect(src).toContain("https://my.matterport.com/show/?m=${p.matterport}");
     expect(src).toContain('target: "_blank"');
   });
 
-  it("points the חסידא 17 card at its hosted tour", () => {
+  it("points the חסידא card at its hosted tour", () => {
     const card = portfolio.find((item) => item.id === 15);
-    expect(card?.title).toBe("חסידא 17 · אשדוד");
-    expect(card?.tour).toBe("chasida-17");
+    expect(card?.title).toBe("רובע ז׳, אשדוד");
+    expect(card?.tour).toBe("rova-7");
     expect(card?.matterport).toBeUndefined();
     expect(card?.tag).toBe("דירה + סיור וירטואלי");
     expect(card?.tags).toContain("סיור וירטואלי 3D");
-    expect(card?.gallery[0]).toBe("/portfolio/chasida-17/01.jpg");
+    expect(card?.gallery[0]).toBe("/portfolio/rova-7/01.jpg");
   });
 
   it("points the יהויכין 11 card at its hosted tour", () => {
     const card = portfolio.find((item) => item.id === 13);
-    expect(card?.title).toBe("יהויכין 11 · אשדוד");
-    expect(card?.tour).toBe("yehoyakin-11");
+    expect(card?.title).toBe("רובע י״ג, אשדוד");
+    expect(card?.tour).toBe("rova-13");
     expect(card?.matterport).toBeUndefined();
     expect(card?.tag).toBe("דירה + סיור וירטואלי");
     expect(card?.tags).toContain("סיור וירטואלי 3D");
-    expect(card?.gallery[0]).toBe("/portfolio/yehoyachin-11/01.jpg");
+    expect(card?.gallery[0]).toBe("/portfolio/rova-13/01.jpg");
   });
 
   it("opens /tours/<slug> when tour is set, otherwise Matterport", () => {
@@ -329,12 +325,6 @@ describe("viewer stage stays ltr", () => {
 describe("card text never mentions RE/MAX", () => {
   const src = fs.readFileSync("src/App.jsx", "utf8");
   const portfolio = portfolioFromApp();
-  const cardTagLine = (() => {
-    const start = src.indexOf("export const cardTagLine");
-    const end = src.indexOf("\n};", start);
-    const code = src.slice(start, end + 3).replace(/export /g, "");
-    return Function(`"use strict"; ${code}; return cardTagLine;`)();
-  })();
   const REMAX = /re\s*\/?\s*max|רימקס|רי\/מקס/i;
 
   it("no card title, kicker, subtitle or tag line contains RE/MAX", () => {
@@ -350,7 +340,7 @@ describe("card text never mentions RE/MAX", () => {
     expect(jsx.filter((l) => /\b(p|lead)\.partner\b/.test(l))).toEqual([]);
   });
 
-  it("uses the exact tag line for שבט זבולון 5 and drops RE/MAX from חסידא 17", () => {
+  it("uses the exact tag line for שבט זבולון 5 and drops RE/MAX from חסידא", () => {
     const zev = portfolio.find((p) => p.id === 16);
     expect(cardTagLine(zev)).toBe("מרפסת · סלון · מטבח · סיור וירטואלי 3D");
     const hasida = portfolio.find((p) => p.id === 15);
@@ -402,23 +392,25 @@ describe("gallery lightbox (all cards)", () => {
 describe("Yan Shindelman (REHOUSE) works", () => {
   const portfolio = portfolioFromApp();
   const YAN = [
-    [17, "shevet-levi-4", "שבט לוי 4", "רובע י״ב · אשדוד", null, 14],
-    [18, "atzmaut-21", "העצמאות 21", "סיטי · אשדוד", null, 18],
-    [19, "tzionut-55", "הציונות 55", "סיטי · אשדוד", null, 14],
-    [20, "kalanit-7a", "הכלנית 7א", "רובע ח׳ · אשדוד", null, 19],
-    [21, "ussishkin-21", "אוסישקין 21", "רובע ט״ו · אשדוד", null, 12],
-    [22, "petah-tikva-9", "פתח תקווה 9", "רובע ט׳ · אשדוד", null, 17],
-    [23, "agnon-21", "שי עגנון 21", "עתיקות · אשקלון", "JN6a8HHqRpX", 11],
-    [24, "nahal-snir-9", "נחל שניר 9", "רובע י״א · אשדוד", "mDADwNnNKtD", 13],
-    [25, "micha-hanavi-13", "מיכה הנביא 13", "רובע י׳ · אשדוד", null, 14],
-    [26, "harav-kook-19", "הרב קוק 19", "רובע ב׳ · אשדוד", null, 16],
-    [27, "haeshkol-8", "האשכול 8", "רובע א׳ · אשדוד", "mWxuq2zaKdZ", 16],
-    [28, "milman-2", "מילמן 2", "רובע ו׳ · אשדוד", null, 19],
+    [17, "rova-12-17", "רובע י״ב, אשדוד - יאן שינדלמן", "מרפסת · נוף · מטבח", null, 14],
+    [18, "sity-18", "סיטי, אשדוד - יאן שינדלמן", "מרפסת · סלון · מטבח", null, 18],
+    [19, "sity-19", "סיטי, אשדוד - יאן שינדלמן", "פנטהאוז · בריכה · מרפסת גג · נוף", null, 14],
+    [20, "rova-8", "רובע ח׳, אשדוד - יאן שינדלמן", "מרפסת · סלון · מטבח", null, 19],
+    [21, "rova-15-21", "רובע ט״ו, אשדוד - יאן שינדלמן", "מרפסת · סלון · מטבח", null, 12],
+    [22, "rova-9", "רובע ט׳, אשדוד - יאן שינדלמן", "מרפסת גג · סלון · מטבח", null, 17],
+    [23, "atikot", "עתיקות, אשקלון - יאן שינדלמן", "סלון · מטבח", "JN6a8HHqRpX", 11],
+    [24, "rova-11-24", "רובע י״א, אשדוד - יאן שינדלמן", "סלון · מטבח · מרפסת", "mDADwNnNKtD", 13],
+    [25, "rova-10", "רובע י׳, אשדוד - יאן שינדלמן", "סלון · מטבח", null, 14],
+    [26, "rova-2", "רובע ב׳, אשדוד - יאן שינדלמן", "סלון · מטבח", null, 16],
+    [27, "rova-1", "רובע א׳, אשדוד - יאן שינדלמן", "נוף · מטבח · סלון", "mWxuq2zaKdZ", 16],
+    [28, "rova-6", "רובע ו׳, אשדוד - יאן שינדלמן", "סלון · מטבח · מרפסת", null, 19],
   ];
 
-  it.each(YAN)("card %i (%s) has title, location, tour and a full local gallery", (id, slug, street, sub, model, count) => {
+  it.each(YAN)("card %i (%s) has title, location, tour and a full local gallery", (id, slug, title, sub, model, count) => {
     const card = portfolio.find((p) => p.id === id);
-    expect(card.title).toBe(`${street} - יאן שינדלמן`);
+    expect(card.title).toBe(title);
+    expect(card.title).toMatch(/יאן שינדלמן/);
+    expect(card.title).not.toMatch(/\d/);
     expect(card.sub).toBe(sub);
     expect(card.company).toBe("rehouse");
     expect(card.tour).toBeUndefined();
@@ -465,13 +457,7 @@ describe("Yan Shindelman (REHOUSE) works", () => {
 describe("REHOUSE works grouped by region", () => {
   const src = fs.readFileSync("src/App.jsx", "utf8");
   const portfolio = portfolioFromApp();
-  const helpers = (() => {
-    const start = src.indexOf("const KNOWN_CITIES");
-    const end = src.indexOf("// Card tag line:", start);
-    const code = src.slice(start, end).replace(/export /g, "");
-    return Function(`"use strict"; ${code}; return { cityOf, groupByCity };`)();
-  })();
-  const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
+  const helpers = { cityOf, groupByCity };
   const rehouse = portfolio.filter((p) => companyOf(p) === "rehouse");
 
   it("gives every card an explicit city that matches its title/location", () => {
@@ -485,7 +471,7 @@ describe("REHOUSE works grouped by region", () => {
 
   it("derives a city from the location line when the field is missing", () => {
     expect(helpers.cityOf({ sub: "עתיקות · אשקלון" })).toBe("אשקלון");
-    expect(helpers.cityOf({ title: "הפטל 17 · יבנה", sub: "גינה" })).toBe("יבנה");
+    expect(helpers.cityOf({ title: "הפטל · יבנה", sub: "גינה" })).toBe("יבנה");
     expect(helpers.cityOf({ title: "x", sub: "y" })).toBe("אחר");
   });
 
@@ -496,7 +482,7 @@ describe("REHOUSE works grouped by region", () => {
     expect(groups[1].items.map((p) => p.id)).toEqual([23]);
     expect(groups[2].items.map((p) => p.id)).toEqual([5]);
     const ashdod = groups[0].items.map((p) => p.id);
-    expect(ashdod).toEqual([...ashdod].sort((a, b) => a - b));
+    expect(ashdod).toEqual([...ashdod].sort((a, b) => b - a));
     expect(helpers.groupByCity([{ id: 1, city: "באר שבע" }, { id: 2, city: "יבנה" }, { id: 3, city: "אשדוד" }]).map((g) => g.city)).toEqual(["אשדוד", "יבנה", "באר שבע"]);
   });
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isEmailAllowed } from "@/lib/auth/allowlist.js";
 import { isDevAuthBypassEnabled } from "@/lib/auth/dev-bypass.js";
+import { legacyHostRedirect } from "@/lib/canonical-host.js";
 
 /**
  * Hard gate for /admin and pipeline APIs.
@@ -11,14 +12,25 @@ import { isDevAuthBypassEnabled } from "@/lib/auth/dev-bypass.js";
  * /admin/login is excluded from the gate so signed-out users can reach it.
  * After sign-in we always send people to /admin (deep /admin/* may 404).
  *
- * Public tours live at /tour/[jobId] — intentionally NOT in the matcher below,
- * so they stay unauthenticated. Do not add /tour to this matcher.
+ * The matcher covers public pages so visio-photography.vercel.app can 308
+ * to visioisrael.com. Auth runs only for /admin, /api/pipeline and /api/branding.
+ * Public tours at /tour/[jobId] stay unauthenticated.
  *
  * LOCAL-ONLY: DEV_AUTH_BYPASS=1 with NODE_ENV!==production skips the gate
  * so Playwright can drive /admin. Impossible in production (see tests).
  */
 export async function middleware(request) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
+  const canonical = legacyHostRedirect(request.headers.get("host"), pathname, search);
+  if (canonical) {
+    return NextResponse.redirect(canonical, 308);
+  }
+
+  const guarded =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api/pipeline") ||
+    pathname.startsWith("/api/branding");
+  if (!guarded) return NextResponse.next();
 
   if (pathname.startsWith("/api/pipeline/webhook/")) {
     return NextResponse.next();
@@ -76,10 +88,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: [
-    "/admin",
-    "/admin/:path*",
-    "/api/pipeline/:path*",
-    "/api/branding/:path*",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|favicon.svg).*)"],
 };
