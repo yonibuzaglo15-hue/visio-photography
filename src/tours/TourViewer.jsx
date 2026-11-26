@@ -212,6 +212,8 @@ export default function TourViewer({ tour }) {
   }
 
   const heading = [tour.title, tour.location].filter(Boolean).join(" · ");
+  const summary = (tour.note || "").split("\n").map((line) => line.trim()).find(Boolean)
+    || `סיור וירטואלי 360° של ${heading}.`;
   const planSrc = tour.plan ? `${tour.assetBase}/${tour.plan}` : null;
   const noteLines = (tour.note || "").split("\n").filter(Boolean);
 
@@ -235,7 +237,9 @@ export default function TourViewer({ tour }) {
         <div>
           <a className="visio-tour-brand" href="/">VISIO</a>
           <h1 className="visio-tour-title">{heading}</h1>
+          <p className="visio-tour-desc">{summary}</p>
           <div className="visio-tour-room">{room}</div>
+          <a className="visio-tour-alt" href="/#portfolio">גלריית תמונות</a>
         </div>
         <div className="visio-tour-ctl" dir="ltr">
           <button

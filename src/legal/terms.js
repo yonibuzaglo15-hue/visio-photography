@@ -1,0 +1,50 @@
+import { OWNER_CONSENT_TEXT } from "../../lib/booking-consent.js";
+
+// On-site terms. The full PDF is optional: /terms shows a download only when
+// public/terms/visio-terms.pdf is present.
+export const PUBLIC_TERMS = [
+  {
+    title: "ביטול",
+    body: "לקוח עסקי: 48 שעות ומעלה ללא חיוב; 24 עד 48 שעות 50%. לקוח פרטי (צרכן): ביטול בהתאם לחוק הגנת הצרכן – ראו סעיף 11 בתקנון.",
+  },
+  {
+    title: "אספקה",
+    body: "כל הצילומים יסופקו ב-Google Drive תוך 24 עד 48 שעות מהצילום.",
+  },
+  {
+    title: "שימוש",
+    body: "הלקוח מקבל רישיון שימוש לשיווק הנכס, לאחר תשלום מלא.",
+  },
+  {
+    title: "הסכמת בעל הנכס",
+    body: OWNER_CONSENT_TEXT,
+  },
+  {
+    title: "פרטיות",
+    body: "VISIO רשאית להציג עבודות בתיק העבודות ללא כתובת מלאה וללא פרטים מזהים, ותסיר נכס לבקשת הבעלים.",
+  },
+  {
+    title: "סיור וירטואלי",
+    body: "סיור וירטואלי מסופק כשירות חוזר חודשי (₪50 + מע״מ לחודש). ביטול המנוי בכל עת בהודעה בוואטסאפ 053-352-3379 או בדואר אלקטרוני yoni@visioisrael.com; הביטול נכנס לתוקף תוך 3 ימי עסקים, ללא דמי ביטול.",
+  },
+  {
+    title: "אחריות",
+    body: "VISIO אחראית לאיכות הצילום ולעמידה בלוחות הזמנים שסוכמו. סבב תיקונים אחד כלול; תיקונים נוספים בתוספת תשלום שתוסכם מראש.",
+  },
+  {
+    title: "קניין רוחני",
+    body: "זכויות היוצרים שייכות ל-VISIO; הלקוח מקבל רישיון שימוש לשיווק הנכס, לאחר תשלום מלא.",
+  },
+];
+
+export const BUSINESS = {
+  name: "יונתן בוזגלו",
+  brand: "VISIO",
+  trade: "עוסק מורשה 206586869",
+  address: "החלוצים 9, אשדוד",
+  email: "yoni@visioisrael.com",
+  phone: "053-352-3379",
+  whatsapp: "https://wa.me/972533523379",
+};
+
+export const BUSINESS_LINE = `${BUSINESS.name} (${BUSINESS.brand}), ${BUSINESS.trade}, ${BUSINESS.address}, ${BUSINESS.email}, וואטסאפ ${BUSINESS.phone}`;

@@ -148,7 +148,7 @@ function traceQuads(ctx, quads) {
 
 function openPane(pane) {
   if (pane.href) {
-    if (pane.href.startsWith("http")) window.open(pane.href, "_blank", "noopener");
+    if (pane.href.startsWith("http")) window.open(pane.href, "_blank", "noopener,noreferrer");
     else window.location.assign(pane.href);
     return;
   }
@@ -451,7 +451,7 @@ export default function DroneFloors({ packages, onNav, showVat, formatPrice }) {
       <div className="visio-drone-live">
         <div className="visio-drone-stage">
           <img className="visio-drone-poster" src="/drone/poster.webp" alt="" />
-          <canvas ref={canvasRef} className="visio-drone-canvas" aria-label="חלונות הבניין עם עבודות שצילמנו" />
+          <canvas ref={canvasRef} className="visio-drone-canvas" aria-label="חלונות הבניין עם עבודות שצילמנו. סיור Matterport נפתח באתר חיצוני." />
           <DroneHeading />
           <div className="visio-drone-card-slot">
             {cards.map((item) => (

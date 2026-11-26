@@ -6,7 +6,7 @@ import { createPsvTourViewer } from "../../../lib/tour/create-psv-viewer.js";
 /**
  * Public tour viewer — Photo Sphere Viewer + VirtualTour + Map plugins.
  */
-export default function TourViewerClient({ config: initialConfig }) {
+export default function TourViewerClient({ config: initialConfig, description = "" }) {
   const containerRef = useRef(null);
   const apiRef = useRef(null);
   const [error, setError] = useState("");
@@ -113,6 +113,25 @@ export default function TourViewerClient({ config: initialConfig }) {
           {error}
         </div>
       )}
+      {description ? (
+        <div
+          style={{
+            position: "fixed",
+            top: 16,
+            right: 16,
+            zIndex: 30,
+            maxWidth: 420,
+            color: "#fff",
+            textShadow: "0 1px 2px #000",
+            fontFamily: "system-ui, sans-serif",
+            fontSize: 16,
+            lineHeight: 1.45,
+          }}
+        >
+          <p style={{ margin: "0 0 6px" }}>{description}</p>
+          <a href="/#portfolio" style={{ color: "#fff" }}>גלריית תמונות</a>
+        </div>
+      ) : null}
       <div
         style={{
           position: "fixed",
