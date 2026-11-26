@@ -6,10 +6,11 @@ describe("booking consent", () => {
     expect(parseBookingConsent({ customerType: "", ownerConsent: "yes" }).ok).toBe(false);
     expect(parseBookingConsent({ customerType: "business", ownerConsent: "" }).ok).toBe(false);
     expect(parseBookingConsent({ customerType: "private", ownerConsent: "no" }).ok).toBe(false);
+    expect(parseBookingConsent({ customerType: "private", ownerConsent: "yes", termsAccepted: "" }).ok).toBe(false);
   });
 
   it("stores the declaration and a timestamp when both answers are present", () => {
-    const parsed = parseBookingConsent({ customerType: "private", ownerConsent: "yes" });
+    const parsed = parseBookingConsent({ customerType: "private", ownerConsent: "yes", termsAccepted: "yes" });
     expect(parsed.ok).toBe(true);
     expect(parsed.customerType).toBe("private");
     expect(parsed.customerTypeLabel).toBe("לקוח פרטי");

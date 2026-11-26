@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { fulfillBooking } from "@/lib/fulfill-booking";
 import { createJob } from "@/lib/pipeline/store.js";
 import { parseBookingConsent } from "@/lib/booking-consent.js";
+import { cleanPackage, cleanPhone, cleanText, clientIp } from "@/lib/public-input.js";
+import { rateLimit } from "@/lib/rate-limit.js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,6 +45,8 @@ async function readBooking(request) {
       agentPhone: field("agentPhone"),
       customerType: field("customerType"),
       ownerConsent: field("ownerConsent"),
+      termsAccepted: field("termsAccepted"),
+      company_website: field("company_website"),
       logo: await readUpload(form.get("logo")),
       agentPhoto: await readUpload(form.get("agentPhoto")),
     };
@@ -60,19 +64,36 @@ async function readBooking(request) {
     agentPhone: body.agentPhone || "",
     customerType: body.customerType || "",
     ownerConsent: body.ownerConsent || "",
+    termsAccepted: body.termsAccepted || "",
+    company_website: body.company_website || "",
     logo: null,
     agentPhoto: null,
   };
 }
 
 export async function POST(request) {
+  if (!rateLimit(`book:${clientIp(request)}`)) {
+    return NextResponse.json({ success: false, error: "יותר מדי ניסיונות. נסו שוב בעוד כמה דקות." }, { status: 429 });
+  }
   let booking;
   try {
     booking = await readBooking(request);
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message || "בקשה לא תקינה" }, { status: err.status || 400 });
   }
-  const { name, phone, address, pkg, date, time, notes, bookingRef, agentPhone, logo, agentPhoto } = booking;
+  if (cleanText(booking.company_website, 200)) {
+    return NextResponse.json({ success: true, ignored: true });
+  }
+  const name = cleanText(booking.name, 80);
+  const phone = cleanPhone(booking.phone);
+  const address = cleanText(booking.address, 160);
+  const pkg = cleanPackage(booking.pkg) || "FULL";
+  const date = cleanText(booking.date, 12);
+  const time = cleanText(booking.time, 8);
+  const notes = cleanText(booking.notes, 1000);
+  const bookingRef = cleanText(booking.bookingRef, 80);
+  const agentPhone = cleanPhone(booking.agentPhone);
+  const { logo, agentPhoto } = booking;
   const consent = parseBookingConsent(booking);
   if (!consent.ok) {
     return NextResponse.json({ success: false, error: consent.error }, { status: 400 });
@@ -141,6 +162,7 @@ export async function POST(request) {
             ownerConsent: true,
             ownerConsentAt: consent.ownerConsentAt,
             ownerConsentText: consent.ownerConsentText,
+            termsAcceptedAt: consent.termsAcceptedAt,
           },
           branding: {
             agentPhone: agentPhone || "",

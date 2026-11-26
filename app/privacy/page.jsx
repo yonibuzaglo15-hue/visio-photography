@@ -43,7 +43,7 @@ export default function PrivacyPage() {
       <p>הגישה למידע מוגבלת למתן השירות.</p>
       <h2>localStorage</h2>
       <p>
-        בדפדפן נשמר ב-localStorage רק מצב התצוגה, יום או לילה. אין כלי מעקב של צד שלישי.
+        בדפדפן נשמרים מצב התצוגה, בחירת הנגישות, ובחירת העוגיות. מדידה לא נטענת לפני אישור.
       </p>
       <p>
         פניות: <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>

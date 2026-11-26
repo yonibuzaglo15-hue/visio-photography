@@ -1,5 +1,10 @@
 import VisioApp from "@/src/App";
 
 export default function HomePage() {
-  return <VisioApp />;
+  return (
+    <>
+      <link rel="preload" as="image" href="/home/8/hero.webp" fetchPriority="high" />
+      <VisioApp />
+    </>
+  );
 }

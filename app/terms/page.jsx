@@ -1,38 +1,30 @@
-import fs from "node:fs";
-import path from "node:path";
 import LegalPage from "@/src/legal/LegalPage";
-import { BUSINESS, BUSINESS_LINE, PUBLIC_TERMS } from "@/src/legal/terms";
+import { BUSINESS_LINE, PUBLIC_TERMS } from "@/src/legal/terms";
 
 export const metadata = {
   title: "תקנון · VISIO Photography",
-  description: "תנאי השירות של VISIO Photography",
+  description: "תקנון ומדיניות פרטיות של VISIO Photography להורדה",
 };
 
 export default function TermsPage() {
-  const pdfPath = path.join(process.cwd(), "public", "terms", "visio-terms.pdf");
-  const hasPdf = fs.existsSync(pdfPath);
-  const cancelHref = `${BUSINESS.whatsapp}?text=${encodeURIComponent("ביטול עסקה או מנוי")}`;
-
   return (
     <LegalPage kicker="TERMS" title="תקנון">
-      <p className="visio-footer-business">{BUSINESS_LINE}</p>
-      {PUBLIC_TERMS.map((term) => (
-        <section key={term.title} className="visio-term">
-          <h2 className="visio-term-title">{term.title}</h2>
-          <p>{term.body}</p>
-        </section>
-      ))}
+      <p>{BUSINESS_LINE}</p>
       <p>
-        <a href={cancelHref}>ביטול עסקה או מנוי</a>
+        זהו סיכום. הנוסח המלא של התקנון ושל מדיניות הפרטיות נמצא בקובצי ה־PDF. עו״ד פיטר יחליף אותם בנוסח הסופי.
       </p>
+      <div className="visio-legal-downloads">
+        <a className="visio-btn" href="/legal/terms.pdf">הורדת התקנון</a>
+        <a className="visio-btn outline" href="/legal/privacy.pdf">הורדת מדיניות הפרטיות</a>
+      </div>
+      <ul>
+        {PUBLIC_TERMS.slice(0, 4).map((term) => (
+          <li key={term.title}><strong>{term.title}.</strong> {term.body}</li>
+        ))}
+      </ul>
       <p>
         <a href="/broker-offer">תקנון מבצע מתווכים</a>
       </p>
-      {hasPdf ? (
-        <p>
-          <a href="/terms/visio-terms.pdf">הורדת התקנון</a>
-        </p>
-      ) : null}
     </LegalPage>
   );
 }

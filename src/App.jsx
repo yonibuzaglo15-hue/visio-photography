@@ -8,7 +8,8 @@ import { useScrollCraft } from "./scroll/useScrollCraft.js";
 import DroneFloors from "./scroll/DroneFloors.jsx";
 import LampLobby from "./scroll/LampLobby.jsx";
 import { CUSTOMER_TYPES, OWNER_CONSENT_TEXT } from "../lib/booking-consent.js";
-import { BUSINESS_LINE, PUBLIC_TERMS } from "./legal/terms.js";
+import { BUSINESS_LINE } from "./legal/terms.js";
+import CookieSettingsButton from "./site/CookieSettingsButton.jsx";
 import { PORTFOLIO, SELECTED_WORK_IDS, companyOf, groupByCity, cardTagLine, PORTFOLIO_FILTERS } from "./data/portfolio.js";
 import { PROPERTY_IMAGES } from "./data/property-images.js";
 
@@ -250,10 +251,10 @@ function PortfolioFilter({ value, onChange }) {
 }
 
 const PARTNERS = [
-  { id: "remax", src: "/partners/remax.webp", alt: "RE/MAX Together", width: 1200, height: 528 },
-  { id: "rehouse", src: "/partners/rehouse.webp", alt: "ReHouse", width: 1200, height: 725 },
-  { id: "gabay", src: "/partners/gabay-group.webp", alt: "Gabay Group Real Estate", width: 1200, height: 1093 },
-  { id: "sk", src: "/partners/sk-nechasim.webp", alt: "SK נכסים", width: 1200, height: 1536 },
+  { id: "remax", alt: "RE/MAX Together", width: 640, height: 282 },
+  { id: "rehouse", alt: "ReHouse", width: 640, height: 387 },
+  { id: "gabay", alt: "Gabay Group Real Estate", width: 640, height: 583 },
+  { id: "sk", alt: "SK נכסים", width: 500, height: 640 },
 ];
 
 function PartnerLogos() {
@@ -261,9 +262,8 @@ function PartnerLogos() {
     <div className="visio-partner-set" aria-hidden={copy === "b" ? "true" : undefined}>
       {PARTNERS.map((p) => (
         <div key={`${p.id}-${copy}`} className={`visio-partner tone-${p.id}`}>
-          <div className="visio-partner-card">
-            <img src={p.src} alt={copy === "b" ? "" : p.alt} width={p.width} height={p.height} draggable="false" />
-          </div>
+          <img className="is-light" src={`/partners/${p.id}-light.webp`} alt={copy === "b" ? "" : p.alt} width={p.width} height={p.height} draggable="false" />
+          <img className="is-dark" src={`/partners/${p.id}-dark.webp`} alt="" width={p.width} height={p.height} draggable="false" aria-hidden="true" />
         </div>
       ))}
     </div>
@@ -740,6 +740,9 @@ function BookingSection() {
   const [form, setForm] = useState({ name: "", phone: "", address: "", pkg: "FULL", notes: "" });
   const [customerType, setCustomerType] = useState("");
   const [ownerConsent, setOwnerConsent] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [paymentNote, setPaymentNote] = useState("");
   const [done, setDone] = useState(false);
   const [wm, setWm] = useState({ agentPhone: "", logoFile: null, logoUrl: null, agentPhotoFile: null, agentPhotoUrl: null, wantAgentPhoto: false });
   const logoRef = useRef(null);
@@ -779,6 +782,8 @@ function BookingSection() {
     body.append("agentPhone", wm.agentPhone || "");
     body.append("customerType", customerType);
     body.append("ownerConsent", ownerConsent ? "yes" : "");
+    body.append("termsAccepted", termsAccepted ? "yes" : "");
+    body.append("company_website", honeypot);
     body.append("bookingRef", `booking-${Date.now()}`);
     if (wm.logoFile) body.append("logo", wm.logoFile);
     if (wm.wantAgentPhoto && wm.agentPhotoFile) body.append("agentPhoto", wm.agentPhotoFile);
@@ -789,6 +794,24 @@ function BookingSection() {
         setSubmitError(data.error || "לא הצלחנו לשלוח את הבקשה.");
         return;
       }
+      const payRes = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          pkg: form.pkg,
+          customerType,
+          ownerConsent: "yes",
+          termsAccepted: "yes",
+          company_website: honeypot,
+          orderId: body.get("bookingRef"),
+        }),
+      });
+      const pay = await payRes.json().catch(() => ({}));
+      if (pay.url) {
+        window.location.assign(pay.url);
+        return;
+      }
+      setPaymentNote(pay.message || "התשלום המקוון ייפתח בקרוב. ניצור איתכם קשר לתיאום התשלום.");
       setDone(true);
     } catch {
       setSubmitError("לא הצלחנו לשלוח את הבקשה.");
@@ -813,10 +836,14 @@ function BookingSection() {
       setSubmitError("יש לאשר את הסכמת בעל הנכס");
       return;
     }
+    if (!termsAccepted) {
+      setSubmitError("יש לאשר את התקנון ומדיניות הפרטיות");
+      return;
+    }
     completeBooking();
   };
 
-  const formIncomplete = !form.name || !form.phone || !form.address || !customerType || !ownerConsent;
+  const formIncomplete = !form.name || !form.phone || !form.address || !customerType || !ownerConsent || !termsAccepted;
 
   if (done) return (
     <section className="visio-section" style={{ textAlign: "center" }}>
@@ -825,7 +852,7 @@ function BookingSection() {
       <p className="visio-copy" style={{ margin: 0 }}>נאשר את המועד בוואטסאפ בהקדם</p>
       <p className="visio-copy" style={{ maxWidth: 640, margin: "16px auto 0" }}>{OWNER_CONSENT_TEXT}</p>
       <p className="visio-notice" style={{ maxWidth: 420, margin: "20px auto 0" }}>
-        התשלום יתבצע ביום הצילום במזומן / ביט / העברה בנקאית
+        {paymentNote || "התשלום המקוון ייפתח בקרוב. ניצור איתכם קשר לתיאום התשלום."}
       </p>
       <div className="visio-done-grid">
         {[["תאריך", `${sd} ${HEB_MONTHS[sm - 1]} ${sy}`], ["שעה", selSlot], ["חבילה", PACKAGES.find(x => x.id === form.pkg)?.name || form.pkg], ["כתובת", form.address]].map(([l, v]) => (
@@ -835,7 +862,7 @@ function BookingSection() {
           </div>
         ))}
       </div>
-      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); setCustomerType(""); setOwnerConsent(false); }}>
+      <button className="visio-btn outline" style={{ marginTop: 28 }} onClick={() => { setDone(false); setStep(1); setSelDate(null); setSelSlot(null); setCustomerType(""); setOwnerConsent(false); setTermsAccepted(false); setPaymentNote(""); }}>
         ← קביעת צילום נוסף
       </button>
     </section>
@@ -1083,9 +1110,14 @@ function BookingSection() {
             <p className="visio-copy">
               הפרטים שתמסור ישמשו לתיאום הצילום ולמתן השירות בלבד, ויישמרו אצל ספקי השירות שלנו (יומן, דואר ומסרים). אינך חייב על פי דין למסור אותם, אך בלעדיהם לא נוכל לתאם את הצילום. לפרטים: <a href="/privacy">מדיניות הפרטיות</a>
             </p>
-            <p className="visio-copy">
-              בלחיצה על אישור ההזמנה אני מאשר שקראתי את <a href="/terms">התקנון</a>
-            </p>
+            <label className="visio-honeypot" htmlFor="booking-company-website">
+              אתר
+              <input id="booking-company-website" name="company_website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={(event) => setHoneypot(event.target.value)} />
+            </label>
+            <label className="visio-check-row" htmlFor="booking-terms">
+              <input id="booking-terms" className="visio-consent-input" type="checkbox" required checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+              <span className="visio-copy" style={{ color: C.text }}>קראתי ואני מאשר את <a href="/terms">התקנון</a> ואת <a href="/privacy">מדיניות הפרטיות</a></span>
+            </label>
             <label className="visio-check-row" htmlFor="booking-owner-consent">
               <input
                 id="booking-owner-consent"
@@ -1123,15 +1155,12 @@ function CharterSection() {
         <SectionTitle sup="CHARTER" title="תנאי שירות" sub="שקיפות מלאה · תנאים ברורים" />
       </div>
       <div className="visio-narrow" data-sc-in>
-        {PUBLIC_TERMS.map((term) => (
-          <section key={term.title} className="visio-term">
-            <h3 className="visio-term-title">{term.title}</h3>
-            <p>{term.body}</p>
-          </section>
-        ))}
-        <p className="visio-copy" style={{ marginTop: 24 }}>
-          אותו נוסח מופיע גם <a href="/terms">בעמוד התקנון</a>.
+        <p className="visio-copy">התקנון ומדיניות הפרטיות זמינים להורדה. הנוסח המלא הוא הקובץ, והעמוד מסכם אותו בקצרה.</p>
+        <p className="visio-legal-downloads">
+          <a className="visio-btn" href="/legal/terms.pdf">הורדת התקנון</a>
+          <a className="visio-btn outline" href="/legal/privacy.pdf">הורדת מדיניות הפרטיות</a>
         </p>
+        <p className="visio-copy"><a href="/terms">לעמוד התקנון</a></p>
       </div>
     </section>
   );
@@ -1277,7 +1306,6 @@ export default function VisioApp() {
             <span className="visio-topbar-text"><Bidi>צילום נדל״ן מקצועי · AI Editing · סיורים וירטואליים</Bidi></span>
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginInlineStart: "auto" }}>
               <button className="visio-link" onClick={() => nav("booking")}>הזמן צילום</button>
-              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -1299,12 +1327,14 @@ export default function VisioApp() {
                 : <button key={n.id} type="button" className={`visio-nav-link${active === n.id ? " active" : ""}`} onClick={() => nav(n.id)}>{n.label}</button>
             ))}
           </div>
+          <div className="visio-nav-tools">
+            <ThemeToggle />
+          </div>
         </div>
       </nav>
 
       {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
       <aside id="visio-drawer" className={`nav-drawer ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen} inert={menuOpen ? undefined : ""}>
-        <div className="nav-drawer-mark"><Bidi>VISIO</Bidi></div>
         {NAV.map(n => (
           n.href
             ? <a key={n.id} className="nav-drawer-btn" href={n.href}>{n.label}</a>
@@ -1316,7 +1346,7 @@ export default function VisioApp() {
       </aside>
 
       {/* ── CONTENT ── */}
-      <main className="page-content">
+      <main id="main" className="page-content">
         <HomeSection onNav={nav} />
         <PortfolioSection />
         <PricingSection onNav={nav} />
@@ -1325,7 +1355,7 @@ export default function VisioApp() {
         <AboutSection onNav={nav} />
       </main>
 
-      <a className="visio-wa" href="https://wa.me/972533523379" target="_blank" rel="noreferrer" aria-label="וואטסאפ 053-352-3379">
+      <a className="visio-wa" href="https://wa.me/972533523379" target="_blank" rel="noopener noreferrer" aria-label="וואטסאפ 053-352-3379">
         <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
           <path fill="currentColor" d="M12.04 2C6.58 2 2.15 6.4 2.15 11.83c0 1.74.46 3.44 1.34 4.94L2 22l5.39-1.41a10.1 10.1 0 0 0 4.65 1.12h.01c5.46 0 9.89-4.4 9.89-9.83C21.94 6.4 17.5 2 12.04 2zm5.76 14.15c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.12.1-1.81-.11-.41-.13-.95-.31-1.63-.61-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.16-1.54-1.16-2.94s.73-2.08 1-2.37c.24-.27.64-.39 1.02-.39.12 0 .23 0 .33.01.3.01.44.03.64.49.24.57.82 1.98.89 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.41.5-.14.14-.28.29-.12.56.16.27.71 1.17 1.52 1.89 1.05.93 1.93 1.22 2.2 1.36.28.14.44.12.6-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.46.21.53.32.07.12.07.68-.17 1.36z" />
         </svg>
@@ -1343,6 +1373,7 @@ export default function VisioApp() {
           ))}
           <a href="/privacy">מדיניות פרטיות</a>
           <a href="/accessibility">הצהרת נגישות</a>
+          <CookieSettingsButton />
         </div>
         <p className="visio-footer-business">{BUSINESS_LINE}</p>
         <p className="visio-footer-legal">

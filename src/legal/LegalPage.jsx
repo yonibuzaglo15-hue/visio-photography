@@ -1,4 +1,5 @@
 import { BUSINESS, BUSINESS_LINE } from "./terms.js";
+import CookieSettingsButton from "../site/CookieSettingsButton.jsx";
 
 export default function LegalPage({ kicker, title, children }) {
   return (
@@ -6,7 +7,7 @@ export default function LegalPage({ kicker, title, children }) {
       <header className="visio-legal-bar">
         <a className="visio-legal-brand" href="/">VISIO</a>
       </header>
-      <main className="visio-section visio-narrow visio-legal">
+      <main id="main" className="visio-section visio-narrow visio-legal">
         <p className="visio-kicker">{kicker}</p>
         <h1 className="visio-section-title">{title}</h1>
         {children}
@@ -20,6 +21,7 @@ export default function LegalPage({ kicker, title, children }) {
           <a href="/terms">תקנון</a>
           <a href="/privacy">מדיניות פרטיות</a>
           <a href="/accessibility">הצהרת נגישות</a>
+          <CookieSettingsButton />
         </div>
         <p className="visio-footer-legal">
           <a href={BUSINESS.whatsapp}>וואטסאפ {BUSINESS.phone}</a>
