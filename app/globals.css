@@ -286,6 +286,11 @@ button:hover { opacity: 0.85; }
 .visio-portfolio-hover .visio-btn.on-image { background: #ffffff; color: #111111; border-color: #ffffff; }
 .visio-portfolio-hover .visio-btn.on-image.outline { background: #111111; color: #ffffff; border-color: #ffffff; }
 .visio-portfolio-meta { padding-top: 16px; }
+.visio-works-more-wrap { display: flex; justify-content: center; margin: clamp(36px, 6vw, 64px) 16px 8px; }
+.visio-works-more { min-height: 48px; min-width: 44px; padding-inline: 28px; }
+.visio-works-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; background: var(--pub-bg); border-bottom: 1px solid var(--pub-rule); }
+.visio-works-page .visio-portfolio-card { content-visibility: auto; contain-intrinsic-size: auto 460px; }
+.visio-works-page .visio-portfolio-img-wrap img { height: 100%; }
 
 /* ── Portfolio filter (segmented pill) ── */
 .visio-filter-wrap { display: flex; justify-content: center; margin: calc(-1 * clamp(12px, 2.5vw, 28px)) 0 clamp(32px, 5vw, 52px); padding: 0 16px; }

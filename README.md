@@ -46,7 +46,33 @@ public/tours/<slug>/
 
 `map.x` / `map.y` are percentages on `plan.jpg` (left / top). `hotspots[].yaw` and `pitch` are the floor-ring position inside that panorama. Each hotspot `scene` must be another scene id. Scene order in the array is the order of the rooms bar.
 
-Then, in the `PORTFOLIO` array in `src/App.jsx`, set `tour` on the property. The card button opens `/tours/<slug>` on this site. Leave `matterport` in place if you still want the original model id recorded. Cards without `tour` keep opening Matterport. A card can also set `hero` and `gallery` to stills in this folder when it has no entry in `PROPERTY_IMAGES`.
+Then add the property at the **top** of `src/data/portfolio.json` (newest first) and set `tour` to that slug. The card button opens `/tours/<slug>` on this site. Leave `matterport` in place if you still want the original model id recorded. Cards without `tour` keep opening Matterport. Set `hero` and `gallery` to stills under `public/portfolio/<slug>/`. A handful of early shoots still use `src/data/property-images.js` when those fields are omitted.
+
+## Adding a property
+
+One new shoot is one object plus one folder. Nothing else in the app has to change.
+
+1. Put the stills in `public/portfolio/<slug>/` (`cover.jpg` and `01.jpg`, `02.jpg`, …). `<slug>` is the area, never the street (`rova-5`, `atikot`).
+2. Insert one object as the **first** item of `src/data/portfolio.json`. The array order is newest first, and that is the order on `/works` and on the company tabs.
+3. `title` is the neighbourhood or area and the city (`רובע ה׳, אשדוד`). Do not put a street or a house number in `title`, `sub`, `tag`, `tags`, or the file names. An agent name may stay (`רובע י״ב, אשדוד - גיא רוזן`).
+4. `company` is `rehouse` or `remax`. `partner` is stored for that filter and is not drawn on the card.
+5. Optional `tour` points at `public/tours/<slug>/`. Optional `matterport` is the model id. Optional `fit: "contain"` keeps a banner from being cropped.
+
+The field list is `src/data/portfolio.schema.json`. The home tab "הכל" stays the six selected covers (`SELECTED_WORK_IDS` in `src/data/portfolio.js`). Every other property is on the REHOUSE and RE/MAX tabs and on `/works`.
+
+```json
+{
+  "id": 31,
+  "title": "רובע ה׳, אשדוד",
+  "sub": "סלון · מטבח",
+  "city": "אשדוד",
+  "tag": "דירה",
+  "partner": "RE/MAX",
+  "company": "remax",
+  "hero": "/portfolio/rova-5b/cover.jpg",
+  "gallery": ["/portfolio/rova-5b/01.jpg"]
+}
+```
 
 ```js
 { title: "אשדוד", sub: "מרפסת · סלון · מטבח · 44 נקודות", matterport: "Hkg7xrnXgoM", tour: "ashdod-apartment" }

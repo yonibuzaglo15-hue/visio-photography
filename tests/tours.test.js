@@ -1,6 +1,7 @@
 import fs from "fs";
 import { describe, expect, it } from "vitest";
 import { listTourSlugs, loadTour } from "../lib/tours/loadTour.js";
+import { cardTagLine, cityOf, groupByCity, companyOf } from "../src/data/portfolio.js";
 
 const KEPT_MATTERPORT = {
   1: "ooDYEMx6TCr",
@@ -25,12 +26,7 @@ function jpegSize(file) {
 }
 
 function portfolioFromApp() {
-  const src = fs.readFileSync("src/App.jsx", "utf8");
-  const start = src.indexOf("const PORTFOLIO = [");
-  const end = src.indexOf("\n];", start);
-  if (start < 0 || end < 0) throw new Error("PORTFOLIO array not found");
-  const literal = src.slice(start + "const PORTFOLIO = ".length, end + 2);
-  return Function(`"use strict"; return (${literal});`)();
+  return JSON.parse(fs.readFileSync("src/data/portfolio.json", "utf8"));
 }
 
 describe("hosted tours", () => {
@@ -329,12 +325,6 @@ describe("viewer stage stays ltr", () => {
 describe("card text never mentions RE/MAX", () => {
   const src = fs.readFileSync("src/App.jsx", "utf8");
   const portfolio = portfolioFromApp();
-  const cardTagLine = (() => {
-    const start = src.indexOf("export const cardTagLine");
-    const end = src.indexOf("\n};", start);
-    const code = src.slice(start, end + 3).replace(/export /g, "");
-    return Function(`"use strict"; ${code}; return cardTagLine;`)();
-  })();
   const REMAX = /re\s*\/?\s*max|רימקס|רי\/מקס/i;
 
   it("no card title, kicker, subtitle or tag line contains RE/MAX", () => {
@@ -467,13 +457,7 @@ describe("Yan Shindelman (REHOUSE) works", () => {
 describe("REHOUSE works grouped by region", () => {
   const src = fs.readFileSync("src/App.jsx", "utf8");
   const portfolio = portfolioFromApp();
-  const helpers = (() => {
-    const start = src.indexOf("const KNOWN_CITIES");
-    const end = src.indexOf("// Card tag line:", start);
-    const code = src.slice(start, end).replace(/export /g, "");
-    return Function(`"use strict"; ${code}; return { cityOf, groupByCity };`)();
-  })();
-  const companyOf = (p) => p.company || (/re\s*\/?\s*max/i.test(p.partner || "") ? "remax" : /re\s*house/i.test(p.partner || "") ? "rehouse" : null);
+  const helpers = { cityOf, groupByCity };
   const rehouse = portfolio.filter((p) => companyOf(p) === "rehouse");
 
   it("gives every card an explicit city that matches its title/location", () => {
@@ -498,7 +482,7 @@ describe("REHOUSE works grouped by region", () => {
     expect(groups[1].items.map((p) => p.id)).toEqual([23]);
     expect(groups[2].items.map((p) => p.id)).toEqual([5]);
     const ashdod = groups[0].items.map((p) => p.id);
-    expect(ashdod).toEqual([...ashdod].sort((a, b) => a - b));
+    expect(ashdod).toEqual([...ashdod].sort((a, b) => b - a));
     expect(helpers.groupByCity([{ id: 1, city: "באר שבע" }, { id: 2, city: "יבנה" }, { id: 3, city: "אשדוד" }]).map((g) => g.city)).toEqual(["אשדוד", "יבנה", "באר שבע"]);
   });
 
